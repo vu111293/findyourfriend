@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -18,11 +20,16 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
+import com.devsmart.android.ui.HorizontalListView;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.internal.ct;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -44,6 +51,16 @@ public class LocationActivity extends FragmentActivity {
 	private TextView txtLatitute;
 	private TextView txtLongtitute;
 	private Button btnUpload;
+	
+	private LinearLayout controlLayout;
+	private HorizontalListView avatarListView;
+	private SwipeAdapter swipeAdapter;
+	
+	// state of controller 
+	private Boolean isOpenCrt = false;
+	
+	// friend's id current
+	private int idFriendCur = -1;
 
 	private Controller aController;
 	private AsyncTask<Void, Void, Void> mSendLocationTask;
@@ -56,6 +73,9 @@ public class LocationActivity extends FragmentActivity {
 	private long lastprovidertimestamp = 0;
 	private boolean gps_recorder_running = false;
 	private LocationManager myLocationManager = null;
+	private List<LatLng> locationsHis = null;
+	
+	private View viewSelected = null;
 
 	public static final String TAG = "Gps";
 
@@ -65,6 +85,59 @@ public class LocationActivity extends FragmentActivity {
 
 		setContentView(R.layout.activity_gps);
 
+		// setup control layout and avatar list view
+		controlLayout = (LinearLayout) findViewById(R.id.controlLayout);
+
+		avatarListView = (HorizontalListView) findViewById(R.id.avatarListView);
+		swipeAdapter = new SwipeAdapter();
+		
+		for (int i = 0; i < 10; ++i) {
+			swipeAdapter.addItem("A " + i);			
+		}
+
+		avatarListView.setAdapter(swipeAdapter);
+
+		avatarListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.i(TAG, "click at " + position);
+				
+				if (viewSelected != null) {
+					if (!viewSelected.equals(view)) {
+						viewSelected.setBackgroundColor(0xffffffff);
+						view.setBackgroundColor(0xffff0000);
+					}
+				} else {
+					view.setBackgroundColor(0xffff0000);
+				}
+				
+				viewSelected = view;
+
+				if (idFriendCur == position) {
+					if (!isOpenCrt) {
+						// open
+						showControl();
+						isOpenCrt = true;
+					} else {
+						// close
+						hideControl();
+						isOpenCrt = false;
+						viewSelected.setBackgroundColor(0xffffffff);
+					}
+				} else {
+					// open
+					showControl();
+					isOpenCrt = true;
+					idFriendCur = position;
+				}
+
+			}
+		});
+		
+		
+		
 		// setup map
 		FragmentManager myFM = getSupportFragmentManager();
 		SupportMapFragment mySpFrg = (SupportMapFragment) myFM
@@ -73,6 +146,7 @@ public class LocationActivity extends FragmentActivity {
 		mMap = mySpFrg.getMap();
 		mMap.setMyLocationEnabled(true);
 		mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+		mMap.getUiSettings().setZoomControlsEnabled(false);
 		// mySpFrg.getMap().addMarker(options);
 
 		// setup onclick on map
@@ -107,7 +181,6 @@ public class LocationActivity extends FragmentActivity {
 					// lastLocation.getLongitude(), regId);
 
 					// send click location
-
 					if (clickLocation != null)
 						setupSendLocation(clickLocation.latitude,
 								clickLocation.longitude, regId);
@@ -140,7 +213,21 @@ public class LocationActivity extends FragmentActivity {
 		setupLocationsHistory();
 	}
 
-	private List<LatLng> locationsHis = null;
+	private void showControl() {
+		controlLayout.setAlpha(1.0f);
+		ValueAnimator anim = ObjectAnimator.ofFloat(controlLayout,
+				"translationY", 0, -controlLayout.getHeight());
+		anim.setDuration(500);
+		anim.start();
+	}
+	
+	private void hideControl() {
+		ValueAnimator anim = ObjectAnimator.ofFloat(controlLayout,
+				// "translationY", 0, ctrlLayout.getHeight());
+				"alpha", 0);
+		anim.setDuration(300);
+		anim.start();
+	}
 
 	private void setupLocationsHistory() {
 		mLoadLocationTask = new AsyncTask<Void, Void, Void>() {
@@ -148,7 +235,7 @@ public class LocationActivity extends FragmentActivity {
 			@Override
 			protected Void doInBackground(Void... params) {
 				locationsHis = aController
-				 		.getLocationHistory(getApplicationContext());
+						.getLocationHistory(getApplicationContext());
 				return null;
 			}
 
@@ -158,14 +245,12 @@ public class LocationActivity extends FragmentActivity {
 
 				// draw on map
 				for (LatLng p : locationsHis) {
-					CircleOptions cirOpt = new CircleOptions()
-							.center(p).radius(20)
-							.fillColor(0xaaff0000)
-							.strokeWidth(0)
+					CircleOptions cirOpt = new CircleOptions().center(p)
+							.radius(20).fillColor(0xaaff0000).strokeWidth(0)
 							.visible(true);
 
 					mMap.addCircle(cirOpt);
-					
+
 					mMap.addMarker(new MarkerOptions().position(p));
 				}
 			}
@@ -400,7 +485,6 @@ public class LocationActivity extends FragmentActivity {
 
 	public boolean isProviderSupported(String in_Provider) {
 		LocationManager locationManager = getLocationManager();
-		/* locals */
 		int lv_N;
 		List lv_List;
 

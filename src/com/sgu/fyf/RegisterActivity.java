@@ -82,7 +82,7 @@ public class RegisterActivity extends Activity {
 				String email = txtEmail.getText().toString();
 				
 				// Check if user filled the form
-				if(name.trim().length() > 0 && email.trim().length() > 0){
+				//if(name.trim().length() > 0 && email.trim().length() > 0){
 					
 					// Launch Main Activity
 					Intent i = new Intent(getApplicationContext(), MainActivity.class);
@@ -95,10 +95,10 @@ public class RegisterActivity extends Activity {
 					startActivity(i);
 					finish();
 					
-				}else{					
+				//}else{					
 					// user doen't filled that data
-					aController.showAlertDialog(RegisterActivity.this, "Registration Error!", "Please enter your details", false);
-				}
+				//	aController.showAlertDialog(RegisterActivity.this, "Registration Error!", "Please enter your details", false);
+				//}
 			}
 		});
 	}

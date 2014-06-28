@@ -109,6 +109,8 @@ public class MainActivity extends Activity {
 
 			// Register with GCM
 			GCMRegistrar.register(this, Config.GOOGLE_SENDER_ID);
+			
+			Log.i("GCM", "registing");
 
 		} else {
 
@@ -125,7 +127,6 @@ public class MainActivity extends Activity {
 				// Try to register again, but not in the UI thread.
 				// It's also necessary to cancel the thread onDestroy(),
 				// hence the use of AsyncTask instead of a raw thread.
-
 				final Context context = this;
 				mRegisterTask = new AsyncTask<Void, Void, Void>() {
 
