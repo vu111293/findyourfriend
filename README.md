@@ -7,3 +7,6 @@ Thành viên nhóm:
 1. Trương Hữu Toàn.
 2. Nguyễn Chí Hùng
 3. Lê Quốc Vũ
+
+
+![alt tag](https://github.com/vu111293/findyourfriend/blob/master/ic_launcher-web.png)
