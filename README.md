@@ -22,26 +22,20 @@ Find your friend
 
 ### Ảnh chụp ứng dụng hiện tại
 
-   **Hiển thị vị trí lịch sử di chuyển**
-    [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-05.png)](#features)
-   
+
+* PIC    [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-05.png)]
+    
+    
+* PIC  [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-10.png)]
 
 
-   **Danh mục menu chính**
-   [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-10.png)](#features)
+* PIC   [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-53.png)]
 
 
-
-   **Dể dàng thông báo qua tin nhắn**
-    [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-36-53.png)](#features)
+* PIC   [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-37-00.png)]
 
 
-
-   **Truy cập nhanh đến danh mục bạn bè**
-    [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-06-29-22-37-00.png)](#features)
-
-
-### Mentor: Nguyễn Thùy Linh
+**Mentor: Nguyễn Thùy Linh**
 
 **Thành viên nhóm:**
 * Trương Hữu Toàn
