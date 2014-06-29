@@ -28,7 +28,7 @@ Find your friend
 
 ## Tìm vị trí bạn bè
 
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)](#features)
+[![solarized dualmode](http://cdn1.tnwcdn.com/wp-content/blogs.dir/1/files/2013/03/google_nobar.png)](#features)
 
 
 ###Bạn hay có những chuyến đi chơi xa cùng bạn bè? Bạn đang cần biết vị trí điểm hẹn mà người bạn của bạn đã đến trước? Bạn bị lạc và muồn cầu cứu mà không biết gọi ai? Ứng dụng Find your friend sẽ giúp bạn làm điều đó. 
