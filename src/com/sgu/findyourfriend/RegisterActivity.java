@@ -1,19 +1,30 @@
 package com.sgu.findyourfriend;
 
 import com.google.android.gcm.GCMRegistrar;
+import com.sgu.findyourfriend.screen.MainActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class RegisterActivity extends Activity {
 
 	// UI elements
 	private EditText txtName;
 	private EditText txtEmail;
+
+	// Async task
+	private AsyncTask<Void, Void, Void> mRegisterTask;
+	
+	// Controller
+	private Controller aController;
 
 	// Register button
 	private Button btnRegister;
@@ -23,9 +34,8 @@ public class RegisterActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_register);
 
-		// Get Global Controller Class object (see application tag in
-		// AndroidManifest.xml)
-		final Controller aController = (Controller) getApplicationContext();
+		// Get Global Controller Class object (see application tag in AndroidManifest.xml)
+		aController = (Controller) getApplicationContext();
 
 		// Check if Internet Connection present
 		if (!aController.isConnectingToInternet()) {
@@ -57,14 +67,11 @@ public class RegisterActivity extends Activity {
 
 		if (GCMRegistrar.isRegisteredOnServer(this)) {
 
+			ProfileInfo.gcmMyId = GCMRegistrar.getRegistrationId(this);
+			
 			// Launch Main Activity
-			Intent i = new Intent(getApplicationContext(), MainActivity.class);
-
-			// Registering user on our server
-			// Sending registraiton details to MainActivity
-			i.putExtra("name", "demo");
-			i.putExtra("email", "demo");
-			// i.putExtra("registed", false);
+			Intent i = new Intent(getApplicationContext(),
+					com.sgu.findyourfriend.screen.MainActivity.class);
 			startActivity(i);
 		}
 
@@ -84,16 +91,9 @@ public class RegisterActivity extends Activity {
 				// Check if user filled the form
 				if (name.trim().length() > 0 && email.trim().length() > 0) {
 
-					// Launch Main Activity
-					Intent i = new Intent(getApplicationContext(),
-							MainActivity.class);
-
-					// Registering user on our server
-					// Sending registraiton details to MainActivity
-					i.putExtra("name", name);
-					i.putExtra("email", email);
-					// i.putExtra("registed", false);
-					startActivity(i);
+					// setup account
+					accountRegist(name, email);
+					
 					finish();
 
 				} else {
@@ -106,4 +106,67 @@ public class RegisterActivity extends Activity {
 		});
 	}
 
+	private void accountRegist(final String name, final String email) {
+		// Get GCM registration id
+		final String regId = GCMRegistrar.getRegistrationId(this);
+
+		// reference to ProfileInfo class
+		ProfileInfo.gcmMyId = regId;
+
+		Log.i("GCM", regId);
+
+		// Check if regid already presents
+		if (regId.equals("")) {
+
+			// Register with GCM
+			GCMRegistrar.register(this, Config.GOOGLE_SENDER_ID);
+
+			Log.i("GCM", "registing");
+
+		} else {
+
+			// Device is already registered on GCM Server
+			if (GCMRegistrar.isRegisteredOnServer(this)) {
+
+				// Skips registration.
+				Toast.makeText(getApplicationContext(),
+						"Already registered with GCM Server", Toast.LENGTH_LONG)
+						.show();
+
+			} else {
+
+				// Try to register again, but not in the UI thread.
+				// It's also necessary to cancel the thread onDestroy(),
+				// hence the use of AsyncTask instead of a raw thread.
+				final Context context = this;
+				mRegisterTask = new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+
+						// Register on our server
+						// On server creates a new user
+						aController.register(context, name, email, regId);
+
+						return null;
+					}
+
+					@Override
+					protected void onPostExecute(Void result) {
+						mRegisterTask = null;
+						
+						// start main activity
+						Intent i = new Intent(getApplicationContext(),
+								com.sgu.findyourfriend.screen.MainActivity.class);
+						startActivity(i);
+					}
+
+				};
+
+				// execute AsyncTask
+				mRegisterTask.execute(null, null, null);
+			}
+		}
+
+	}
 }

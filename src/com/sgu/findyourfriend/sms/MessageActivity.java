@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -46,6 +47,8 @@ public class MessageActivity extends ListActivity implements OnItemClickListener
 	private List<Message> messages;
 	private AwesomeAdapter adapter;
 	private EditText text;
+	private Button btnSendMessage;
+	
 	private  static Random rand = new Random();
 	private static String sender;
 
@@ -73,6 +76,8 @@ public class MessageActivity extends ListActivity implements OnItemClickListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_messager);
 		
+		context = getApplicationContext();
+		
 		// setup database
 		dataSource = new MessagesDataSource(this);
 		dataSource.open();
@@ -91,8 +96,10 @@ public class MessageActivity extends ListActivity implements OnItemClickListener
 		// set receiver
 		toAddr = getIntent().getStringExtra("receiver");
 		
-		context = getApplicationContext();
+		
 		text = (EditText) this.findViewById(R.id.text);
+		
+		
 
 		aController = (Controller) getApplicationContext();
 

@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_main_bak);
 
 		// Get Global Controller Class object (see application tag in
 		// AndroidManifest.xml)

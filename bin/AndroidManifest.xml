@@ -51,6 +51,11 @@
             android:label="@string/app_name" >
         </activity>
         <activity
+            android:name="com.sgu.findyourfriend.screen.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name="com.sgu.findyourfriend.gps.LocationActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name" >

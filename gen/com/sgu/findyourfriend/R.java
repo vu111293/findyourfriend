@@ -8,6 +8,15 @@
 package com.sgu.findyourfriend;
 
 public final class R {
+    public static final class array {
+        /**  Nav Drawer List Item Icons 
+ Keep them in order as the titles are in 
+         */
+        public static final int nav_drawer_icons=0x7f0a0001;
+        /**  Nav Drawer Menu Items 
+         */
+        public static final int nav_drawer_items=0x7f0a0000;
+    }
     public static final class attr {
         /** 
     The size of the ad. It must be one of BANNER, FULL_BANNER, LEADERBOARD,
@@ -342,9 +351,17 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f050021;
-        public static final int common_signin_btn_text_light=0x7f050022;
+        public static final int common_signin_btn_text_dark=0x7f050027;
+        public static final int common_signin_btn_text_light=0x7f050028;
+        public static final int counter_text_bg=0x7f050025;
+        public static final int counter_text_color=0x7f050026;
         public static final int listViewBg=0x7f05001a;
+        public static final int list_background=0x7f050022;
+        public static final int list_background_pressed=0x7f050023;
+        public static final int list_divider=0x7f050024;
+        /**  sliding menu 
+         */
+        public static final int list_item_title=0x7f050021;
         public static final int sendDarkColor=0x7f05001d;
         public static final int sendLightColor=0x7f05001b;
         public static final int sendMeduimColor=0x7f05001c;
@@ -369,10 +386,14 @@ containing a value of this type.
         public static final int wallet_hint_foreground_holo_light=0x7f050011;
         public static final int wallet_holo_blue_light=0x7f050015;
         public static final int wallet_link_text_light=0x7f050016;
-        public static final int wallet_primary_text_holo_light=0x7f050023;
-        public static final int wallet_secondary_text_holo_dark=0x7f050024;
+        public static final int wallet_primary_text_holo_light=0x7f050029;
+        public static final int wallet_secondary_text_holo_dark=0x7f05002a;
     }
     public static final class dimen {
+        /**  Default screen margins, per the Android Design guidelines. 
+         */
+        public static final int activity_horizontal_margin=0x7f090003;
+        public static final int activity_vertical_margin=0x7f090004;
         public static final int padding_large=0x7f090002;
         public static final int padding_medium=0x7f090001;
         public static final int padding_small=0x7f090000;
@@ -403,27 +424,38 @@ containing a value of this type.
         public static final int common_signin_btn_text_normal_light=0x7f020016;
         public static final int common_signin_btn_text_pressed_dark=0x7f020017;
         public static final int common_signin_btn_text_pressed_light=0x7f020018;
-        public static final int fail=0x7f020019;
-        public static final int gcm_logo=0x7f02001a;
-        public static final int green=0x7f02001b;
-        public static final int ic_action_search=0x7f02001c;
-        public static final int ic_launcher=0x7f02001d;
-        public static final int ic_plusone_medium_off_client=0x7f02001e;
-        public static final int ic_plusone_small_off_client=0x7f02001f;
-        public static final int ic_plusone_standard_off_client=0x7f020020;
-        public static final int ic_plusone_tall_off_client=0x7f020021;
-        public static final int icon=0x7f020022;
-        public static final int item_avatar_friend=0x7f020023;
-        public static final int message_bar=0x7f020024;
-        public static final int message_field=0x7f020025;
-        public static final int notavaiable=0x7f020026;
-        public static final int orange=0x7f020027;
-        public static final int powered_by_google_dark=0x7f020028;
-        public static final int powered_by_google_light=0x7f020029;
-        public static final int send_button=0x7f02002a;
-        public static final int speech_bubble_green=0x7f02002b;
-        public static final int speech_bubble_orange=0x7f02002c;
-        public static final int success=0x7f02002d;
+        public static final int counter_bg=0x7f020019;
+        public static final int fail=0x7f02001a;
+        public static final int gcm_logo=0x7f02001b;
+        public static final int green=0x7f02001c;
+        public static final int ic_action_search=0x7f02001d;
+        public static final int ic_communities=0x7f02001e;
+        public static final int ic_drawer=0x7f02001f;
+        public static final int ic_home=0x7f020020;
+        public static final int ic_launcher=0x7f020021;
+        public static final int ic_pages=0x7f020022;
+        public static final int ic_people=0x7f020023;
+        public static final int ic_photos=0x7f020024;
+        public static final int ic_plusone_medium_off_client=0x7f020025;
+        public static final int ic_plusone_small_off_client=0x7f020026;
+        public static final int ic_plusone_standard_off_client=0x7f020027;
+        public static final int ic_plusone_tall_off_client=0x7f020028;
+        public static final int ic_whats_hot=0x7f020029;
+        public static final int icon=0x7f02002a;
+        public static final int item_avatar_friend=0x7f02002b;
+        public static final int list_item_bg_normal=0x7f02002c;
+        public static final int list_item_bg_pressed=0x7f02002d;
+        public static final int list_selector=0x7f02002e;
+        public static final int message_bar=0x7f02002f;
+        public static final int message_field=0x7f020030;
+        public static final int notavaiable=0x7f020031;
+        public static final int orange=0x7f020032;
+        public static final int powered_by_google_dark=0x7f020033;
+        public static final int powered_by_google_light=0x7f020034;
+        public static final int send_button=0x7f020035;
+        public static final int speech_bubble_green=0x7f020036;
+        public static final int speech_bubble_orange=0x7f020037;
+        public static final int success=0x7f020038;
     }
     public static final class id {
         public static final int avatarListView=0x7f06001f;
@@ -432,34 +464,41 @@ containing a value of this type.
         public static final int bntLocation=0x7f06001c;
         public static final int bntShare=0x7f06001e;
         public static final int book_now=0x7f060010;
-        public static final int bottom_write_bar=0x7f060026;
-        public static final int btnCall=0x7f060028;
-        public static final int btnLocation=0x7f060025;
-        public static final int btnRefesh=0x7f060022;
-        public static final int btnRegister=0x7f06002b;
-        public static final int btnSend=0x7f060024;
+        public static final int bottom_write_bar=0x7f060029;
+        public static final int btnCall=0x7f06002b;
+        public static final int btnLocation=0x7f060028;
+        public static final int btnRefesh=0x7f060025;
+        public static final int btnRegister=0x7f06002e;
+        public static final int btnSend=0x7f060027;
+        public static final int btnSendMessage=0x7f060033;
         public static final int btnUpload=0x7f060018;
         public static final int buyButton=0x7f06000a;
         public static final int buy_now=0x7f06000f;
         public static final int buy_with_google=0x7f06000e;
-        public static final int callItem=0x7f060034;
+        public static final int callItem=0x7f06003c;
         public static final int classic=0x7f060011;
         public static final int controlLayout=0x7f06001b;
+        public static final int counter=0x7f060031;
+        public static final int drawer_layout=0x7f060020;
+        public static final int frame_container=0x7f060021;
         public static final int friendListView=0x7f060014;
         public static final int grayscale=0x7f060012;
         public static final int holo_dark=0x7f060005;
         public static final int holo_light=0x7f060006;
         public static final int hybrid=0x7f060004;
-        public static final int image=0x7f060030;
-        public static final int imgProfile=0x7f06002c;
-        public static final int imgStatus=0x7f06002f;
+        public static final int icon=0x7f06002f;
+        public static final int image=0x7f060039;
+        public static final int imgProfile=0x7f060035;
+        public static final int imgStatus=0x7f060038;
         public static final int latlngLayout=0x7f060015;
-        public static final int lblMessage=0x7f060020;
-        public static final int mFriendListItem=0x7f060036;
+        public static final int lblMessage=0x7f060023;
+        public static final int list_slidermenu=0x7f060022;
+        public static final int listview=0x7f060034;
+        public static final int mFriendListItem=0x7f06003e;
         public static final int mapFragment=0x7f06001a;
-        public static final int mapItem=0x7f060035;
+        public static final int mapItem=0x7f06003d;
         public static final int match_parent=0x7f06000c;
-        public static final int message_text=0x7f060032;
+        public static final int message_text=0x7f06003a;
         public static final int monochrome=0x7f060013;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
@@ -467,19 +506,20 @@ containing a value of this type.
         public static final int sandbox=0x7f060008;
         public static final int satellite=0x7f060002;
         public static final int selectionDetails=0x7f06000b;
-        public static final int smsItem=0x7f060033;
-        public static final int spiFriends=0x7f060021;
+        public static final int smsItem=0x7f06003b;
+        public static final int spiFriends=0x7f060024;
         public static final int strict_sandbox=0x7f060009;
         public static final int terrain=0x7f060003;
-        public static final int text=0x7f060027;
-        public static final int title=0x7f060031;
-        public static final int txtEmail=0x7f06002a;
+        public static final int text=0x7f06002a;
+        public static final int title=0x7f060030;
+        public static final int txtEmail=0x7f06002d;
+        public static final int txtLabel=0x7f060032;
         public static final int txtLatitute=0x7f060016;
         public static final int txtLongtitute=0x7f060017;
-        public static final int txtMemberName=0x7f06002d;
-        public static final int txtMessage=0x7f060023;
-        public static final int txtName=0x7f060029;
-        public static final int txtPhoneNumber=0x7f06002e;
+        public static final int txtMemberName=0x7f060036;
+        public static final int txtMessage=0x7f060026;
+        public static final int txtName=0x7f06002c;
+        public static final int txtPhoneNumber=0x7f060037;
         public static final int wrap_content=0x7f06000d;
     }
     public static final class integer {
@@ -489,17 +529,26 @@ containing a value of this type.
         public static final int activity_friendlist=0x7f030000;
         public static final int activity_gps=0x7f030001;
         public static final int activity_main=0x7f030002;
-        public static final int activity_messager=0x7f030003;
-        public static final int activity_phonecall=0x7f030004;
-        public static final int activity_register=0x7f030005;
-        public static final int item_friend=0x7f030006;
-        public static final int list_ava_item=0x7f030007;
-        public static final int sms_row=0x7f030008;
+        public static final int activity_main_bak=0x7f030003;
+        public static final int activity_messager=0x7f030004;
+        public static final int activity_phonecall=0x7f030005;
+        public static final int activity_register=0x7f030006;
+        public static final int drawer_list_item=0x7f030007;
+        public static final int fragment_friend=0x7f030008;
+        public static final int fragment_help=0x7f030009;
+        public static final int fragment_location=0x7f03000a;
+        public static final int fragment_map=0x7f03000b;
+        public static final int fragment_message=0x7f03000c;
+        public static final int fragment_setting=0x7f03000d;
+        public static final int item_friend=0x7f03000e;
+        public static final int list_ava_item=0x7f03000f;
+        public static final int sms_row=0x7f030010;
     }
     public static final class menu {
-        public static final int menu=0x7f0a0000;
+        public static final int menu=0x7f0b0000;
     }
     public static final class string {
+        public static final int action_settings=0x7f040036;
         public static final int already_registered=0x7f040025;
         public static final int app_name=0x7f040020;
         public static final int auth_client_needs_enabling_title=0x7f040001;
@@ -597,6 +646,11 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f04001e;
+        /**  Content Description 
+         */
+        public static final int desc_list_item_icon=0x7f040039;
+        public static final int drawer_close=0x7f040038;
+        public static final int drawer_open=0x7f040037;
         public static final int error_config=0x7f040024;
         public static final int gcm_deleted=0x7f04002b;
         public static final int gcm_error=0x7f040029;
@@ -623,6 +677,20 @@ containing a value of this type.
         public static final int wallet_buy_button_place_holder=0x7f04001f;
     }
     public static final class style {
+        /** 
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    
+
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        
+         */
+        public static final int AppBaseTheme=0x7f080005;
+        /**  Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+         */
         public static final int AppTheme=0x7f080004;
         public static final int WalletFragmentDefaultButtonTextAppearance=0x7f080002;
         public static final int WalletFragmentDefaultDetailsHeaderTextAppearance=0x7f080001;

@@ -57,19 +57,6 @@ public class FriendListActivity extends Activity implements OnItemClickListener 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friendlist);
 
-		/*
-		 * mAdapter = new FriendListAdapter(this); mAdapter.addItem(new
-		 * Friend("Tran Van A", "vana@gmail.com", "01668451247",
-		 * "hfhvbahsvbashdvhasbvjbsjkdbvlajsbvlasv", true));
-		 * mAdapter.addItem(new Friend("Tran Van A", "vana@gmail.com",
-		 * "01668451247", "hfhvbahsvbashdvhasbvjbsjkdbvlajsbvlasv", false));
-		 * mAdapter.addItem(new Friend("Tran Van A", "vana@gmail.com",
-		 * "01668451247", "hfhvbahsvbashdvhasbvjbsjkdbvlajsbvlasv", true));
-		 * 
-		 * mListView.setAdapter(mAdapter);
-		 * mListView.setOnItemClickListener(this);
-		 */
-
 		DownloadTask downloadTask = new DownloadTask();
 		downloadTask.execute(Config.GET_FRIENDS_SERVER_URL);
 		mListView = (ListView) findViewById(R.id.friendListView);

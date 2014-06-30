@@ -137,7 +137,6 @@ public class LocationActivity extends FragmentActivity {
 		});
 		
 		
-		
 		// setup map
 		FragmentManager myFM = getSupportFragmentManager();
 		SupportMapFragment mySpFrg = (SupportMapFragment) myFM
@@ -262,18 +261,6 @@ public class LocationActivity extends FragmentActivity {
 	}
 
 	private void setupHistoryPosition() {
-		/*
-		 * Marker hamburg = mMap.addMarker( new
-		 * MarkerOptions().position(HAMBURG).title("Hamburg")); Marker kiel =
-		 * mMap.addMarker( new MarkerOptions().position(KIEL).title("Kiel")
-		 * .snippet("Kiel is cool")
-		 * .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
-		 * 
-		 * mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
-		 * 
-		 * mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-		 */
-
 		CircleOptions cirOpt = new CircleOptions()
 				.center(new LatLng(37.4, 15.6)).radius(100000)
 				.strokeColor(Color.RED).strokeWidth(20).visible(true);

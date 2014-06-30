@@ -13,5 +13,14 @@
 	<color name="barDarkColor">#CECECE</color>
 	<color name="barMeduimColor">#DFDEE0</color>
 	<color name="barLightColor">#F2F2F2</color>
+	
+	
+	<!-- sliding menu -->
+	<color name="list_item_title">#fff</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#992416</color>
+    <color name="list_divider">#272727</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="counter_text_color">#c5c4c4</color>
 
 </resources>
