@@ -17,10 +17,10 @@ FIND YOUR FRIEND
 
 ## Ảnh chụp ứng dụng
 ##
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-21-32.png)]
 ##
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-21-21.png)]
 ##
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)]
-##
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-22-56.png)]
+
+
