@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapActivity" >
+
+     <LinearLayout
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:orientation="vertical" >
+
+         <fragment
+             android:id="@+id/map"
+             android:name="com.google.android.gms.maps.MapFragment"
+             android:layout_width="match_parent"
+             android:layout_height="276dp"
+             android:layout_weight="0.46" />
+
+         <HorizontalScrollView
+             android:layout_width="match_parent"
+             android:layout_height="50dp" >
+
+             <LinearLayout
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:orientation="horizontal" >
+
+                 <Button
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Button1" 
+                     android:background="@drawable/button_avatar"
+                     />
+
+                 <Button
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Button2" />
+
+                 <Button
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Button3" />
+
+                 <Button
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Button4" />
+
+                 <Button
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Button5" />
+             </LinearLayout>
+         </HorizontalScrollView>
+
+     </LinearLayout>
+
+</RelativeLayout>
