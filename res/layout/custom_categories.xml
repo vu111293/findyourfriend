@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/HeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical" 
+        
+        >
+
+        <TextView
+            android:id="@+id/TextView_Categories_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+             android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+            android:text="Small Text"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+  	<View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:background="#DADADC" ></View>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ItemLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp" >
+
+            <ImageView
+                android:id="@+id/ImageView_Categories_item_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_camera" />
+
+            <TextView
+                android:id="@+id/TextView_Categories_item_ItemName"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.94"
+                android:gravity="center_vertical"
+                
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/TextView_Categories_item_Number"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+            	android:layout_marginTop="2dp"
+            	android:layout_marginBottom="2dp"
+                
+                android:gravity="center"
+                android:text="10"
+                android:background="@drawable/button_friendrequests_blue"
+                android:textColor="#ffffff"
+                
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+
+	<View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#DADADC"
+         ></View>
+    </LinearLayout>
+
+</LinearLayout>

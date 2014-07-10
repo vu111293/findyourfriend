@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <!-- neo layout -->
+
+    <LinearLayout
+        android:id="@+id/blankLayout"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="visible" >
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/blankLayout"
+        android:layout_alignParentTop="true"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
+    <!-- remove black blank -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" >
+
+
+    </FrameLayout>
+
+    <!-- controller layout -->
+
+    <include 
+        android:id="@+id/inc_horixontal_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        layout="@layout/item_horizontal_friend_list"/>
+
+    <com.devsmart.android.ui.HorizontalListView
+        android:id="@+id/avatarListView"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_alignBottom="@id/blankLayout"
+        android:background="#449ADC" />
+
+</RelativeLayout>
