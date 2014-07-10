@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" android:background="@drawable/loadingscreenbg">
+
+    <ProgressBar
+        android:id="@+id/pb_progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" android:layout_marginBottom="20dip" android:layout_marginLeft="20dip" android:layout_marginRight="20dip" android:layout_marginTop="10dip"/>
+
+    <TextView
+        android:id="@+id/tv_loadingtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/pb_progressbar"
+        android:layout_centerHorizontal="true"
+        android:text="Loading, please wait..."
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/pb_progressbar"
+        android:layout_centerHorizontal="true"
+        android:text="Progress: 0%"
+        android:textAppearance="?android:attr/textAppearanceSmall" android:textColor="#ffffffff" android:shadowColor="#000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="3.0"/>
+
+</RelativeLayout>

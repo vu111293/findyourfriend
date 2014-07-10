@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#DDC92020"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="cảnh báo khẩn"
+        android:textStyle="bold"
+        android:textColor="#FFF"
+        android:textSize="18pt" />
+
+    <TextView
+        android:id="@+id/txtTicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:gravity="center_vertical"
+        android:text="9"
+        android:textStyle="bold"
+        android:textColor="#FFF"
+        android:textSize="80pt" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:paddingLeft="10pt"
+        android:paddingRight="10pt"
+        android:text="Chúng tôi sẽ gọi, email, gửi tin nhắn đến bất kì ai đang ớ gần bạn."
+        android:textColor="#FFF"
+        android:textSize="10pt" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:paddingLeft="10pt"
+        android:paddingRight="10pt"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hủy"
+            android:textStyle="bold"
+            android:textColor="#FFF"
+            android:textSize="12pt" />
+    </LinearLayout>
+
+</LinearLayout>
