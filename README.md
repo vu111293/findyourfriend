@@ -17,10 +17,10 @@ FIND YOUR FRIEND
 
 ## Ảnh chụp ứng dụng
 ##
-[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-21-32.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-55-00.png)]
 ##
-[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-21-21.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-13-45.png)]
 ##
-[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-02-15-22-56.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-13-38.png)]
 
 
