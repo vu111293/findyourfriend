@@ -1,0 +1,150 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <!-- neo layout -->
+
+    <LinearLayout
+        android:id="@+id/blankLayout"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="visible" >
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/blankLayout"
+        android:layout_alignParentTop="true"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
+    <!-- remove black blank -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" >
+    </FrameLayout>
+
+    <!-- controller layout -->
+
+    <HorizontalScrollView
+        android:id="@+id/controlLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:background="#086EBC"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:padding="5dp" >
+
+            <Button
+                android:id="@+id/btnMessage"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_message"
+                android:text="nhắn tin"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+
+            <Button
+                android:id="@+id/btnCall"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_call"
+                android:text="gọi"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+
+            <Button
+                android:id="@+id/btnHistory"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_history"
+                android:text="xem l.sử"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_update"
+                android:text="cập nhật"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+
+            <Button
+                android:id="@+id/btnRoute"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_route"
+                android:text="tìm đường"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+
+            <Button
+                android:id="@+id/btnRequest"
+                android:layout_width="60dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="3sp"
+                android:background="@android:color/transparent"
+                android:drawablePadding="-10sp"
+                android:drawableTop="@drawable/ic_request"
+                android:text="yêu cầu"
+                android:textColor="#FFFFFF"
+                android:textSize="6pt" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <com.devsmart.android.ui.HorizontalListView
+        android:id="@+id/avatarListView"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignBottom="@id/blankLayout"
+        android:background="#449ADC" />
+
+</RelativeLayout>
