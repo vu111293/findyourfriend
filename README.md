@@ -2,7 +2,7 @@ FIND YOUR FRIEND
 ==============
 
 ## Phần mềm mã nguồn mở tham dự cuộc thi "Mùa hè sáng tạo 2014"
-## Bạn hay có những chuyến đi chơi xa cùng bạn bè? Bạn đang cần biết vị trí điểm hẹn mà người bạn của bạn đã đến trước? Bạn bị lạc và muồn cầu cứu mà không biết gọi ai? Ứng dụng Find your friend sẽ giúp bạn làm điều đó. 
+## Bạn hay có những chuyến đi chơi xa cùng bạn bè? Bạn đang cần biết vị trí điểm hẹn? Bạn bị lạc và muốn bạn bè hỗ trợ? Ứng dụng Find your friend sẽ giúp bạn làm điều đó. 
 
 * **Tự động tạo 1 tài khoản với ID là số điện thoại của bạn.**
 * **Hiển thị những số điện thoại trong danh bạ đang dùng chương trình này giúp bạn truy cập nhanh đến người cần tìm.**
@@ -17,10 +17,12 @@ FIND YOUR FRIEND
 
 ## Ảnh chụp ứng dụng
 ##
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-13-38.png)]
+##
 [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-55-00.png)]
 ##
-[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-13-45.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-57-56.png)]
 ##
-[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-13-38.png)]
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-10-14-58-14.png)]
 
 
