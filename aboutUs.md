@@ -20,5 +20,5 @@ Dự án có sự tham gia của:
   + Chị [Nguyễn Thùy Linh]: Mentor chính, đồng thời là tác giả ý tưởng - [linhnt1601@gmail.com ](mailto:linhnt1601@gmail.com ) đến từ Viện Đại học Mở Hà Nội.
   
 ### Liên hệ hỗ trợ
-Nếu có bất kỳ thắc mắc gì liên quan đến dự án, vui lòng gửi email tới địa chỉ [mhst14-13-mizu@groups.google.com](mailto:mhst14-13-mizu@groups.google.com) để được hỗ trợ.
+Nếu có bất kỳ thắc mắc gì liên quan đến dự án, vui lòng gửi email tới địa chỉ [mhst2014fyf@groups.google.com](mailto:mhst2014fyf@groups.google.com) để được hỗ trợ.
 
