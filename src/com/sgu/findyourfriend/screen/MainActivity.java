@@ -1,39 +1,45 @@
 package com.sgu.findyourfriend.screen;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.sgu.findyourfriend.FriendManager;
 import com.sgu.findyourfriend.MessageManager;
-import com.sgu.findyourfriend.ProfileInfo;
+import com.sgu.findyourfriend.MyProfileManager;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.CustomAdapter_FriendStatus;
+import com.sgu.findyourfriend.ctr.ControlOptions;
 
 public class MainActivity extends FragmentActivity {
 
 	public static String TAG = "MAIN ACTIVITY";
-	private static final String MAP_TAG = "map_fragment";
-	private static final String MESSAGE_TAG = "message_fragment";
-	private static final String REQUEST_TAG = "request_fragment";
-	private static final String CATEGORIES_TAG = "categories_fragment";
+	public static final String MAP_TAG = "map_fragment";
+	public static final String MESSAGE_TAG = "message_fragment";
+	public static final String REQUEST_TAG = "request_fragment";
+	public static final String CATEGORIES_TAG = "categories_fragment";
 
 	private FragmentTabHost mTabHost;
 	private MainActivity mMain = this;
@@ -59,17 +65,18 @@ public class MainActivity extends FragmentActivity {
 		LayoutInflater mInflater = LayoutInflater.from(this);
 		mRootView = mInflater.inflate(R.layout.activity_main, null);
 
-		ProfileInfo.instance = new ProfileInfo(getApplicationContext());
-		ProfileInfo.gcmMyId = GCMRegistrar
-				.getRegistrationId(getApplicationContext());
+		// MyProfileManager.getInstance().init(getApplicationContext());
+		// MyProfileManager.gcmMyId = GCMRegistrar
+		// .getRegistrationId(getApplicationContext());
+		//
+		// // init friend manager
+		// FriendManager.getInstance().init(getApplicationContext());
+		//
+		// // init message manager
+		// MessageManager.instance = new
+		// MessageManager(getApplicationContext());
 
-		// init friend manager
-		FriendManager.instance = new FriendManager(getApplicationContext());
-
-		// init message manager
-		MessageManager.instance = new MessageManager(getApplicationContext());
-
-		initView();
+		// initView();
 
 		tv_progress = (TextView) findViewById(R.id.tv_progress);
 		pb_progressBar = (ProgressBar) findViewById(R.id.pb_progressbar);
@@ -81,23 +88,63 @@ public class MainActivity extends FragmentActivity {
 
 		// 100 / 10 * (10 - i)
 
-		final Handler handler = new Handler();
-		final Runnable r = new Runnable() {
-			public void run() {
-				if (counter > 0) {
+		// final Handler handler = new Handler();
+		// final Runnable r = new Runnable() {
+		// public void run() {
+		// if (counter > 0) {
+		//
+		// int per = (int) (100 / maxCounter) * (maxCounter - counter);
+		// tv_progress.setText("Progress: " + per + "%");
+		// pb_progressBar.setProgress(per);
+		// handler.postDelayed(this, 500);
+		// counter--;
+		// } else
+		// setContentView(mRootView);
+		//
+		// }
+		// };
+		//
+		// handler.postDelayed(r, 0);
 
-					int per = (int) (100 / maxCounter) * (maxCounter - counter);
-					tv_progress.setText("Progress: " + per + "%");
-					pb_progressBar.setProgress(per);
-					handler.postDelayed(this, 500);
-					counter--;
-				} else
-					setContentView(mRootView);
+		(new AsyncTask<Void, Void, Void>() {
 
+			@Override
+			protected Void doInBackground(Void... arg0) {
+				MyProfileManager.getInstance().init(getApplicationContext());
+				MyProfileManager.getInstance().mine.setGcmid(GCMRegistrar
+						.getRegistrationId(getApplicationContext()));
+
+				// init friend manager
+				FriendManager.getInstance().init(getApplicationContext());
+
+				// init message manager
+				MessageManager.instance = new MessageManager(
+						getApplicationContext());
+
+				// PostData.historyCreate(getApplicationContext(), 5, new
+				// LatLng(18.073887272186989, 120.1006023606658));
+
+				return null;
 			}
-		};
 
-		handler.postDelayed(r, 0);
+			@Override
+			protected void onPostExecute(Void result) {
+				// Log.d("MINE", MyProfileManager.getInstance().mine.getName());
+				// Log.d("MINE",
+				// MyProfileManager.getInstance().mine.getGcmId());
+				// Log.d("MINE", MyProfileManager.getInstance().mine.getId() +
+				// "");
+				// Log.d("MINE",
+				// MyProfileManager.getInstance().mine.getLastestlogin().toGMTString());
+				// Log.d("MINE",
+				// MyProfileManager.getInstance().myLocation.toString());
+
+				FriendManager.getInstance().setup();
+				initView();
+				setContentView(mRootView);
+			}
+
+		}).execute();
 
 	}
 
@@ -113,29 +160,30 @@ public class MainActivity extends FragmentActivity {
 		mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
 		mTabHost.addTab(
-				mTabHost.newTabSpec(MESSAGE_TAG)
-						.setIndicator(
-								"",
-								getResources().getDrawable(
-										R.drawable.ic_action_camera)),
-				MessageContainerFragment.class, null);
-
-		mTabHost.addTab(
-				mTabHost.newTabSpec(MAP_TAG).setIndicator("",
-						getResources().getDrawable(R.drawable.ic_action_about)),
+				mTabHost.newTabSpec(MAP_TAG).setIndicator(
+						"",
+						getResources().getDrawable(
+								R.drawable.ic_location_silver)),
 				MapContainerFragment.class, null);
 
 		mTabHost.addTab(
-				mTabHost.newTabSpec(REQUEST_TAG).setIndicator("",
-						getResources().getDrawable(R.drawable.ic_action_email)),
-				FriendRequestsFragment.class, null);
+				mTabHost.newTabSpec(MESSAGE_TAG).setIndicator("",
+						getResources().getDrawable(R.drawable.ic_grp_silver)),
+				MessageContainerFragment.class, null);
+
+		mTabHost.addTab(
+				mTabHost.newTabSpec(REQUEST_TAG).setIndicator(
+						"",
+						getResources()
+								.getDrawable(R.drawable.ic_request_silver)),
+				FriendRequestsContainerFragment.class, null);
 
 		mTabHost.addTab(
 				mTabHost.newTabSpec(CATEGORIES_TAG).setIndicator(
 						"",
 						getResources().getDrawable(
 								R.drawable.ic_action_settings)),
-				CategoriesFragment.class, null);
+				CategoriesContainerFragment.class, null);
 
 		currentTab = mTabHost.getCurrentTab();
 
@@ -152,6 +200,13 @@ public class MainActivity extends FragmentActivity {
 				}
 
 				currentTab = mTabHost.getCurrentTab();
+
+				if (!mTabHost.getCurrentTabTag().equals(MESSAGE_TAG)) {
+					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					keyboard.hideSoftInputFromWindow(
+							mTabHost.getApplicationWindowToken(), 0);
+				}
+
 			}
 		});
 
@@ -180,13 +235,73 @@ public class MainActivity extends FragmentActivity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		CustomAdapter_FriendStatus adapter = new CustomAdapter_FriendStatus(
 				this, R.layout.custom_friend_status,
-				FriendManager.instance.friends);
+				FriendManager.getInstance().friends);
 		mDrawerList.setAdapter(adapter);
+
+		mDrawerList.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, final int pos,
+					long arg3) {
+				// mDrawerLayout.closeDrawer(mDrawerList);
+				// mTabHost.setCurrentTabByTag(MESSAGE_TAG);
+
+				// (new OptionsDialog(mTabHost.getContext(), mTabHost,
+				// pos)).show();
+
+				String[] items = { "Xem trên bản đồ", "Gọi", "Nhắn tin", "Khác" };
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						mTabHost.getContext());
+				builder.setTitle("Your choices are:");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+						case 0:
+							ControlOptions.getInstance().edit();
+							ControlOptions.getInstance().putHashMap("friendId", pos + "");
+							
+							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
+							mTabHost.setCurrentTabByTag(MAP_TAG);
+							break;
+						case 1:
+							Intent callIntent = new Intent(Intent.ACTION_CALL);
+							callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							callIntent.setData(Uri.parse("tel:"
+									+ FriendManager.getInstance().friends.get(pos)
+											.getUserInfo().getPhoneNumber()));
+							mTabHost.getContext().startActivity(callIntent);
+							break;
+							
+						case 2:
+							ControlOptions.getInstance().edit();
+							ControlOptions.getInstance().putHashMap("friendId", pos + "");
+							
+							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
+							mTabHost.setCurrentTabByTag(MESSAGE_TAG);
+							break;
+							
+						case 3: 
+							break;
+						}						
+						
+						mDrawerLayout.closeDrawer(mDrawerList);
+					}
+				}).setNegativeButton("Quay lại",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+							}
+						});
+				
+				builder.show();
+
+			}
+
+		});
 
 		mMain.getActionBar().setCustomView(mCustomView);
 
 		mActionBar.setDisplayShowCustomEnabled(true);
-		
+
 		// set listener fot item control
 		mCustomView.findViewById(R.id.imgFriendList).setOnClickListener(
 				new OnClickListener() {
@@ -200,7 +315,6 @@ public class MainActivity extends FragmentActivity {
 							mDrawerLayout.openDrawer(mDrawerList);
 
 						}
-
 					}
 				});
 
@@ -209,8 +323,8 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onClick(View v) {
-						ImagenceDialog dialog = new ImagenceDialog(
-								mTabHost.getContext());
+						ImagenceDialog dialog = new ImagenceDialog(mTabHost
+								.getContext());
 						dialog.show();
 					}
 				});
@@ -261,6 +375,11 @@ public class MainActivity extends FragmentActivity {
 			finish();
 		}
 
+	}
+
+	public void gotoTabByTagName(String tabTag) {
+		mDrawerLayout.closeDrawer(mDrawerList);
+		mTabHost.setCurrentTabByTag(tabTag);
 	}
 
 }

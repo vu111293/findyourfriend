@@ -22,7 +22,7 @@ public class MessageManager {
 
 	private Controller aController;
 	public List<Message> messages;
-	
+
 	IMessage iMessage;
 
 	// access database
@@ -44,9 +44,9 @@ public class MessageManager {
 	}
 
 	public void setMessageListener(IMessage iMessage) {
-		this.iMessage  = iMessage;
+		this.iMessage = iMessage;
 	}
-	
+
 	public List<Message> getAllMessage() {
 		return messages;
 	}
@@ -56,9 +56,21 @@ public class MessageManager {
 		return messages;
 	}
 
-	public Message sendMessage(String msg, List<Friend> friendsId) {
-		Message sms = new Message(msg, true, ProfileInfo.gcmMyId,
-				ProfileInfo.instance.gcmMyId, new Date(
+	public void sendMessage(String msg, List<String> addrs) {
+
+		for (String addr : addrs) {
+			Message sms = new Message(msg, true, MyProfileManager.getInstance().mine.getGcmId(),
+					addr, new Date(
+							System.currentTimeMillis()));
+			sms = dataSource.createMessage(sms);
+			iMessage.addNewMessage(sms);
+			new SendMessage().execute(msg);
+		}
+	}
+
+	public Message sendMessage(String msg, List<Friend> friendsId, int k) {
+		Message sms = new Message(msg, true, MyProfileManager.getInstance().mine.getGcmId(),
+				MyProfileManager.getInstance().mine.getGcmId(), new Date(
 						System.currentTimeMillis()));
 		sms = dataSource.createMessage(sms);
 		iMessage.addNewMessage(sms);
@@ -69,8 +81,8 @@ public class MessageManager {
 	private class SendMessage extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(String... params) {
-			String regIdFrom = ProfileInfo.gcmMyId;
-			String regIdTo = ProfileInfo.gcmMyId;
+			String regIdFrom = MyProfileManager.getInstance().mine.getGcmId();
+			String regIdTo = MyProfileManager.getInstance().mine.getGcmId();
 			String message = params[0];
 
 			aController.sendMessage(context, regIdFrom, regIdTo, message);
@@ -96,13 +108,13 @@ public class MessageManager {
 			aController.acquireWakeLock(context);
 
 			Message sms = new Message(newMessage, true, "server",
-					ProfileInfo.gcmMyId, new Date(System.currentTimeMillis()));
+					MyProfileManager.getInstance().mine.getGcmId(), new Date(System.currentTimeMillis()));
 			// save to database
 			sms = dataSource.createMessage(sms);
 
 			// Display message on the screen
 			iMessage.addNewMessage(sms);
-			
+
 			Toast.makeText(context, "Got Message: " + newMessage,
 					Toast.LENGTH_LONG).show();
 
@@ -122,5 +134,5 @@ public class MessageManager {
 	public void destroy() {
 		context.unregisterReceiver(mHandleMessageReceiver);
 	}
-	
+
 }

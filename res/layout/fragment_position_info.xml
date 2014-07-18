@@ -63,7 +63,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Địa chỉ"
+            android:text="địa chỉ"
             android:textColor="#818185"
             android:textSize="@dimen/tite_text" />
 
@@ -82,7 +82,7 @@
             android:orientation="horizontal" >
 
             <LinearLayout
-                android:layout_width="0dp"
+               android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical" >
@@ -128,76 +128,112 @@
 
         <!-- thông tin phương tiện di chuyển -->
 
+
+        <!-- do dai quan duong -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical" >
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:src="@drawable/ic_flaga" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/txtDistanceInfo"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Thông tin di chuyển"
-                android:textColor="#818185"
-                android:textSize="@dimen/medium_contain_text" />
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:paddingLeft="5dp"
+                android:text="150 km"
+                android:textColor="#434343"
+                android:textSize="@dimen/small_text_contain"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:src="@drawable/ic_flagb" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal" >
+
+            <!-- thoi gian di bo -->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal" >
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                <ImageView
+                    android:layout_width="13dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:layout_gravity="bottom"
+                    android:src="@drawable/s50_walk" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="đi bộ"
-                        android:textColor="#818185"
-                        android:textSize="@dimen/tite_text" />
-
-                    <TextView
-                        android:id="@+id/txtWalkTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="2 giờ 30 phút"
-                        android:textColor="#445261"
-                        android:textSize="@dimen/small_text_contain" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/txtWalkTimeInfo"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:layout_gravity="bottom"
+                    android:paddingLeft="5dp"
+                    android:text="1h30&apos;"
+                    android:textColor="#434343"
+                    android:textSize="@dimen/small_text_contain"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="xe máy"
-                        android:textColor="#818185"
-                        android:textSize="@dimen/tite_text" />
+            <!-- thoi giam di moto -->
 
-                    <TextView
-                        android:id="@+id/txtCarTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="10 phút"
-                        android:textColor="#445261"
-                        android:textSize="@dimen/small_text_contain" />
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:src="@drawable/s50_motobike" />
+
+                <TextView
+                    android:id="@+id/txtMotobikeTimeInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:paddingLeft="5dp"
+                    android:text="30&apos;"
+                    android:textColor="#434343"
+                    android:textSize="@dimen/small_text_contain"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <include 
+    <include
         android:id="@+id/horizaltalController"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        layout="@layout/item_horizontal_friend_list"/>
+        layout="@layout/item_horizontal_controllor" />
 
 </RelativeLayout>

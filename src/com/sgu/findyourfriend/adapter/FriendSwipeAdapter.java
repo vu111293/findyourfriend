@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.model.Friend;
 
@@ -24,10 +27,20 @@ public class FriendSwipeAdapter extends BaseAdapter {
 
 	private List<Friend> mData;
 	private Context mContext;
+	
+	ImageLoader imageLoader;
+	// DisplayImageOptions options;
 
 	public FriendSwipeAdapter(Context context) {
 		this.mContext = context;
 		mData = new ArrayList<Friend>();
+		
+		imageLoader = ImageLoader.getInstance();
+		
+		if (imageLoader == null) {
+			Log.i("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG", "Hit");
+			
+		}
 	}
 
 	public FriendSwipeAdapter(Context context, List<Friend> friends) {
@@ -62,13 +75,34 @@ public class FriendSwipeAdapter extends BaseAdapter {
 	@Override
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
-		return mData.get(position).getUserInfo().isAccepted() ? USER_ACCEPTED
+		return mData.get(position).isAccepted() ? USER_ACCEPTED
 				: USER_WAITACCCEPT;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Friend friend = this.getItem(position);
+		
+		convertView = LayoutInflater.from(mContext).inflate(
+				R.layout.item_friend_accepted, parent, false);
+		ImageView imgAvatar = (ImageView) convertView
+				.findViewById(R.id.imgAvatar);
+		
+		
+		imageLoader.displayImage(friend.getUserInfo().getAvatar(), imgAvatar);
+		
+		return convertView;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*
 		ViewHolder holder;
 
 		if (convertView == null) {
@@ -95,6 +129,11 @@ public class FriendSwipeAdapter extends BaseAdapter {
 
 		if (friend.getUserInfo().isAccepted()) {
 			// edit
+			//  imageLoader
+			//  .displayImage(friend.getUserInfo().getAvatar(), holder.imgAvatar);
+			
+			
+			
 			holder.imgAvatar.setImageResource(R.drawable.avatar2);
 		} else {
 			// edit
@@ -104,7 +143,7 @@ public class FriendSwipeAdapter extends BaseAdapter {
 
 
 
-		return convertView;
+		return convertView;*/
 	}
 
 	private class ViewHolder {

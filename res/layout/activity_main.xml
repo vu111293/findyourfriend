@@ -37,6 +37,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:background="#FFFFFF"
-        android:divider="@android:color/transparent" />
+        android:divider="#E6E6E6" 
+        android:dividerHeight="1dp"/>
 
 </android.support.v4.widget.DrawerLayout>

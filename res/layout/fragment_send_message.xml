@@ -2,17 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp"
     android:orientation="vertical" >
 
     <com.devsmart.android.ui.HorizontalListView
         android:id="@+id/avatarListView"
         android:layout_width="match_parent"
         android:layout_height="55dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentTop="true"
-        android:background="@color/barDarkColor" />
+        android:background="@color/bottom_bar_color" />
     
     <EditText
+        android:layout_margin="5dp"
         android:id="@+id/editMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

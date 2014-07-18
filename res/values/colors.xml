@@ -22,5 +22,18 @@
     <color name="list_divider">#272727</color>
     <color name="counter_text_bg">#626262</color>
     <color name="counter_text_color">#c5c4c4</color>
+    
+    
+    <!-- bar -->
+    <color name="bar_color">#3B5999</color>
+    <color name="selector_bar_color">#2F497A</color>
+    <color name="bottom_bar_color">#E6E9F0</color>
+    <color name="selector_color">#2D4979</color>
+    
+    <!-- status color -->
+    <color name="share">#1395FE</color>
+    <color name="none_accept">#7B7D7B</color>
+    <color name="offine">#FF0000</color>
+    <color name="online">#00FF00</color>
 
 </resources>

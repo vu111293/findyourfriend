@@ -4,12 +4,17 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.sgu.findyourfriend.MyProfileManager;
+import com.sgu.findyourfriend.net.PostData;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,6 +24,8 @@ public class GpsPosition {
 	public static final String TAG = "GPS POSITION";
 	private Context context;
 	private Location lastLocation = null;
+	private Location lastLocationUpdate = null;
+	
 	private Timer gpsTimer = new Timer();
 	private long lastprovidertimestamp = 0;
 	private LocationManager myLocationManager = null;
@@ -77,6 +84,23 @@ public class GpsPosition {
 		}, 0, checkInterval);
 	}
 
+	private void setUpSendMyLocationToserver(final long interval) {
+		if (lastLocationUpdate == null || lastLocation.equals(lastLocationUpdate))
+			return;
+		
+		final Handler handler = new Handler();
+		final Runnable r = new Runnable() {
+			public void run() {
+//				PostData.sendLoation(context, lastLocationUpdate.getLatitude(), lastLocationUpdate.getLongitude(), 
+//				ProfileInfo.gcmMyId);
+					handler.postDelayed(this, interval);
+			}
+		};
+
+		handler.postDelayed(r, 0);
+	}
+	
+	
 	private long getGPSCheckMillisFromPrefs() {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -104,9 +128,9 @@ public class GpsPosition {
 
 	public void doLocationUpdate(Location l, boolean force) {
 		long minDistance = getMinDistanceFromPrefs();
-		Log.d(TAG, "update received:" + l);
+		// Log.d(TAG, "update received:" + l);
 		if (l == null) {
-			Log.d(TAG, "Empty location");
+			// Log.d(TAG, "Empty location");
 			if (force)
 				Toast.makeText(context, "Current location not available",
 						Toast.LENGTH_SHORT).show();
@@ -114,19 +138,19 @@ public class GpsPosition {
 		}
 		if (getLastLocation() != null) {
 			float distance = l.distanceTo(getLastLocation());
-			Log.d(TAG, "Distance to last: " + distance);
+			// Log.d(TAG, "Distance to last: " + distance);
 			if (l.distanceTo(getLastLocation()) < minDistance && !force) {
-				Log.d(TAG, "Position didn't change");
+				// Log.d(TAG, "Position didn't change");
 				return;
 			}
 			if (l.getAccuracy() >= getLastLocation().getAccuracy()
 					&& l.distanceTo(getLastLocation()) < l.getAccuracy() && !force) {
-				Log.d(TAG, "Accuracy got worse and we are still "
-						+ "within the accuracy range.. Not updating");
+				// Log.d(TAG, "Accuracy got worse and we are still "
+				// 		+ "within the accuracy range.. Not updating");
 				return;
 			}
 			if (l.getTime() <= lastprovidertimestamp && !force) {
-				Log.d(TAG, "Timestamp not never than last");
+				// Log.d(TAG, "Timestamp not never than last");
 				return;
 			}
 		}
@@ -150,11 +174,11 @@ public class GpsPosition {
 		Location networkLocation = getLocationByProvider(LocationManager.NETWORK_PROVIDER);
 		// if we have only one location available, the choice is easy
 		if (gpslocation == null) {
-			Log.d(TAG, "No GPS Location available.");
+			// Log.d(TAG, "No GPS Location available.");
 			return networkLocation;
 		}
 		if (networkLocation == null) {
-			Log.d(TAG, "No Network Location available");
+			// Log.d(TAG, "No Network Location available");
 			return gpslocation;
 		}
 		// a locationupdate is considered 'old' if its older than the configured
@@ -165,20 +189,20 @@ public class GpsPosition {
 		boolean networkIsOld = (networkLocation.getTime() < old);
 		// gps is current and available, gps is better than network
 		if (!gpsIsOld) {
-			Log.d(TAG, "Returning current GPS Location");
+			// Log.d(TAG, "Returning current GPS Location");
 			return gpslocation;
 		}
 		// gps is old, we can't trust it. use network location
 		if (!networkIsOld) {
-			Log.d(TAG, "GPS is old, Network is current, returning network");
+			// Log.d(TAG, "GPS is old, Network is current, returning network");
 			return networkLocation;
 		}
 		// both are old return the newer of those two
 		if (gpslocation.getTime() > networkLocation.getTime()) {
-			Log.d(TAG, "Both are old, returning gps(newer)");
+			// Log.d(TAG, "Both are old, returning gps(newer)");
 			return gpslocation;
 		} else {
-			Log.d(TAG, "Both are old, returning network(newer)");
+			// Log.d(TAG, "Both are old, returning network(newer)");
 			return networkLocation;
 		}
 	}
@@ -195,7 +219,7 @@ public class GpsPosition {
 				location = locationManager.getLastKnownLocation(provider);
 			}
 		} catch (IllegalArgumentException e) {
-			Log.d(TAG, "Cannot acces Provider " + provider);
+			// Log.d(TAG, "Cannot acces Provider " + provider);
 		}
 		return location;
 	}

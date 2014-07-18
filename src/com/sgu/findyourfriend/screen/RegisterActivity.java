@@ -18,7 +18,7 @@ import android.widget.ViewSwitcher;
 import com.google.android.gcm.GCMRegistrar;
 import com.sgu.findyourfriend.Config;
 import com.sgu.findyourfriend.FriendManager;
-import com.sgu.findyourfriend.ProfileInfo;
+import com.sgu.findyourfriend.MyProfileManager;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.utils.Controller;
 
@@ -100,8 +100,8 @@ public class RegisterActivity extends Activity {
 				if (name.trim().length() > 0 && email.trim().length() > 0) {
 
 					// save info
-					ProfileInfo.name = name;
-					ProfileInfo.email = email;
+//					MyProfileManager.name = name;
+//					MyProfileManager.email = email;
 
 					// setup account
 					accountRegist(name, email);
@@ -151,7 +151,7 @@ public class RegisterActivity extends Activity {
 		final String regId = GCMRegistrar.getRegistrationId(this);
 
 		// reference to ProfileInfo class
-		ProfileInfo.gcmMyId = regId;
+//		MyProfileManager.gcmMyId = regId;
 
 		Log.i("GCM", regId);
 

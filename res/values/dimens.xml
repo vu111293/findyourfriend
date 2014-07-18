@@ -10,7 +10,7 @@
     
     
     <dimen name="big_title_text">13pt</dimen>
-    <dimen name="big_contain_text">11.5pt</dimen>
+    <dimen name="big_contain_text">10.5pt</dimen>
     <dimen name="medium_contain_text">10pt</dimen>
     <dimen name="tite_text">9pt</dimen>
     <dimen name="small_text_contain">8pt</dimen>

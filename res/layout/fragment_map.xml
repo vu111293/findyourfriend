@@ -41,13 +41,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        layout="@layout/item_horizontal_friend_list"/>
+        layout="@layout/item_horizontal_controllor"/>
 
     <com.devsmart.android.ui.HorizontalListView
         android:id="@+id/avatarListView"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_alignBottom="@id/blankLayout"
-        android:background="#449ADC" />
+        android:background="@color/bottom_bar_color" />
 
 </RelativeLayout>

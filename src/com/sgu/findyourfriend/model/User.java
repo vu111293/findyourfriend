@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class User {
 
 	// attributes
+	private int id;
 	private String name;
 	private int gender; // 0: no select, 1: boy, 2: girl
 	private String province;
@@ -17,15 +18,14 @@ public class User {
 	private Timestamp lastestLogin;
 	
 	private String phoneNumber;
-	private boolean isAvailable = true;
-	private boolean isAccepted = true;
 	private LatLng lastLocation;
 	private List<History> steps;
 
 	// methods
 
-	public User(String name, int gender, String province, String email,
+	public User(int id, String name, int gender, String province, String email,
 			String avatar, String gcmid, Timestamp lastestlogin) {
+		this.setId(id);
 		this.setName(name);
 		this.setGender(gender);
 		this.setProvince(province);
@@ -35,16 +35,20 @@ public class User {
 		this.setLastestlogin(lastestlogin);
 	}
 
-	public User(String name) {
-		this(name, 0, null, null, null, null, new Timestamp(0));
-	}
-
 	public User(User user) {
-		this(user.name, user.gender, user.province, user.email, user.avatar, user.gcmId, user.lastestLogin);
+		this(user.id, user.name, user.gender, user.province, user.email, user.avatar, user.gcmId, user.lastestLogin);
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -105,22 +109,6 @@ public class User {
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
-	}
-
-	public boolean isAvailable() {
-		return isAvailable;
-	}
-
-	public void setAvailable(boolean isAvailable) {
-		this.isAvailable = isAvailable;
-	}
-
-	public boolean isAccepted() {
-		return isAccepted;
-	}
-
-	public void setAccepted(boolean isAccepted) {
-		this.isAccepted = isAccepted;
 	}
 
 	public LatLng getLastLocation() {

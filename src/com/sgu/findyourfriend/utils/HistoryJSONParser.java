@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.model.History;
 
 public class HistoryJSONParser {
-
+  
 	public static List<History> parse(JSONObject jObject) {
 		JSONArray jHistorys = null;
 		try {
@@ -48,7 +48,7 @@ public class HistoryJSONParser {
 	}
 
 	// Parsing the Country JSON object
-	private static History getHistory(JSONObject jHistory) {
+	public static History getHistory(JSONObject jHistory) {
 
 		Timestamp st;
 		LatLng location = null;
@@ -56,8 +56,8 @@ public class HistoryJSONParser {
 
 		try {
 			st = Timestamp.valueOf(jHistory.getString("timest"));
-			location = new LatLng(Float.parseFloat(jHistory.getString("longtitude")),
-					Float.parseFloat(jHistory.getString("latitude")));
+			location = new LatLng(Double.parseDouble(jHistory.getString("latitude")),
+					Double.parseDouble(jHistory.getString("longtitude")));
 			history = new History(st, location);
 		} catch (JSONException e) {
 			e.printStackTrace();

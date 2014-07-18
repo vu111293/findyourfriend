@@ -1,9 +1,14 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,20 +24,31 @@ import com.sgu.findyourfriend.FriendManager;
 import com.sgu.findyourfriend.IMessage;
 import com.sgu.findyourfriend.MessageManager;
 import com.sgu.findyourfriend.R;
-import com.sgu.findyourfriend.adapter.FriendSwipeAdapter;
+import com.sgu.findyourfriend.adapter.FriendSwipeAdapter2;
 import com.sgu.findyourfriend.model.Message;
 
+@SuppressLint("ValidFragment")
 public class SendMessageFragment extends Fragment implements IMessage {
 
 	private HorizontalListView friendsHList;
-	private FriendSwipeAdapter swipeAdapter;
+	private FriendSwipeAdapter2 swipeAdapter;
 
-	private TextView txtSendInfo;
 	private EditText editMessage;
 
 	private int[] masks;
 	private Context context;
 	private Activity activity;
+
+	private int friendId;
+
+	private MessageFragment mainFragment;
+
+	public SendMessageFragment() {
+	}
+
+	public SendMessageFragment(MessageFragment mainFragment) {
+		this.mainFragment = mainFragment;
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -60,7 +76,7 @@ public class SendMessageFragment extends Fragment implements IMessage {
 		textSendEvent.setVisibility(View.VISIBLE);
 
 		// init masks
-		masks = new int[FriendManager.instance.friends.size()];
+		masks = new int[FriendManager.getInstance().friends.size()];
 
 		editMessage = (EditText) rootView.findViewById(R.id.editMessage);
 
@@ -82,10 +98,11 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 				// send to myself
 				MessageManager.instance.sendMessage(editMessage.getText()
-						.toString(), null);
+						.toString(), getToAddress());
 				editMessage.setText("");
 
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				InputMethodManager imm = (InputMethodManager) getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(editMessage.getWindowToken(), 0);
 
 				// finish fragment
@@ -96,8 +113,8 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 		friendsHList = (HorizontalListView) rootView
 				.findViewById(R.id.avatarListView);
-		swipeAdapter = new FriendSwipeAdapter(getActivity(),
-				FriendManager.instance.friends);
+		swipeAdapter = new FriendSwipeAdapter2(getActivity(),
+				R.layout.item_friend_accepted, FriendManager.getInstance().friends);
 		friendsHList.setAdapter(swipeAdapter);
 
 		friendsHList.setOnItemClickListener(new OnItemClickListener() {
@@ -107,12 +124,25 @@ public class SendMessageFragment extends Fragment implements IMessage {
 					int position, long id) {
 
 				masks[position] = 1 - masks[position];
-				changeMask(position, view);
+				changeSelector(position, view);
+
+				// swipeAdapter.getView(friendId, null,
+				// friendsHList).setBackgroundColor(0xff086EBC);
 			}
 
 		});
 
 		MessageManager.instance.setMessageListener(this);
+
+		Bundle bundle = getArguments();
+		friendId = bundle.getInt("friendId", -1);
+
+		if (friendId > 0) {
+			Log.i("wwwwwwwwwwwwwwwwwwwwwwwww", friendId + "");
+			masks[friendId] = 1;
+			swipeAdapter.hightLightItem(friendId);
+			swipeAdapter.notifyDataSetChanged();
+		}
 
 		// getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 		return rootView;
@@ -139,72 +169,43 @@ public class SendMessageFragment extends Fragment implements IMessage {
 		}
 	}
 
-	private void changeMask(int pos, View view) {
-		StringBuilder builder = new StringBuilder();
-		int len = FriendManager.instance.friends.size();
-		boolean firstF = false;
+	private List<String> getToAddress() {
+		List<String> addrs = new ArrayList<String>();
+		int len = FriendManager.getInstance().friends.size();
 
-		if (pos == 0) {
-			if (masks[pos] == 0) {
-				view.setBackgroundColor(0x00);
-				// them cai da luu chon vao txt
-				for (int i = 1; i < len; ++i) {
-					if (masks[i] == 1) {
-						if (firstF)
-							builder.append("; ");
-						else
-							firstF = true;
+		if (masks[0] == 0) {
+			// them cai da luu chon vao txt
+			for (int i = 1; i < len; ++i) {
+				if (masks[i] == 1) {
 
-						builder.append(FriendManager.instance.friends.get(i)
-								.getUserInfo().getName());
-					}
-				}
-
-			} else {
-				view.setBackgroundColor(0xff086EBC);
-				// them tat ca vao txt
-				for (int i = 1; i < len; ++i) {
-					if (firstF)
-						builder.append("; ");
-					else
-						firstF = true;
-
-					builder.append(FriendManager.instance.friends.get(i)
-							.getUserInfo().getName());
-
+					addrs.add(FriendManager.getInstance().friends.get(i)
+							.getNumberLogin().get(0));
 				}
 			}
+
 		} else {
-			if (masks[pos] == 0) {
-				// huy chon
-				view.setBackgroundColor(0x00);
-			} else {
-				// chon
-				view.setBackgroundColor(0xff086EBC);
+			// them tat ca vao txt
+			for (int i = 1; i < len; ++i) {
+				addrs.add(FriendManager.getInstance().friends.get(i)
+						.getNumberLogin().get(0));
+
 			}
-
-			if (masks[0] == 0)
-				// hieu chinh txt
-				for (int i = 1; i < len; ++i) {
-					if (masks[i] == 1) {
-						if (firstF)
-							builder.append("; ");
-						else
-							firstF = true;
-
-						builder.append(FriendManager.instance.friends.get(i)
-								.getUserInfo().getName());
-					}
-
-				}
-			else
-				return;
 		}
-		txtSendInfo.setText(builder.toString());
+
+		return addrs;
+	}
+
+	private void changeSelector(int pos, View view) {
+		if (masks[pos] == 0)
+			view.setBackgroundColor(0x00);
+		else
+			view.setBackgroundColor(0xff086EBC);
 	}
 
 	@Override
 	public void addNewMessage(Message msg) {
+		if (mainFragment != null)
+			mainFragment.addNewMessage(msg);
 	}
 
 }

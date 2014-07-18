@@ -13,9 +13,12 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -29,27 +32,75 @@ public class GpsDirection {
 	private GoogleMap mMap;
 	private Polyline polylineCurrent;
 	private boolean isBeforeRemove;
-	
+
+	private boolean isRouted;
+	private String mdurationsMode[] = new String[3];
+	private String mdistance;
+
+	private PolylineOptions polylineOptions;
+
+	private TextView txtDistance;
+	private TextView txtWalk;
+	private TextView txtMoto;
+
+	private boolean isDraw; // different for get information screen and route
+							// task
+
+	public enum MODE {
+		driving, walking
+	};
+
 	public GpsDirection(Context context, GoogleMap mMap) {
 		this.context = context;
 		this.mMap = mMap;
 	}
-	
-	
-	public void excuteDirection(LatLng origin, LatLng dest, boolean isBeforeRemove) {
+
+	public GpsDirection(Context context) {
+		this.context = context;
+		this.mMap = null;
+	}
+
+	public void excuteDirection(LatLng origin, LatLng dest,
+			boolean isBeforeRemove) {
 		this.isBeforeRemove = isBeforeRemove;
 		if (isBeforeRemove && polylineCurrent != null)
 			polylineCurrent.remove();
-		
-		
+
+		isDraw = true;
+
 		String url = getDirectionsUrl(origin, dest);
-		DownloadTask downloadTask = new DownloadTask();
-		
+		DownloadTask downloadTask = new DownloadTask(MODE.driving);
+
 		// Start downloading json data from Google Directions API
 		downloadTask.execute(url);
 	}
-	
+
+	public void loadViewDirectionInfo(TextView txtDistance, TextView txtWalk,
+			TextView txtMoto, LatLng origin, LatLng dest) {
+
+		isDraw = false;
+
+		this.txtDistance = txtDistance;
+		this.txtWalk = txtWalk;
+		this.txtMoto = txtMoto;
+
+		// prepare
+		this.txtDistance.setText("đang tính...");
+		this.txtWalk.setText("...");
+		this.txtMoto.setText("...");
+
+		for (MODE m : MODE.values()) {
+			String url = getDirectionsUrl(origin, dest, m.toString());
+			DownloadTask downloadTask = new DownloadTask(m);
+			downloadTask.execute(url);
+		}
+	}
+
 	public String getDirectionsUrl(LatLng origin, LatLng dest) {
+		return getDirectionsUrl(origin, dest, "");
+	}
+
+	public String getDirectionsUrl(LatLng origin, LatLng dest, String fmode) {
 
 		// Origin of route
 		String str_origin = "origin=" + origin.latitude + ","
@@ -61,8 +112,13 @@ public class GpsDirection {
 		// Sensor enabled
 		String sensor = "sensor=false";
 
+		String mode = "mode=" + fmode;
+
+		String unit = "units=metric"; // &mode=driving
+
 		// Building the parameters to the web service
-		String parameters = str_origin + "&" + str_dest + "&" + sensor;
+		String parameters = str_origin + "&" + str_dest + "&" + sensor + "&"
+				+ unit + "&" + mode;
 
 		// Output format
 		String output = "json";
@@ -70,6 +126,8 @@ public class GpsDirection {
 		// Building the url to the web service
 		String url = "https://maps.googleapis.com/maps/api/directions/"
 				+ output + "?" + parameters;
+
+		Log.i("DIRECTION: ", url);
 
 		return url;
 	}
@@ -117,6 +175,12 @@ public class GpsDirection {
 	// Fetches data from url passed
 	private class DownloadTask extends AsyncTask<String, Void, String> {
 
+		MODE mode;
+
+		public DownloadTask(MODE m) {
+			this.mode = m;
+		}
+
 		// Downloading data in non-ui thread
 		@Override
 		protected String doInBackground(String... url) {
@@ -139,7 +203,7 @@ public class GpsDirection {
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 
-			ParserTask parserTask = new ParserTask();
+			ParserTask parserTask = new ParserTask(mode);
 
 			// Invokes the thread for parsing the JSON data
 			parserTask.execute(result);
@@ -150,6 +214,12 @@ public class GpsDirection {
 	/** A class to parse the Google Places in JSON format */
 	private class ParserTask extends
 			AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+		MODE mode;
+
+		public ParserTask(MODE m) {
+			this.mode = m;
+		}
 
 		// Parsing the data in non-ui thread
 		@Override
@@ -181,8 +251,18 @@ public class GpsDirection {
 			String duration = "";
 			String startAddress = "";
 			String endAddress = "";
+			String travelMode = "";
 
 			if (result.size() < 1) {
+				if (!isDraw) {
+					if (mode.equals(MODE.walking))
+						txtWalk.setText("không có sẵn");
+					else if (mode.equals(MODE.driving)) {
+						txtMoto.setText("không có sẵn");
+						txtDistance.setText("không xác định");
+					}
+				}
+
 				Toast.makeText(context, "No Points", Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -210,7 +290,12 @@ public class GpsDirection {
 						endAddress = (String) point.get("endAddress");
 						continue;
 					}
+//					else if (j == 3) {
+//						travelMode = (String) point.get("travel_mode");
+//						Log.i("MODE", travelMode);
+//					}
 
+					
 					double lat = Double.parseDouble(point.get("lat"));
 					double lng = Double.parseDouble(point.get("lng"));
 					LatLng position = new LatLng(lat, lng);
@@ -233,9 +318,37 @@ public class GpsDirection {
 			Log.i("ADDRESS INFO: ", "Start:" + startAddress + ", End:"
 					+ endAddress);
 
-			// Drawing polyline in the Google Map for the i-th route
-			polylineCurrent =  mMap.addPolyline(lineOptions);
+			if (isDraw) {
+				Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
+				
+				polylineCurrent = mMap.addPolyline(lineOptions);
+				return;
+			}
+
+			if (mode.equals(MODE.walking)) {
+				mdurationsMode[0] = duration;
+				Log.i("WALKING duration: ", duration);
+				txtWalk.setText(Utility.convertSecTimeToString(Long
+						.parseLong(duration)));
+
+			} else if (mode.equals(MODE.driving)) {
+				mdurationsMode[2] = duration;
+				mdistance = distance;
+				txtDistance.setText(distance);
+				txtMoto.setText(Utility.convertSecTimeToString(Long
+						.parseLong(duration)));
+
+				polylineOptions = lineOptions;
+				Log.i("DISTANCE: ", distance);
+				Log.i("TRAVLING duration: ", duration);
+			}
+
+			/*
+			 * if (travelMode.equals("TRAVLING")) // Drawing polyline in the
+			 * Google Map for the i-th route polylineCurrent =
+			 * mMap.addPolyline(lineOptions);
+			 */
 		}
 	}
-	
+
 }

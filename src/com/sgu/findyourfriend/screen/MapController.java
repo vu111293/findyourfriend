@@ -6,23 +6,35 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
-import com.google.android.gms.internal.fo;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sgu.findyourfriend.FriendManager;
+import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.History;
+import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.utils.GpsDirection;
 
 public class MapController {
@@ -70,8 +82,8 @@ public class MapController {
 		Intent callIntent = new Intent(Intent.ACTION_CALL);
 		callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		callIntent.setData(Uri.parse("tel:"
-				+ FriendManager.instance.friends.get(friendId).getUserInfo()
-						.getPhoneNumber()));
+				+ FriendManager.getInstance().friends.get(friendId)
+						.getUserInfo().getPhoneNumber()));
 		context.startActivity(callIntent);
 	}
 
@@ -82,6 +94,8 @@ public class MapController {
 
 		mLoadLocationTask = new AsyncTask<Void, Void, Void>() {
 
+			Friend f;
+			
 			@Override
 			protected Void doInBackground(Void... params) {
 				// locationsHis = aController.getLocationHistory(context);
@@ -102,6 +116,11 @@ public class MapController {
 				historyList.add(new History(new Timestamp(System
 						.currentTimeMillis() - 1000), new LatLng(
 						13.173887272186989, 107.1006023606658)));
+				
+				f = FriendManager.getInstance().friends.get(friendId); 
+				if (null == f.getSteps()) 				
+					f.setSteps(PostData.historyGetUserHistory(context, f.getUserInfo().getId()));
+				
 				return null;
 			}
 
@@ -112,20 +131,19 @@ public class MapController {
 				List<LatLng> latlngs = new ArrayList<LatLng>();
 
 				// draw on map
-				for (History p : historyList) {
-					MarkerOptions opt = new MarkerOptions();
-					opt.position(p.getLocation());
-
-					Marker m = mMap.addMarker(opt);
-					hisMarkerList.add(m);
+				int sn = f.getSteps().size();
+				while (sn > 0) {
+					History hp = f.getSteps().get(sn - 1);
+					Log.i("LOC", hp.getLocation().latitude + " # " + hp.getLocation().longitude);
 					
-					latlngs.add(p.getLocation());
+					createHistoryPoint(hp, sn);
+					latlngs.add(hp.getLocation());
+					sn--;
 				}
 
 				// set bound zoom
 				zoomBoundPosition(latlngs);
 			}
-
 		};
 
 		// execute AsyncTask
@@ -137,8 +155,10 @@ public class MapController {
 	}
 
 	public void routeTask(int friendId) {
-		LatLng dest = FriendManager.instance.friends.get(friendId)
-				.getUserInfo().getLastLocation();
+		// clear marker history before
+		clearnMarkerHistory();
+		
+		LatLng dest = FriendManager.getInstance().friends.get(friendId).getLastLocation();
 		Location myLocation = mMap.getMyLocation();
 		LatLng myLatLng = new LatLng(myLocation.getLatitude(),
 				myLocation.getLongitude());
@@ -177,15 +197,80 @@ public class MapController {
 
 		mMap.animateCamera(cu);
 	}
-	
+
 	public void zoomToPosition(LatLng latLng) {
 		CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(latLng, 8);
 		mMap.animateCamera(cu);
 	}
-	
+
 	public void zoomToPosition(Location location) {
 		CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(
 				new LatLng(location.getLatitude(), location.getLongitude()), 8);
 		mMap.animateCamera(cu);
 	}
+
+	public void createHistoryPoint(History hisP, int prio) {
+		MarkerOptions opt = new MarkerOptions();
+		opt.position(hisP.getLocation());
+		opt.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(
+				R.drawable.ic_position_history, prio + "")));
+		Marker m = mMap.addMarker(opt);
+		opt.title(hisP.getTimest().toGMTString());
+		hisMarkerList.add(m);
+	}
+
+	// ---------------bitmap untils
+
+	private Bitmap writeTextOnDrawable(int drawableId, String text) {
+
+		Bitmap bm = BitmapFactory.decodeResource(context.getResources(),
+				drawableId).copy(Bitmap.Config.ARGB_8888, true);
+
+		Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
+
+		Paint paint = new Paint();
+		paint.setStyle(Style.FILL);
+		paint.setColor(Color.BLACK);
+		paint.setTypeface(tf);
+		paint.setTextAlign(Align.CENTER);
+		paint.setTextSize(convertToPixels(context, 18));
+
+		Rect textRect = new Rect();
+		paint.getTextBounds(text, 0, text.length(), textRect);
+
+		Canvas canvas = new Canvas(bm);
+
+		// If the text is bigger than the canvas , reduce the font size
+		if (textRect.width() >= (canvas.getWidth() - 4)) // the padding on
+															// either sides is
+															// considered as 4,
+															// so as to
+															// appropriately fit
+															// in the text
+			paint.setTextSize(convertToPixels(context, 7)); // Scaling needs to
+															// be used for
+															// different dpi's
+
+		// Calculate the positions
+		int xPos = (canvas.getWidth() / 2) - 2; // -2 is for regulating the x
+												// position offset
+
+		// "- ((paint.descent() + paint.ascent()) / 2)" is the distance from the
+		// baseline to the center.
+		int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint
+				.ascent()) / 2));
+
+		canvas.drawText(text, xPos, yPos, paint);
+
+		return bm;
+	}
+
+	public static int convertToPixels(Context context, int nDP) {
+		final float conversionScale = context.getResources()
+				.getDisplayMetrics().density;
+
+		return (int) ((nDP * conversionScale) + 0.5f);
+
+	}
+
 }

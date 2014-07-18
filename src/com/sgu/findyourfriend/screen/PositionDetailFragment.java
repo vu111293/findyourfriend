@@ -13,9 +13,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.internal.bu;
+import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.FriendManager;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.utils.GpsDirection;
 
 public class PositionDetailFragment extends Fragment {
 
@@ -26,8 +29,10 @@ public class PositionDetailFragment extends Fragment {
 	private TextView txtPhoneNumber;
 	private TextView txtUpdateTime;
 	private TextView txtAccuracy;
+	
+	private TextView txtDistance;
 	private TextView txtWalkTime;
-	private TextView txtCarTime;
+	private TextView txtMotobikeTime;
 
 	// include layout for horizontal friend list
 	private View inc;
@@ -43,6 +48,8 @@ public class PositionDetailFragment extends Fragment {
 	private Button btnRequest;
 
 	private int friendId;
+	
+	private GpsDirection gpsDirection;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,9 +57,11 @@ public class PositionDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_position_info,
 				container, false);
 
+		gpsDirection = new GpsDirection(getActivity());
+		
 		Bundle bundle = this.getArguments();
 		friendId = bundle.getInt("friendId");
-		friend = FriendManager.instance.friends.get(friendId);
+		friend = FriendManager.getInstance().friends.get(friendId);
 
 		txtName = (TextView) rootView.findViewById(R.id.txtUserName);
 		txtAddress = (TextView) rootView.findViewById(R.id.txtAddress);
@@ -60,8 +69,10 @@ public class PositionDetailFragment extends Fragment {
 		txtPhoneNumber = (TextView) rootView.findViewById(R.id.txtPhone);
 		txtUpdateTime = (TextView) rootView.findViewById(R.id.txtUpdateTime);
 		txtAccuracy = (TextView) rootView.findViewById(R.id.txtAccuracy);
-		txtWalkTime = (TextView) rootView.findViewById(R.id.txtWalkTime);
-		txtCarTime = (TextView) rootView.findViewById(R.id.txtCarTime);
+		
+		txtDistance = (TextView) rootView.findViewById(R.id.txtDistanceInfo);
+		txtWalkTime = (TextView) rootView.findViewById(R.id.txtWalkTimeInfo);
+		txtMotobikeTime = (TextView) rootView.findViewById(R.id.txtMotobikeTimeInfo);
 
 		txtName.setText(friend.getUserInfo().getName());
 		txtAddress.setText(bundle.getString("address"));
@@ -76,6 +87,10 @@ public class PositionDetailFragment extends Fragment {
 		this.rootView = rootView;
 		setupControlView(rootView);
 
+		gpsDirection.loadViewDirectionInfo(txtDistance, txtWalkTime, txtMotobikeTime,
+				new LatLng(bundle.getDouble("myLat"), bundle.getDouble("myLng")),
+				friend.getLastLocation());
+		
 		// if ()
 		// ((LinearLayout)
 		// ((ViewGroup)view.findViewById(R.id.btnMessage).getParent())).setBackgroundColor(Color.RED);
@@ -115,7 +130,7 @@ public class PositionDetailFragment extends Fragment {
 				Intent callIntent = new Intent(Intent.ACTION_CALL);
 				callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				callIntent.setData(Uri.parse("tel:"
-						+ FriendManager.instance.friends.get(friendId)
+						+ FriendManager.getInstance().friends.get(friendId)
 								.getUserInfo().getPhoneNumber()));
 				getActivity().getApplicationContext().startActivity(callIntent);
 			}
@@ -182,7 +197,7 @@ public class PositionDetailFragment extends Fragment {
 				enableView(R.id.btnMessage);
 				enableView(R.id.btnCall);
 				enableView(R.id.btnRoute);
-				if (friend.getShare() == 1) {
+				if (friend.isShare()) {
 					disableView(R.id.btnRequest);
 				} else {
 					enableView(R.id.btnRequest);

@@ -23,6 +23,7 @@ import android.widget.ListView;
 import com.sgu.findyourfriend.MessageManager;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.MessageAdapter;
+import com.sgu.findyourfriend.ctr.ControlOptions;
 import com.sgu.findyourfriend.model.Message;
 
 public class MessageFragment extends Fragment {
@@ -76,18 +77,9 @@ public class MessageFragment extends Fragment {
 			public void onFocusChange(View arg0, boolean arg1) {
 				// load send message fragment
 
-				SendMessageFragment fragment = new SendMessageFragment();
-
-				Bundle bundle = new Bundle();
-				bundle.putInt("friendId", -1);
-				fragment.setArguments(bundle);
-
-				((BaseContainerFragment) mThis.getParentFragment())
-						.replaceFragment(fragment, true);
-
+				openEditMessageScene(-1);
 			}
 		});
-
 
 		messages = MessageManager.instance.getAllMessage();
 		Log.i("MESSAGE", "numbwe sms db: " + messages.size());
@@ -129,10 +121,42 @@ public class MessageFragment extends Fragment {
 			}
 		});
 		smsListView.setSelection(messages.size() - 1);
+		
+		
+		// check require from sliding friend event
+		if (ControlOptions.getInstance().isRequire()) {
+			Log.i("REQUIRE", "####################################");
+			int fId = Integer.parseInt(ControlOptions.getInstance().getHashMap("friendId"));
+			openEditMessageScene(fId);
+			ControlOptions.getInstance().finish();
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		smsListView.setSelection(messages.size() - 1);
 	}
 
 	public void onDestroyView() {
 		super.onDestroyView();
+	}
+
+	public void addNewMessage(Message msg) {
+		messages.add(msg);
+		adapter.notifyDataSetChanged();
+		smsListView.setSelection(messages.size() - 1);
+	}
+
+	private void openEditMessageScene(int friendId) {
+		SendMessageFragment fragment = new SendMessageFragment(mThis);
+
+		Bundle bundle = new Bundle();
+		bundle.putInt("friendId", friendId);
+		fragment.setArguments(bundle);
+
+		((BaseContainerFragment) mThis.getParentFragment()).replaceFragment(
+				fragment, true);
 	}
 
 }

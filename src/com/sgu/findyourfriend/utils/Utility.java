@@ -23,12 +23,16 @@ public class Utility {
 	
 	
 	// example: 30' 10s
-	public static String convertTimeToString(Long mics) {
-		int sumSecs = (int) (mics / 1000);
-		int days = sumSecs / (24 * 60 * 60); sumSecs %= (24 * 60 * 60); 
-		int hours = sumSecs / (60 * 60); sumSecs %= (60 * 60);
-		int mins = sumSecs / 60; sumSecs %= 60;
-		int secs = sumSecs;
+	public static String convertMicTimeToString(Long mics) {
+		return convertSecTimeToString(mics / 1000);
+	}
+	
+	public static String convertSecTimeToString(Long sumSecs) {
+		// int sumSecs = (int) (mics / 1000);
+		int days = (int) (sumSecs / (24 * 60 * 60)); sumSecs %= (24 * 60 * 60); 
+		int hours = (int) (sumSecs / (60 * 60)); sumSecs %= (60 * 60);
+		int mins = (int) (sumSecs / 60); sumSecs %= 60;
+		Long secs = sumSecs;
 		
 		StringBuilder builder = new StringBuilder();
 		if (days > 0) builder.append(" " + days + "d");

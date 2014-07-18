@@ -23,6 +23,7 @@ public class DirectionsJSONParser {
 		JSONArray jSteps = null;
 		JSONObject jDistance = null;
 		JSONObject jDuration = null;
+		JSONObject jMode = null;
 
 		try {
 
@@ -47,7 +48,7 @@ public class DirectionsJSONParser {
 					jDuration = ((JSONObject) jLegs.get(j))
 							.getJSONObject("duration");
 					HashMap<String, String> hmDuration = new HashMap<String, String>();
-					hmDuration.put("duration", jDuration.getString("text"));
+					hmDuration.put("duration", jDuration.getString("value"));
 
 					// get start and end address 
 					HashMap<String, String> hmAddress = new HashMap<String, String>();
@@ -58,6 +59,8 @@ public class DirectionsJSONParser {
 					hmAddress.put("endAddress", ((JSONObject) jLegs.get(j))
 							.getString("end_address"));
 					
+					
+					
 					/** Adding distance object to the path */
 					path.add(hmDistance);
 
@@ -67,10 +70,24 @@ public class DirectionsJSONParser {
 					// adding start and end address 
 					path.add(hmAddress);
 					
+					
+					
 					jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
 
+//					boolean isGetMode = false;
+					
 					/** Traversing all steps */
 					for (int k = 0; k < jSteps.length(); k++) {
+//						if (!isGetMode) {
+//							HashMap<String, String> hmMode = new HashMap<String, String>();
+//							
+//							hmMode.put("travel_mode", ((JSONObject) jSteps
+//									.get(k)).getString("travel_mode"));
+//							
+//							path.add(hmMode);
+//							isGetMode = true;
+//						}
+						
 						String polyline = "";
 						polyline = (String) ((JSONObject) ((JSONObject) jSteps
 								.get(k)).get("polyline")).get("points");

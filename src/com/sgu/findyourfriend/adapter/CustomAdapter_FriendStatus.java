@@ -72,27 +72,46 @@ public class CustomAdapter_FriendStatus extends ArrayAdapter<Friend> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
 		convertView = inflater.inflate(LayoutResID, null);
-		TextView Name = (TextView) convertView
-				.findViewById(R.id.TextView_FriendStatus_Name);
-		TextView Phone = (TextView) convertView
-				.findViewById(R.id.TextView_FriendStatus_Phone);
-		ImageView img = (ImageView) convertView
-				.findViewById(R.id.ImageView_FriendStatus_Avatar);
-		ImageView onoffline = (ImageView) convertView
-				.findViewById(R.id.ImageView_FriendStatus_icon_on_offline);
+		TextView name = (TextView) convertView
+				.findViewById(R.id.txtName);
+		TextView phoneNumber = (TextView) convertView
+				.findViewById(R.id.txtPhoneNumber);
+		ImageView imgProfile = (ImageView) convertView
+				.findViewById(R.id.imgProfile);
+		ImageView imgStatusBar = (ImageView) convertView
+				.findViewById(R.id.imgStatusBar);
+		TextView txtStatusText = (TextView) convertView.findViewById(R.id.txtStatusText);
+		ImageView imgNoneAccept = (ImageView) convertView.findViewById(R.id.imgNoneAccept);
+		
+		
 		Friend fr = DataList.get(position);
-		Name.setText(fr.getUserInfo().getName());
-		Phone.setText(fr.getUserInfo().getPhoneNumber());
-		if (fr.getUserInfo().getAvatar() != "") {
-			imageLoader
-					.displayImage(fr.getUserInfo().getAvatar(), img, options);
-
+		
+		
+		name.setText(fr.getUserInfo().getName());
+		phoneNumber.setText(fr.getNumberLogin().get(0));
+		imageLoader.displayImage(fr.getUserInfo().getAvatar(), imgProfile, options);
+		
+		// set img
+		if (fr.isAccepted()) {
+			imgNoneAccept.setVisibility(View.GONE);
+			if (fr.isAvailable()) {
+				if (fr.isShare()) {
+					imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.share));
+					txtStatusText.setText("chia sẻ");
+				} else {
+					imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.online));
+					txtStatusText.setText("trực tuyến");
+				}
+			} else {
+				imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.offine));
+				txtStatusText.setText("đang ẩn");
+			}
+			
+		} else {
+			imgNoneAccept.setVisibility(View.VISIBLE);
+			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.none_accept));
+			txtStatusText.setText("chờ chấp nhận");
 		}
-
-		// if (fr.getShare() == 0) {
-		// onoffline.setVisibility(View.GONE);
-		// }
-
 		return convertView;
 	}
 

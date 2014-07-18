@@ -25,7 +25,7 @@
         android:id="@+id/tv_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/pb_progressbar"
+        android:layout_alignBottom="@id/pb_progressbar"
         android:layout_centerHorizontal="true"
         android:text="Progress: 0%"
         android:textAppearance="?android:attr/textAppearanceSmall" android:textColor="#ffffffff" android:shadowColor="#000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="3.0"/>

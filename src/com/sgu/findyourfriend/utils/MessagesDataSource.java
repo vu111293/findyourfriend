@@ -11,7 +11,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.sgu.findyourfriend.ProfileInfo;
+import com.sgu.findyourfriend.MyProfileManager;
 import com.sgu.findyourfriend.model.Message;
 
 public class MessagesDataSource {
@@ -88,7 +88,7 @@ public class MessagesDataSource {
 		Message message = new Message(
 				cursor.getLong(0),
 				cursor.getString(1),
-				cursor.getString(2).equals(ProfileInfo.gcmMyId),
+				cursor.getString(2).equals(MyProfileManager.getInstance().mine.getGcmId()),
 				cursor.getString(2),
 				cursor.getString(3),
 				new Date(Long.parseLong(cursor.getString(4))));

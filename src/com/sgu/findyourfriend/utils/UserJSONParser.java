@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.sgu.findyourfriend.model.User;
 
 public class UserJSONParser {
@@ -47,7 +49,10 @@ public class UserJSONParser {
 	// Parsing the Country JSON object
 	public static User getUser(JSONObject jUser) {
 
+		Log.d("USER JSON", jUser.toString());
+		
 		User user = null;
+		int id;
 		String name = "";
 		int gender = 0;
 		String province = "";
@@ -57,6 +62,7 @@ public class UserJSONParser {
 		Timestamp lastestLogin = new Timestamp(0);
 
 		try {
+			id = jUser.getInt("id");
 			name = jUser.getString("name");
 			gender = jUser.getInt("gender");
 			province = jUser.getString("province");
@@ -64,7 +70,7 @@ public class UserJSONParser {
 			avatar = jUser.getString("avatar");
 			gcmId = jUser.getString("gcmid");
 			lastestLogin = Timestamp.valueOf(jUser.getString("lastestlogin"));
-			user = new User(name, gender, province, email, avatar, gcmId,
+			user = new User(id, name, gender, province, email, avatar, gcmId,
 					lastestLogin);
 		} catch (JSONException e) {
 			e.printStackTrace();
