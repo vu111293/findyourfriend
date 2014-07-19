@@ -1,40 +1,48 @@
 package com.sgu.findyourfriend.model;
 
 public class FriendRequest {
-	String ImageUrl = "";
-	String Name = "";
-	int MutualFriends = 0;
+	
+	private int id;
+	private String name;
+	private String imgProfile;
+	private boolean isNotNow; 
 
-	public FriendRequest() {
-	}
-
-	public FriendRequest(String name, int mutualfriends, String imgurl) {
-		this.Name = name;
-		this.MutualFriends = mutualfriends;
-		this.ImageUrl = imgurl;
-	}
-
-	public String getImageUrl() {
-		return ImageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		ImageUrl = imageUrl;
+	public FriendRequest(int id, String name, String imgProfile, boolean isNotNow) {
+		this.setId(id);
+		this.setName(name);
+		this.setImgProfile(imgProfile);
+		this.setNotNow(isNotNow);
 	}
 
 	public String getName() {
-		return Name;
+		return name;
 	}
 
 	public void setName(String name) {
-		Name = name;
+		this.name = name;
 	}
 
-	public int getMutualFriends() {
-		return MutualFriends;
+	public String getImgProfile() {
+		return imgProfile;
 	}
 
-	public void setMutualFriends(int mutualFriends) {
-		MutualFriends = mutualFriends;
+	public void setImgProfile(String imgProfile) {
+		this.imgProfile = imgProfile;
+	}
+
+	public boolean isNotNow() {
+		return isNotNow;
+	}
+
+	public void setNotNow(boolean isNotNow) {
+		this.isNotNow = isNotNow;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

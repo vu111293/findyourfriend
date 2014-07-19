@@ -4,151 +4,86 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.model.Friend;
 
-public class FriendSwipeAdapter extends BaseAdapter {
-
-	// private List<String> mData = new ArrayList<String>();
-
-	public static int USER_ACCEPTED = 0;
-	public static int USER_WAITACCCEPT = 1;
-	public static int NUMBER_USER_TYPE = 2;
-
-	private List<Friend> mData;
-	private Context mContext;
-	
+public class FriendSwipeAdapter extends ArrayAdapter<Friend> {
+	int LayoutResID;
+	Context ctx;
+	List<Friend> DataList = new ArrayList<Friend>();
 	ImageLoader imageLoader;
-	// DisplayImageOptions options;
+	DisplayImageOptions options;
+	private int itemIdHightLight = -1;
 
-	public FriendSwipeAdapter(Context context) {
-		this.mContext = context;
-		mData = new ArrayList<Friend>();
-		
+	@SuppressWarnings("deprecation")
+	public FriendSwipeAdapter(Context context, int resource,
+			List<Friend> objects) {
+		super(context, resource, objects);
+		// TODO Auto-generated constructor stub
+		ctx = context;
+		LayoutResID = resource;
+		DataList = objects;
+
+		options = new DisplayImageOptions.Builder().cacheInMemory(true)
+				.cacheOnDisc(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		imageLoader = ImageLoader.getInstance();
-		
-		if (imageLoader == null) {
-			Log.i("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG", "Hit");
-			
-		}
+//		File cacheDir = StorageUtils.getCacheDirectory(context);
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+				context)
+				.memoryCacheExtraOptions(480, 800)
+				// default = device screen dimensions
+
+				.taskExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+				.taskExecutorForCachedImages(AsyncTask.THREAD_POOL_EXECUTOR)
+				.threadPoolSize(3)
+				// default
+				.threadPriority(Thread.NORM_PRIORITY - 1)
+				// default
+				.tasksProcessingOrder(QueueProcessingType.FIFO)
+				// default
+				.denyCacheImageMultipleSizesInMemory()
+				.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024))
+				// default
+				.memoryCacheSize(2 * 1024 * 1024)
+				.imageDownloader(new BaseImageDownloader(context)) // default
+				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
+				.build();
+		imageLoader.init(config);
 	}
 
-	public FriendSwipeAdapter(Context context, List<Friend> friends) {
-		this.mContext = context;
-		this.mData = friends;
+	public void hightLightItem(int pos) {
+		itemIdHightLight = pos;
 	}
-
-	public void addItem(Friend friend) {
-		mData.add(friend);
-	}
-
-	@Override
-	public Friend getItem(int position) {
-		return mData.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
-	public int getCount() {
-		return mData.size();
-	}
-
-	@Override
-	public int getViewTypeCount() {
-		return NUMBER_USER_TYPE;
-	}
-
-	@Override
-	public int getItemViewType(int position) {
-		// TODO Auto-generated method stub
-		return mData.get(position).isAccepted() ? USER_ACCEPTED
-				: USER_WAITACCCEPT;
-	}
-
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Friend friend = this.getItem(position);
-		
-		convertView = LayoutInflater.from(mContext).inflate(
-				R.layout.item_friend_accepted, parent, false);
+
+		convertView = LayoutInflater.from(ctx).inflate(LayoutResID, parent, false);
 		ImageView imgAvatar = (ImageView) convertView
 				.findViewById(R.id.imgAvatar);
-		
-		
+
 		imageLoader.displayImage(friend.getUserInfo().getAvatar(), imgAvatar);
+
+		if (itemIdHightLight == position) 
+			convertView.setBackgroundColor(0xff086EBC);
 		
 		return convertView;
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*
-		ViewHolder holder;
-
-		if (convertView == null) {
-			holder = new ViewHolder();
-			if (friend.getUserInfo().isAccepted()) {
-				convertView = LayoutInflater.from(mContext).inflate(
-						R.layout.item_friend_accepted, parent, false);
-				holder.imgAvatar = (ImageView) convertView
-						.findViewById(R.id.imgAvatar);
-			} else {
-				convertView = LayoutInflater.from(mContext).inflate(
-						R.layout.item_friend_waitaccept, parent, false);
-				holder.imgAvatar = (ImageView) convertView
-						.findViewById(R.id.imgAvatar);
-				holder.txtName = (TextView) convertView
-						.findViewById(R.id.txtName);
-
-			}
-			convertView.setTag(holder);
-
-		} else {
-			holder = (ViewHolder) convertView.getTag();
-		}
-
-		if (friend.getUserInfo().isAccepted()) {
-			// edit
-			//  imageLoader
-			//  .displayImage(friend.getUserInfo().getAvatar(), holder.imgAvatar);
-			
-			
-			
-			holder.imgAvatar.setImageResource(R.drawable.avatar2);
-		} else {
-			// edit
-			holder.imgAvatar.setImageResource(R.drawable.ic_notavailable);
-			holder.txtName.setText(friend.getUserInfo().getName());			
-		}
-
-
-
-		return convertView;*/
-	}
-
-	private class ViewHolder {
-		public ImageView imgAvatar;
-		public TextView txtName;
 	}
 
 }

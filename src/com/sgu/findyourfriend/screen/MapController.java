@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,12 +17,17 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,8 +37,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sgu.findyourfriend.FriendManager;
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.History;
 import com.sgu.findyourfriend.net.PostData;
@@ -51,10 +58,14 @@ public class MapController {
 
 	private boolean isRouting;
 
-	public MapController(Context context, Fragment f, GoogleMap map) {
+	private ProgressBar pbOnMap;
+
+	public MapController(Context context, Fragment f, GoogleMap map,
+			ProgressBar pbOnMap) {
 		this.context = context;
 		this.baseFragment = f;
 		this.mMap = map;
+		this.pbOnMap = pbOnMap;
 
 		isRouting = false;
 
@@ -75,27 +86,58 @@ public class MapController {
 
 		((BaseContainerFragment) baseFragment.getParentFragment())
 				.replaceFragment(fragment, true);
-
 	}
 
 	public void callTask(int friendId) {
-		Intent callIntent = new Intent(Intent.ACTION_CALL);
-		callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		callIntent.setData(Uri.parse("tel:"
-				+ FriendManager.getInstance().friends.get(friendId)
-						.getUserInfo().getPhoneNumber()));
-		context.startActivity(callIntent);
+
+		ArrayList<String> phs = FriendManager.getInstance().friends.get(
+				friendId).getNumberLogin();
+
+		if (phs.size() == 0) {
+			Toast.makeText(context, "Not phone number", Toast.LENGTH_LONG)
+					.show();
+			return;
+		}
+
+		final String[] phonenumbers = new String[phs.size()];
+
+		for (int i = 0; i < phs.size(); ++i) {
+			phonenumbers[i] = phs.get(i);
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("Chọn số cần gọi:");
+		builder.setItems(phonenumbers, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+				callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				callIntent.setData(Uri.parse("tel:" + phonenumbers[which]));
+				context.startActivity(callIntent);
+			}
+		}).setNegativeButton("Quay lại", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			}
+		});
+
+		builder.show();
 	}
 
 	public void drawHistoryTask(final int friendId) {
+		// clear route
+		gpsDirection.clearRoute();
 
 		// clear marker before add new
 		clearnMarkerHistory();
 
 		mLoadLocationTask = new AsyncTask<Void, Void, Void>() {
-
 			Friend f;
-			
+
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				pbOnMap.setVisibility(View.VISIBLE);
+			}
+
 			@Override
 			protected Void doInBackground(Void... params) {
 				// locationsHis = aController.getLocationHistory(context);
@@ -116,11 +158,12 @@ public class MapController {
 				historyList.add(new History(new Timestamp(System
 						.currentTimeMillis() - 1000), new LatLng(
 						13.173887272186989, 107.1006023606658)));
-				
-				f = FriendManager.getInstance().friends.get(friendId); 
-				if (null == f.getSteps()) 				
-					f.setSteps(PostData.historyGetUserHistory(context, f.getUserInfo().getId()));
-				
+
+				f = FriendManager.getInstance().friends.get(friendId);
+				if (null == f.getSteps())
+					f.setSteps(PostData.historyGetUserHistory(context, f
+							.getUserInfo().getId()));
+
 				return null;
 			}
 
@@ -134,12 +177,17 @@ public class MapController {
 				int sn = f.getSteps().size();
 				while (sn > 0) {
 					History hp = f.getSteps().get(sn - 1);
-					Log.i("LOC", hp.getLocation().latitude + " # " + hp.getLocation().longitude);
-					
+					Log.i("LOC",
+							hp.getLocation().latitude + " # "
+									+ hp.getLocation().longitude);
+
 					createHistoryPoint(hp, sn);
 					latlngs.add(hp.getLocation());
 					sn--;
 				}
+
+				// hide progress bar
+				pbOnMap.setVisibility(View.GONE);
 
 				// set bound zoom
 				zoomBoundPosition(latlngs);
@@ -151,14 +199,17 @@ public class MapController {
 	}
 
 	public void updatePositionTask(int friendId) {
+		clearnMarkerHistory();
+		gpsDirection.clearRoute();
 
 	}
 
 	public void routeTask(int friendId) {
 		// clear marker history before
 		clearnMarkerHistory();
-		
-		LatLng dest = FriendManager.getInstance().friends.get(friendId).getLastLocation();
+
+		LatLng dest = FriendManager.getInstance().friends.get(friendId)
+				.getLastLocation();
 		Location myLocation = mMap.getMyLocation();
 		LatLng myLatLng = new LatLng(myLocation.getLatitude(),
 				myLocation.getLongitude());
@@ -176,12 +227,29 @@ public class MapController {
 
 	}
 
+	// --------------- utilities methods -------------------- //
+
+	private void createHistoryPoint(History hisP, int prio) {
+		MarkerOptions opt = new MarkerOptions();
+		opt.position(hisP.getLocation());
+		opt.title(getAddress(hisP.getLocation()));
+		opt.snippet(hisP.getTimest().toGMTString());
+		opt.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(
+				R.drawable.ic_position_history, prio + "")));
+		Marker m = mMap.addMarker(opt);
+		opt.title(hisP.getTimest().toGMTString());
+		hisMarkerList.add(m);
+	}
+	
+	
 	private void clearnMarkerHistory() {
 		for (Marker m : hisMarkerList) {
 			m.remove();
 		}
 		hisMarkerList.clear();
 	}
+
+	// ------------------- zoom control ----------------------- //
 
 	private void zoomBoundPosition(List<LatLng> latlngs) {
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -209,17 +277,7 @@ public class MapController {
 		mMap.animateCamera(cu);
 	}
 
-	public void createHistoryPoint(History hisP, int prio) {
-		MarkerOptions opt = new MarkerOptions();
-		opt.position(hisP.getLocation());
-		opt.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(
-				R.drawable.ic_position_history, prio + "")));
-		Marker m = mMap.addMarker(opt);
-		opt.title(hisP.getTimest().toGMTString());
-		hisMarkerList.add(m);
-	}
-
-	// ---------------bitmap untils
+	// ---------------bitmap untilities ------------------------ //
 
 	private Bitmap writeTextOnDrawable(int drawableId, String text) {
 
@@ -241,21 +299,12 @@ public class MapController {
 		Canvas canvas = new Canvas(bm);
 
 		// If the text is bigger than the canvas , reduce the font size
-		if (textRect.width() >= (canvas.getWidth() - 4)) // the padding on
-															// either sides is
-															// considered as 4,
-															// so as to
-															// appropriately fit
-															// in the text
-			paint.setTextSize(convertToPixels(context, 7)); // Scaling needs to
-															// be used for
-															// different dpi's
+		if (textRect.width() >= (canvas.getWidth() - 4))
+			paint.setTextSize(convertToPixels(context, 7));
 
 		// Calculate the positions
-		int xPos = (canvas.getWidth() / 2) - 2; // -2 is for regulating the x
-												// position offset
+		int xPos = (canvas.getWidth() / 2) - 2;
 
-		// "- ((paint.descent() + paint.ascent()) / 2)" is the distance from the
 		// baseline to the center.
 		int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint
 				.ascent()) / 2));
@@ -271,6 +320,36 @@ public class MapController {
 
 		return (int) ((nDP * conversionScale) + 0.5f);
 
+	}
+
+	// --------------- getaddress utilities ---------------------- //
+	public String getAddress(LatLng point) {
+		try {
+			Geocoder geocoder;
+			List<Address> addresses;
+			geocoder = new Geocoder(context);
+			if (point.latitude != 0 || point.longitude != 0) {
+				addresses = geocoder.getFromLocation(point.latitude,
+						point.longitude, 1);
+
+				Address address = addresses.get(0);
+
+				String addressText = String.format(
+						"%s, %s",
+						address.getMaxAddressLineIndex() > 0 ? address
+								.getAddressLine(0) : "", address
+								.getCountryName());
+
+				return addressText;
+			} else {
+				Toast.makeText(context, "latitude and longitude are null",
+						Toast.LENGTH_LONG).show();
+				return "";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

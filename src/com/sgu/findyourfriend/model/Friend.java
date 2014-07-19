@@ -1,6 +1,5 @@
 package com.sgu.findyourfriend.model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import com.google.android.gms.maps.model.LatLng;

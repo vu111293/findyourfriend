@@ -16,12 +16,15 @@ import android.content.Context;
 import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -46,6 +49,10 @@ public class GpsDirection {
 	private boolean isDraw; // different for get information screen and route
 							// task
 
+	// amazing for route detection
+	private boolean stopAmazing;
+	private int ir = 0;
+	
 	public enum MODE {
 		driving, walking
 	};
@@ -64,7 +71,8 @@ public class GpsDirection {
 			boolean isBeforeRemove) {
 		this.isBeforeRemove = isBeforeRemove;
 		if (isBeforeRemove && polylineCurrent != null)
-			polylineCurrent.remove();
+			clearRoute();
+			
 
 		isDraw = true;
 
@@ -73,6 +81,15 @@ public class GpsDirection {
 
 		// Start downloading json data from Google Directions API
 		downloadTask.execute(url);
+		
+		// start amazing
+		amazingRoute(dest);
+	}
+
+	public void clearRoute() {
+		if (null != polylineCurrent)
+			polylineCurrent.remove();
+		
 	}
 
 	public void loadViewDirectionInfo(TextView txtDistance, TextView txtWalk,
@@ -85,7 +102,7 @@ public class GpsDirection {
 		this.txtMoto = txtMoto;
 
 		// prepare
-		this.txtDistance.setText("đang tính...");
+		this.txtDistance.setText("...");
 		this.txtWalk.setText("...");
 		this.txtMoto.setText("...");
 
@@ -261,6 +278,8 @@ public class GpsDirection {
 						txtMoto.setText("không có sẵn");
 						txtDistance.setText("không xác định");
 					}
+				} else {
+					stopAmazing = true;
 				}
 
 				Toast.makeText(context, "No Points", Toast.LENGTH_SHORT).show();
@@ -290,12 +309,11 @@ public class GpsDirection {
 						endAddress = (String) point.get("endAddress");
 						continue;
 					}
-//					else if (j == 3) {
-//						travelMode = (String) point.get("travel_mode");
-//						Log.i("MODE", travelMode);
-//					}
+					// else if (j == 3) {
+					// travelMode = (String) point.get("travel_mode");
+					// Log.i("MODE", travelMode);
+					// }
 
-					
 					double lat = Double.parseDouble(point.get("lat"));
 					double lng = Double.parseDouble(point.get("lng"));
 					LatLng position = new LatLng(lat, lng);
@@ -320,8 +338,9 @@ public class GpsDirection {
 
 			if (isDraw) {
 				Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
-				
+
 				polylineCurrent = mMap.addPolyline(lineOptions);
+				stopAmazing = true;
 				return;
 			}
 
@@ -342,13 +361,36 @@ public class GpsDirection {
 				Log.i("DISTANCE: ", distance);
 				Log.i("TRAVLING duration: ", duration);
 			}
-
-			/*
-			 * if (travelMode.equals("TRAVLING")) // Drawing polyline in the
-			 * Google Map for the i-th route polylineCurrent =
-			 * mMap.addPolyline(lineOptions);
-			 */
 		}
+	}
+	
+	private void amazingRoute(LatLng latlng) {
+		final long interval = 250;
+		final int[] radius = new int[] {1000, 5000, 10000, 20000, 50000};
+		
+		CircleOptions opt = new CircleOptions();
+		opt.center(latlng);
+		opt.fillColor(0x882176B9);
+		opt.strokeWidth(0);
+		opt.radius(100);
+		final Circle c = mMap.addCircle(opt);
+		stopAmazing = false;
+		
+		
+		final Handler handler = new Handler();
+		final Runnable r = new Runnable() {
+			public void run() {
+				c.setRadius(radius[ir % 5]);
+				ir++;
+				if (!stopAmazing) {
+					handler.postDelayed(this, interval);
+				} else {
+					c.remove();
+				}
+			}
+		};
+
+		handler.postDelayed(r, 0);
 	}
 
 }

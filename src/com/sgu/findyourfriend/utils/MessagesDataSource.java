@@ -11,7 +11,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.sgu.findyourfriend.MyProfileManager;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.model.Message;
 
 public class MessagesDataSource {

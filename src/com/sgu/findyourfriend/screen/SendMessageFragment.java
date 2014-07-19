@@ -20,18 +20,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.devsmart.android.ui.HorizontalListView;
-import com.sgu.findyourfriend.FriendManager;
-import com.sgu.findyourfriend.IMessage;
-import com.sgu.findyourfriend.MessageManager;
 import com.sgu.findyourfriend.R;
-import com.sgu.findyourfriend.adapter.FriendSwipeAdapter2;
+import com.sgu.findyourfriend.adapter.FriendSwipeAdapter;
+import com.sgu.findyourfriend.mgr.FriendManager;
+import com.sgu.findyourfriend.mgr.IMessage;
+import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.model.Message;
 
 @SuppressLint("ValidFragment")
 public class SendMessageFragment extends Fragment implements IMessage {
 
 	private HorizontalListView friendsHList;
-	private FriendSwipeAdapter2 swipeAdapter;
+	private FriendSwipeAdapter swipeAdapter;
 
 	private EditText editMessage;
 
@@ -97,7 +97,7 @@ public class SendMessageFragment extends Fragment implements IMessage {
 			public void onClick(View arg0) {
 
 				// send to myself
-				MessageManager.instance.sendMessage(editMessage.getText()
+				MessageManager.getInstance().sendMessage(editMessage.getText()
 						.toString(), getToAddress());
 				editMessage.setText("");
 
@@ -113,7 +113,7 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 		friendsHList = (HorizontalListView) rootView
 				.findViewById(R.id.avatarListView);
-		swipeAdapter = new FriendSwipeAdapter2(getActivity(),
+		swipeAdapter = new FriendSwipeAdapter(getActivity(),
 				R.layout.item_friend_accepted, FriendManager.getInstance().friends);
 		friendsHList.setAdapter(swipeAdapter);
 
@@ -132,7 +132,7 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 		});
 
-		MessageManager.instance.setMessageListener(this);
+		MessageManager.getInstance().setMessageListener(this);
 
 		Bundle bundle = getArguments();
 		friendId = bundle.getInt("friendId", -1);

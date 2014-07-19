@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.model.FriendRequest;
 import com.sgu.findyourfriend.model.History;
 import com.sgu.findyourfriend.model.User;
 import com.sgu.findyourfriend.utils.FriendJSONParser;
@@ -546,4 +547,21 @@ public class PostData {
 		}
 	}
 
+	
+	
+	
+	
+	// ----------------- function require --------------------------//
+	
+	public static ArrayList<FriendRequest> getFriendRequesttList(Context ctx, int id) {
+		// some here
+		
+		
+		
+		return new ArrayList<FriendRequest>();
+	}
+	
+	
+	
+	
 }

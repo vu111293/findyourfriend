@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:paddingRight="10dp"
         android:visibility="visible" >
 
         <ImageView
@@ -33,15 +32,15 @@
             android:layout_marginLeft="10dp"
             android:gravity="center_vertical"
             android:padding="3dp"
-            android:src="@drawable/ic_alert_red" />
+            android:src="@drawable/ic_alert" />
 
         <ImageView
             android:id="@+id/imgFriendList"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:gravity="center_vertical"
             android:padding="3dp"
-            android:src="@drawable/ic_friend_green" />
+            android:src="@drawable/ic_friend_status" />
     </LinearLayout>
 
     <TextView

@@ -1,51 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/RelativeLayout1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="1dp"
+    android:paddingTop="1dp" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <ImageView
-            android:id="@+id/imageView_friendrequests_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1.43"
-            android:src="@drawable/android_icon" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp" 
+        android:layout_marginRight="5dp" >
 
         <LinearLayout
-            android:layout_width="245dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="#E6E6E6"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" >
+
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_no_imgprofile" />
+
+            <ImageView
+                android:id="@+id/imgNotNow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="-50dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/triangle_black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/textView_friendrequests_name"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:id="@+id/txtName"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
                 android:text="Nguyễn Chí Hùng"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/textView_friendrequests_mutualfriends"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="10 Bạn Chung"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp" >
+                android:layout_height="0dp"
+                android:layout_weight="0.8"
+                android:orientation="horizontal" >
 
                 <Button
-                    android:id="@+id/button_friendrequests_confirm"
+                    android:id="@+id/btnConfirm"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="0.15"
                     android:background="@drawable/button_friendrequests_blue"
@@ -53,10 +67,10 @@
                     android:textColor="#ffffff" />
 
                 <Button
-                    android:id="@+id/button_friendrequests_notnow"
+                    android:id="@+id/btnNotNow"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="0.07"
                     android:background="@drawable/button_friendrequests_white"
@@ -65,4 +79,4 @@
         </LinearLayout>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

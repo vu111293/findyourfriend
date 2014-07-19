@@ -19,6 +19,7 @@ import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
@@ -31,12 +32,10 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.maps.model.LatLng;
-import com.sgu.findyourfriend.Config;
 import com.sgu.findyourfriend.R;
-import com.sgu.findyourfriend.R.drawable;
-import com.sgu.findyourfriend.R.string;
-import com.sgu.findyourfriend.model.FriendBak;
+import com.sgu.findyourfriend.mgr.Config;
 
+@SuppressLint("Wakelock")
 public class Controller extends Application {
 
 	private final int MAX_ATTEMPTS = 5;
@@ -73,42 +72,6 @@ public class Controller extends Application {
 		} else {
 			// Send Broadcast to Show message on screen
 			displayMessageOnScreen(context, "get location history fail!");
-			return null;
-		}
-	}
-
-	public List<FriendBak> getFriendsName(final Context context) {
-
-		Log.i(Config.TAG, "get friends name");
-		String serverUrl = Config.GET_FRIENDS_SERVER_URL;
-		Map<String, String> params = new HashMap<String, String>();
-
-		String jsonResponse = tryPostWithJsonResult(context, serverUrl, params);
-
-		if (!jsonResponse.equals("")) {
-			// parse json response
-			List<FriendBak> fs = new ArrayList<FriendBak>();
-
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				JSONArray ls = json.getJSONArray("items");
-
-				ls.toString().replace("[", "");
-				ls.toString().replace("]", "");
-
-				for (int i = 0; i < ls.length(); ++i) {
-					JSONObject o = ls.getJSONObject(i);
-					fs.add(new FriendBak(o.getString("name"),
-							o.getString("email"), o.getString("gcm_regid")));
-				}
-			} catch (Exception e) {
-				Log.d(Config.TAG, "Parsed json error: " + e.getMessage());
-			}
-			return fs;
-
-		} else {
-			// Send Broadcast to Show message on screen
-			displayMessageOnScreen(context, "get friend list fail!");
 			return null;
 		}
 	}
@@ -532,6 +495,7 @@ public class Controller extends Application {
 	}
 
 	// Function to display simple Alert Dialog
+	@SuppressWarnings("deprecation")
 	public void showAlertDialog(Context context, String title, String message,
 			Boolean status) {
 		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
@@ -544,8 +508,8 @@ public class Controller extends Application {
 
 		if (status != null)
 			// Set alert dialog icon
-			alertDialog
-					.setIcon((status) ? R.drawable.success : R.drawable.fail);
+//			alertDialog
+//					.setIcon((status) ? R.drawable.success : R.drawable.fail);
 
 		// Set OK Button
 		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {

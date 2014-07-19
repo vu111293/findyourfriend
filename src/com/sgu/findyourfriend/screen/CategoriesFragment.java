@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.sgu.findyourfriend.R;
-import com.sgu.findyourfriend.adapter.CustomAdapter_Categories;
+import com.sgu.findyourfriend.adapter.CustomAdapterCategories;
 import com.sgu.findyourfriend.model.Category;
 
 public class CategoriesFragment extends Fragment {
 	List<Category> Data = new ArrayList<Category>();
-	CustomAdapter_Categories adapter;
+	CustomAdapterCategories adapter;
 	ListView lv;
 
 	public CategoriesFragment() {
@@ -59,7 +59,7 @@ public class CategoriesFragment extends Fragment {
 		Data.add(new Category("Settings", "drawable://"
 				+ R.drawable.ic_action_settings));
 		Data.add(new Category("Help", "drawable://" + R.drawable.ic_action_help));
-		adapter = new CustomAdapter_Categories(rootView.getContext(),
+		adapter = new CustomAdapterCategories(rootView.getContext(),
 				R.layout.custom_categories, Data);
 		lv = (ListView) rootView.findViewById(R.id.ListView_Categories);
 		lv.setAdapter(adapter);

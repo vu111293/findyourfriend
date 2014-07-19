@@ -18,7 +18,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:paddingRight="15dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/ic_no_imgprofile" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
             android:orientation="horizontal" >
 
             <LinearLayout
-               android:layout_width="0dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical" >
@@ -136,33 +136,27 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
             android:orientation="horizontal" >
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="40dp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:src="@drawable/ic_flaga" />
+                android:paddingLeft="5dp"
+                android:text="Độ dài quảng đường: "
+                android:textColor="#434343"
+                android:textSize="@dimen/small_text_contain" />
 
             <TextView
                 android:id="@+id/txtDistanceInfo"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:paddingLeft="5dp"
-                android:text="150 km"
                 android:textColor="#434343"
                 android:textSize="@dimen/small_text_contain"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:src="@drawable/ic_flagb" />
         </LinearLayout>
 
         <LinearLayout
@@ -193,7 +187,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:paddingLeft="5dp"
-                    android:text="1h30&apos;"
                     android:textColor="#434343"
                     android:textSize="@dimen/small_text_contain"
                     android:textStyle="bold" />
@@ -221,7 +214,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:paddingLeft="5dp"
-                    android:text="30&apos;"
                     android:textColor="#434343"
                     android:textSize="@dimen/small_text_contain"
                     android:textStyle="bold" />

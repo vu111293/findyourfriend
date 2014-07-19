@@ -16,14 +16,13 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.sgu.findyourfriend.MessageManager;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.MessageAdapter;
 import com.sgu.findyourfriend.ctr.ControlOptions;
+import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.model.Message;
 
 public class MessageFragment extends Fragment {
@@ -81,7 +80,7 @@ public class MessageFragment extends Fragment {
 			}
 		});
 
-		messages = MessageManager.instance.getAllMessage();
+		messages = MessageManager.getInstance().getAllMessage();
 		Log.i("MESSAGE", "numbwe sms db: " + messages.size());
 
 		adapter = new MessageAdapter(context, messages);
@@ -103,7 +102,7 @@ public class MessageFragment extends Fragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						MessageManager.instance.deleteMessage(messages
+						MessageManager.getInstance().deleteMessage(messages
 								.get(position));
 						messages.remove(messages.get(position));
 						adapter.notifyDataSetChanged();

@@ -4,32 +4,31 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.sgu.findyourfriend.MyProfileManager;
-import com.sgu.findyourfriend.net.PostData;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
+import com.sgu.findyourfriend.net.PostData;
+
 public class GpsPosition {
-	
+
 	public static final String TAG = "GPS POSITION";
 	private Context context;
 	private Location lastLocation = null;
 	private Location lastLocationUpdate = null;
-	
+
 	private Timer gpsTimer = new Timer();
 	private long lastprovidertimestamp = 0;
 	private LocationManager myLocationManager = null;
-	
+
 	public GpsPosition(Context conext) {
 		this.context = conext;
 		lastprovidertimestamp = 0;
@@ -78,39 +77,23 @@ public class GpsPosition {
 
 			@Override
 			public void run() {
+				Log.i(TAG, "check!");
 				Location location = getBestLocation();
 				doLocationUpdate(location, false);
 			}
 		}, 0, checkInterval);
 	}
 
-	private void setUpSendMyLocationToserver(final long interval) {
-		if (lastLocationUpdate == null || lastLocation.equals(lastLocationUpdate))
-			return;
-		
-		final Handler handler = new Handler();
-		final Runnable r = new Runnable() {
-			public void run() {
-//				PostData.sendLoation(context, lastLocationUpdate.getLatitude(), lastLocationUpdate.getLongitude(), 
-//				ProfileInfo.gcmMyId);
-					handler.postDelayed(this, interval);
-			}
-		};
-
-		handler.postDelayed(r, 0);
-	}
-	
-	
 	private long getGPSCheckMillisFromPrefs() {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		int checkminutes = 5000;
+		int checkminutes = 300000;
 		try {
 			checkminutes = Integer.parseInt(prefs.getString(
-					"gps_check_interval", "30000"));
+					"gps_check_interval", "300000"));
 		} catch (NumberFormatException e) {
 		}
-
+		
 		return checkminutes;
 	}
 
@@ -144,9 +127,10 @@ public class GpsPosition {
 				return;
 			}
 			if (l.getAccuracy() >= getLastLocation().getAccuracy()
-					&& l.distanceTo(getLastLocation()) < l.getAccuracy() && !force) {
+					&& l.distanceTo(getLastLocation()) < l.getAccuracy()
+					&& !force) {
 				// Log.d(TAG, "Accuracy got worse and we are still "
-				// 		+ "within the accuracy range.. Not updating");
+				// + "within the accuracy range.. Not updating");
 				return;
 			}
 			if (l.getTime() <= lastprovidertimestamp && !force) {
@@ -157,15 +141,20 @@ public class GpsPosition {
 		// upload/store your location here
 
 		setLastLocation(l);
-
+		Log.i(TAG, "update server here!");
 		if (getLastLocation() != null) {
 
 			double lat = getLastLocation().getLatitude();
 			double lng = getLastLocation().getLongitude();
 
-			// show lat and lng on view
-			// txtLatitute.setText("Lat: " + String.valueOf(lat));
-			// txtLongtitute.setText("Lng: " + String.valueOf(lng));
+			// ---------------- send to server ------------------
+			if (MyProfileManager.getInstance().myLocation.latitude != lat
+					&& MyProfileManager.getInstance().myLocation.latitude != lat) {
+				PostData.historyCreate(context,
+						MyProfileManager.getInstance().mine.getId(),
+						new LatLng(lat, lng));
+			}
+			// ------------------ end ---------------------------
 		}
 	}
 
@@ -181,7 +170,7 @@ public class GpsPosition {
 			// Log.d(TAG, "No Network Location available");
 			return gpslocation;
 		}
-		// a locationupdate is considered 'old' if its older than the configured
+		// a location update is considered 'old' if its older than the configured
 		// update interval. this means, we didn't get a
 		// update from this provider since the last check
 		long old = System.currentTimeMillis() - getGPSCheckMillisFromPrefs();
