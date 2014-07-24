@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.Message;
+import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.utils.Controller;
 import com.sgu.findyourfriend.utils.MessagesDataSource;
 
@@ -19,6 +20,8 @@ public class MessageManager {
 
 	private static MessageManager instance;
 
+	public static int numNewShareMessage = 0;
+	public static int numNewFriendMessage = 0;
 	private Controller aController;
 	public List<Message> messages;
 
@@ -27,9 +30,11 @@ public class MessageManager {
 	// access database
 	private MessagesDataSource dataSource;
 	private Context context;
+	private MainActivity mainActivity;
 
-	public void init(Context context) {
-		this.context = context;
+	public void init(MainActivity mainActivity) {
+		this.mainActivity = mainActivity;
+		this.context = mainActivity.getApplicationContext();
 
 		aController = (Controller) context;
 		this.context.registerReceiver(mHandleMessageReceiver, new IntentFilter(
@@ -47,7 +52,7 @@ public class MessageManager {
 		}
 		return instance;
 	}
-	
+
 	public void setMessageListener(IMessage iMessage) {
 		this.iMessage = iMessage;
 	}
@@ -61,33 +66,35 @@ public class MessageManager {
 		return messages;
 	}
 
-	public void sendMessage(String msg, List<String> addrs) {
+	public void sendMessage(String msg, List<Integer> addrs) {
 
-		for (String addr : addrs) {
-			Message sms = new Message(msg, true, MyProfileManager.getInstance().mine.getGcmId(),
-					addr, new Date(
-							System.currentTimeMillis()));
+		for (int addr : addrs) {
+			Message sms = new Message(msg, true,
+					MyProfileManager.getInstance().mine.getId(), addr,
+					new Date(System.currentTimeMillis()));
 			sms = dataSource.createMessage(sms);
 			iMessage.addNewMessage(sms);
-			new SendMessage().execute(msg);
+			(new SendMessage()).execute(msg, addr + "");
 		}
 	}
 
-	public Message sendMessage(String msg, List<Friend> friendsId, int k) {
-		Message sms = new Message(msg, true, MyProfileManager.getInstance().mine.getGcmId(),
-				MyProfileManager.getInstance().mine.getGcmId(), new Date(
-						System.currentTimeMillis()));
-		sms = dataSource.createMessage(sms);
-		iMessage.addNewMessage(sms);
-		new SendMessage().execute(msg);
-		return sms;
-	}
+	// public Message sendMessage(String msg, List<Friend> friendsId, int k) {
+	// Message sms = new Message(msg, true,
+	// MyProfileManager.getInstance().mine.getId(),
+	// MyProfileManager.getInstance().mine.getGcmId(),
+	// MyProfileManager.getInstance().mine.getGcmId(), new Date(
+	// System.currentTimeMillis()));
+	// sms = dataSource.createMessage(sms);
+	// iMessage.addNewMessage(sms);
+	// new SendMessage().execute(msg);
+	// return sms;
+	// }
 
 	private class SendMessage extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(String... params) {
-			String regIdFrom = MyProfileManager.getInstance().mine.getGcmId();
-			String regIdTo = MyProfileManager.getInstance().mine.getGcmId();
+			String regIdFrom = MyProfileManager.getInstance().mine.getId() + "";
+			String regIdTo = params[1];
 			String message = params[0];
 
 			aController.sendMessage(context, regIdFrom, regIdTo, message);
@@ -101,24 +108,66 @@ public class MessageManager {
 		}
 	}
 
+	public void sendUpdateMessageWidget() {
+		// ui update
+		mainActivity.newMessageNotify(false);
+
+		Intent intent = new Intent(Config.UPDATE_MESSAGE_WIDGET_ACTION);
+		// Send Broadcast to Broadcast receiver with message
+		context.sendBroadcast(intent);
+	}
+
+	public void sendUpdateRequestWidget() {
+		// ui update
+		mainActivity.newRequestNotify(false);
+
+		Intent intent = new Intent(Config.UPDATE_MESSAGE_WIDGET_ACTION);
+		// Send Broadcast to Broadcast receiver with message
+		context.sendBroadcast(intent);
+	}
+
 	// Create a broadcast receiver to get message and show on screen
 	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-
 			String newMessage = intent.getExtras().getString(
 					Config.EXTRA_MESSAGE);
+
+			// check message here !
+			// update num msg for widget
+			SettingManager.getInstance().init(context);
+
+			if (newMessage.startsWith(Config.PREFIX)) {
+				SettingManager.getInstance().setNoNewRequest(
+						SettingManager.getInstance().getNoNewRequest() + 1);
+				mainActivity.newRequestNotify(true);
+			} else {
+				SettingManager.getInstance().setNoNewMessage(
+						SettingManager.getInstance().getNoNewMesssage() + 1);
+				mainActivity.newMessageNotify(true);
+			}
+
+			// update by intent broadcast
+			Intent intentBC = new Intent(Config.UPDATE_MESSAGE_WIDGET_ACTION);
+			// Send Broadcast to Broadcast receiver with message
+			context.sendBroadcast(intentBC);
+
 			// Waking up mobile if it is sleeping
 			aController.acquireWakeLock(context);
 
-			Message sms = new Message(newMessage, true, "server",
-					MyProfileManager.getInstance().mine.getGcmId(), new Date(System.currentTimeMillis()));
+			int idSender = 2; // get from message content
+
+			Message sms = new Message(newMessage, false, idSender,
+					MyProfileManager.getInstance().mine.getId(), new Date(
+							System.currentTimeMillis()));
+
 			// save to database
 			sms = dataSource.createMessage(sms);
 
 			// Display message on the screen
-			iMessage.addNewMessage(sms);
+			if (iMessage != null)
+				iMessage.addNewMessage(sms);
 
 			Toast.makeText(context, "Got Message: " + newMessage,
 					Toast.LENGTH_LONG).show();

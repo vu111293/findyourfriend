@@ -40,8 +40,8 @@ public class MessagesDataSource {
 	public Message createMessage(Message sms) {
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_MESSAGE, sms.getMessage());
-		values.put(MySQLiteHelper.COLUMN_SENDER_ID, sms.getGcmIdSender());
-		values.put(MySQLiteHelper.COLUMN_RECEVIER_ID, sms.getGcmIdReceiver());
+		values.put(MySQLiteHelper.COLUMN_SENDER_ID, sms.getIdSender());
+		values.put(MySQLiteHelper.COLUMN_RECEVIER_ID, sms.getIdReceiver());
 		values.put(MySQLiteHelper.COLUMN_SMS_DATE, sms.getSmsTime().getTime());
 		
 		
@@ -88,9 +88,9 @@ public class MessagesDataSource {
 		Message message = new Message(
 				cursor.getLong(0),
 				cursor.getString(1),
-				cursor.getString(2).equals(MyProfileManager.getInstance().mine.getGcmId()),
-				cursor.getString(2),
-				cursor.getString(3),
+				cursor.getInt(2) == MyProfileManager.getInstance().mine.getId(),
+				cursor.getInt(2),
+				cursor.getInt(3),
 				new Date(Long.parseLong(cursor.getString(4))));
 		return message;
 	}

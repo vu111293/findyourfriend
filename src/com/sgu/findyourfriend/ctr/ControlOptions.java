@@ -13,13 +13,13 @@ public class ControlOptions {
 	
 	private boolean commit;
 	
-	private HashMap<String, String> mhashmap;
+	private HashMap<String, Integer> mhashmap;
 	
 	
 	
 	private ControlOptions() {
 		commit = false;
-		mhashmap = new HashMap<String, String>();
+		mhashmap = new HashMap<String, Integer>();
 	}
 	
 	public synchronized static ControlOptions getInstance() {
@@ -38,11 +38,11 @@ public class ControlOptions {
 		commit = true;
 	}
 	
-	public void putHashMap(String key, String value) {
+	public void putHashMap(String key, Integer value) {
 		mhashmap.put(key, value);
 	}
 	
-	public String getHashMap(String key) {
+	public int getHashMap(String key) {
 		return mhashmap.get(key);
 	}
 	

@@ -17,7 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.devsmart.android.ui.HorizontalListView;
 import com.sgu.findyourfriend.R;
@@ -25,6 +25,7 @@ import com.sgu.findyourfriend.adapter.FriendSwipeAdapter;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.IMessage;
 import com.sgu.findyourfriend.mgr.MessageManager;
+import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.Message;
 
 @SuppressLint("ValidFragment")
@@ -53,10 +54,6 @@ public class SendMessageFragment extends Fragment implements IMessage {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		// getActivity().requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// getActivity().getWindow().setLayout(LayoutParams.FILL_PARENT,
-		// LayoutParams.FILL_PARENT);
 		InputMethodManager imm = (InputMethodManager) getActivity()
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(editMessage, InputMethodManager.SHOW_IMPLICIT);
@@ -72,26 +69,17 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 		View view = getActivity().getActionBar().getCustomView();
 		view.findViewById(R.id.grpItemControl).setVisibility(View.GONE);
-		TextView textSendEvent = (TextView) view.findViewById(R.id.txtSend);
-		textSendEvent.setVisibility(View.VISIBLE);
+		ImageView imgSendEvent = (ImageView) view.findViewById(R.id.imgSend);
+		imgSendEvent.setVisibility(View.VISIBLE);
 
 		// init masks
-		masks = new int[FriendManager.getInstance().friends.size()];
+		masks = new int[FriendManager.getInstance().memberFriends.size()];
 
 		editMessage = (EditText) rootView.findViewById(R.id.editMessage);
 
-		/*
-		 * editMessage.setOnFocusChangeListener(new View.OnFocusChangeListener()
-		 * {
-		 * 
-		 * @Override public void onFocusChange(View v, boolean hasFocus) { if
-		 * (!hasFocus) { hideKeyboard(getActivity()); } else {
-		 * showKeyboard(getActivity()); } } });
-		 */
-
 		editMessage.requestFocus();
 
-		textSendEvent.setOnClickListener(new View.OnClickListener() {
+		imgSendEvent.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -114,7 +102,7 @@ public class SendMessageFragment extends Fragment implements IMessage {
 		friendsHList = (HorizontalListView) rootView
 				.findViewById(R.id.avatarListView);
 		swipeAdapter = new FriendSwipeAdapter(getActivity(),
-				R.layout.item_friend_accepted, FriendManager.getInstance().friends);
+				R.layout.item_friend_accepted, FriendManager.getInstance().memberFriends);
 		friendsHList.setAdapter(swipeAdapter);
 
 		friendsHList.setOnItemClickListener(new OnItemClickListener() {
@@ -125,9 +113,6 @@ public class SendMessageFragment extends Fragment implements IMessage {
 
 				masks[position] = 1 - masks[position];
 				changeSelector(position, view);
-
-				// swipeAdapter.getView(friendId, null,
-				// friendsHList).setBackgroundColor(0xff086EBC);
 			}
 
 		});
@@ -137,14 +122,21 @@ public class SendMessageFragment extends Fragment implements IMessage {
 		Bundle bundle = getArguments();
 		friendId = bundle.getInt("friendId", -1);
 
-		if (friendId > 0) {
+		if (friendId >= 0) {
 			Log.i("wwwwwwwwwwwwwwwwwwwwwwwww", friendId + "");
-			masks[friendId] = 1;
-			swipeAdapter.hightLightItem(friendId);
-			swipeAdapter.notifyDataSetChanged();
+			
+			for (int i = 0; i < swipeAdapter.getData().size(); ++i) {
+				if (swipeAdapter.getItem(i).getUserInfo().getId() == friendId) {
+					masks[i] = 1;
+					swipeAdapter.hightLightItem(i);
+					swipeAdapter.notifyDataSetChanged();
+					break;
+				}
+			}
+			
+			
 		}
 
-		// getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 		return rootView;
 	}
 
@@ -169,25 +161,25 @@ public class SendMessageFragment extends Fragment implements IMessage {
 		}
 	}
 
-	private List<String> getToAddress() {
-		List<String> addrs = new ArrayList<String>();
-		int len = FriendManager.getInstance().friends.size();
-
+	private List<Integer> getToAddress() {
+		List<Integer> addrs = new ArrayList<Integer>();
+		int len = swipeAdapter.getData().size();	
+		
 		if (masks[0] == 0) {
 			// them cai da luu chon vao txt
 			for (int i = 1; i < len; ++i) {
 				if (masks[i] == 1) {
 
-					addrs.add(FriendManager.getInstance().friends.get(i)
-							.getNumberLogin().get(0));
+					addrs.add(swipeAdapter.getItem(i)
+							.getUserInfo().getId());
 				}
 			}
 
 		} else {
 			// them tat ca vao txt
 			for (int i = 1; i < len; ++i) {
-				addrs.add(FriendManager.getInstance().friends.get(i)
-						.getNumberLogin().get(0));
+				addrs.add(swipeAdapter.getItem(i)
+						.getUserInfo().getId());
 
 			}
 		}

@@ -34,6 +34,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.Config;
+import com.sgu.findyourfriend.mgr.SettingManager;
 
 @SuppressLint("Wakelock")
 public class Controller extends Application {
@@ -96,8 +97,8 @@ public class Controller extends Application {
 		String serverUrl = Config.SEND_MESSAGE_SERVER_URL;
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("regIdFrom", regIdFrom);
-		params.put("regIdTo", regIdTo);
+		params.put("memIdFrom", regIdFrom);
+		params.put("memIdTo", regIdTo);
 		params.put("message", message);
 
 		tryPostNoResult(context, serverUrl, params);
@@ -485,13 +486,19 @@ public class Controller extends Application {
 
 	// Notifies UI to display a message.
 	public void displayMessageOnScreen(Context context, String message) {
-
+//		// update num msg for widget
+//		SettingManager.getInstance().init(context);
+//		
+//		if (message.startsWith(Config.PREFIX))
+//			SettingManager.getInstance().setNoNewRequest(SettingManager.getInstance().getNoNewRequest() + 1);
+//		else 
+//			SettingManager.getInstance().setNoNewMessage(SettingManager.getInstance().getNoNewMesssage() + 1);
+		
 		Intent intent = new Intent(Config.DISPLAY_MESSAGE_ACTION);
 		intent.putExtra(Config.EXTRA_MESSAGE, message);
 
 		// Send Broadcast to Broadcast receiver with message
 		context.sendBroadcast(intent);
-
 	}
 
 	// Function to display simple Alert Dialog

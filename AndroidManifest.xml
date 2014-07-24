@@ -51,22 +51,40 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name" >
         </activity>
-        
+
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
-
-                <!-- Receives the actual messages. -->
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <!-- Receives the registration id. -->
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
                 <category android:name="com.sgu.findyourfriend" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="com.sgu.findyourfriend.widget.SimpleWidget"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                
+            </intent-filter>
+            <intent-filter >
+                <action android:name="com.androidexample.gcm.DISPLAY_MESSAGE" />
+            </intent-filter>
+            <intent-filter >
+                <action android:name="com.androidexample.gcm.UPDATE_MESSAGE_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider" />
+        </receiver>
 
-        <service android:name="com.sgu.findyourfriend.mgr.GCMIntentService" />
+        <service android:name="com.sgu.findyourfriend.GCMIntentService" />
+        <service
+            android:name="com.sgu.findyourfriend.widget.WidgetControlService"
+            android:enabled="true" >
+        </service>
     </application>
 
     <permission
@@ -108,13 +126,13 @@
 
     <!-- Permission to vibrate -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    
+
     <!-- Permission to call -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    
+
     <!-- Permission to read phone state -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    
+
     <!-- Permission to vibrate on alert screen -->
     <uses-permission android:name="android.permission.VIBRATE" />
 

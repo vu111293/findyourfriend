@@ -10,6 +10,8 @@ import com.sgu.findyourfriend.R;
 
 public class SettingFragment extends Fragment {
 	
+	
+	
 	public SettingFragment(){}
 	
 	@Override

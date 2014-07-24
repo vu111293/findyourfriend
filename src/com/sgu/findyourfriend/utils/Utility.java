@@ -1,5 +1,8 @@
 package com.sgu.findyourfriend.utils;
 
+import android.content.Context;
+import android.widget.Toast;
+
 /**
  * Utility is a just an ordinary class to have some Utility methods
  * 
@@ -40,6 +43,10 @@ public class Utility {
 		if (mins > 0) builder.append(" " + mins + "'");
 		if (secs > 0) builder.append(" " + secs + "''");
 		return builder.toString();
+	}
+	
+	public static void showMessage(Context ctx, String msg) {
+		Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
 	}
 	
 }

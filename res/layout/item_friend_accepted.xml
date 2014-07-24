@@ -10,9 +10,9 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
         android:gravity="center"
         android:orientation="horizontal" >
 
@@ -22,17 +22,35 @@
             android:layout_height="50dp"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:scaleType="centerCrop"
             android:background="@color/barDarkColor"
-            android:src="@drawable/ic_action_email" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_pages" />
+
+        <ImageView
+            android:id="@+id/imgNotShare"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="-54.5dp"
+            android:layout_marginRight="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/triangle_black" />
+        
+        <ImageView
+            android:id="@+id/imgWait"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="-54.5dp"
+            android:layout_marginRight="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/triangle_full_black" />
     </LinearLayout>
-    
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
         android:gravity="center"
         android:orientation="horizontal" >
 
@@ -46,8 +64,7 @@
             android:src="@drawable/item_avatar_friend" />
     </LinearLayout>
 
-</RelativeLayout>
-<!--
+</RelativeLayout><!--
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

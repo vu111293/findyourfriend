@@ -5,8 +5,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,23 +12,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.model.Friend;
 
 public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 	private int LayoutResID;
 	private Context ctx;
 	private List<Friend> DataList = new ArrayList<Friend>();
-	private ImageLoader imageLoader;
-	private DisplayImageOptions options;
 
-	@SuppressWarnings("deprecation")
 	public CustomAdapterFriendStatus(Context context, int resource,
 			List<Friend> objects) {
 		super(context, resource, objects);
@@ -38,35 +28,13 @@ public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 		ctx = context;
 		LayoutResID = resource;
 		DataList = objects;
-
-		options = new DisplayImageOptions.Builder().cacheInMemory(true)
-				.cacheOnDisc(true).considerExifParams(true)
-				.bitmapConfig(Bitmap.Config.RGB_565).build();
-		imageLoader = ImageLoader.getInstance();
-//		File cacheDir = StorageUtils.getCacheDirectory(context);
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context)
-				.memoryCacheExtraOptions(480, 800)
-				// default = device screen dimensions
-
-				.taskExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-				.taskExecutorForCachedImages(AsyncTask.THREAD_POOL_EXECUTOR)
-				.threadPoolSize(3)
-				// default
-				.threadPriority(Thread.NORM_PRIORITY - 1)
-				// default
-				.tasksProcessingOrder(QueueProcessingType.FIFO)
-				// default
-				.denyCacheImageMultipleSizesInMemory()
-				.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024))
-				// default
-				.memoryCacheSize(2 * 1024 * 1024)
-				.imageDownloader(new BaseImageDownloader(context)) // default
-				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
-				.build();
-		imageLoader.init(config);
 	}
 
+	@Override
+	public Friend getItem(int position) {
+		return DataList.get(position);
+	}
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
@@ -88,17 +56,18 @@ public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 		
 		name.setText(fr.getUserInfo().getName());
 		phoneNumber.setText(fr.getNumberLogin().get(0));
-		imageLoader.displayImage(fr.getUserInfo().getAvatar(), imgProfile, options);
+		
+		imgProfile.setImageDrawable(FriendManager.getInstance().hmImageP
+				.get(fr.getUserInfo().getId()));
 		
 		// set img
-		if (fr.isAccepted()) {
+		if (fr.getAcceptState() == Friend.ACCEPT_STATE) {
 			imgNoneAccept.setVisibility(View.GONE);
 			if (fr.isAvailable()) {
+				imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.online));
 				if (fr.isShare()) {
-					imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.share));
 					txtStatusText.setText("chia sẻ");
 				} else {
-					imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.online));
 					txtStatusText.setText("trực tuyến");
 				}
 			} else {
@@ -106,10 +75,10 @@ public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 				txtStatusText.setText("đang ẩn");
 			}
 			
-		} else {
+		} else if(fr.getAcceptState() == Friend.WAIT_STATE){
 			imgNoneAccept.setVisibility(View.VISIBLE);
-			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.none_accept));
-			txtStatusText.setText("chờ chấp nhận");
+			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.pending));
+			txtStatusText.setText("chờ");
 		}
 		return convertView;
 	}

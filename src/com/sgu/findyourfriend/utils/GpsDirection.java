@@ -337,7 +337,7 @@ public class GpsDirection {
 					+ endAddress);
 
 			if (isDraw) {
-				Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
+//				Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
 
 				polylineCurrent = mMap.addPolyline(lineOptions);
 				stopAmazing = true;
@@ -345,21 +345,21 @@ public class GpsDirection {
 			}
 
 			if (mode.equals(MODE.walking)) {
-				mdurationsMode[0] = duration;
-				Log.i("WALKING duration: ", duration);
+				if (duration.equals("")) duration = "0";
+//				Log.i("WALKING duration: ", duration);
 				txtWalk.setText(Utility.convertSecTimeToString(Long
 						.parseLong(duration)));
 
 			} else if (mode.equals(MODE.driving)) {
-				mdurationsMode[2] = duration;
+				if (duration.equals("")) duration = "0";
 				mdistance = distance;
 				txtDistance.setText(distance);
 				txtMoto.setText(Utility.convertSecTimeToString(Long
 						.parseLong(duration)));
 
 				polylineOptions = lineOptions;
-				Log.i("DISTANCE: ", distance);
-				Log.i("TRAVLING duration: ", duration);
+//				Log.i("DISTANCE: ", distance);
+//				Log.i("TRAVLING duration: ", duration);
 			}
 		}
 	}

@@ -19,43 +19,42 @@
     <LinearLayout
         android:id="@+id/grpItemControl"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:visibility="visible" >
 
         <ImageView
             android:id="@+id/imgAlert"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:gravity="center_vertical"
             android:padding="3dp"
+            android:background="@drawable/custom_button_control"
             android:src="@drawable/ic_alert" />
 
         <ImageView
             android:id="@+id/imgFriendList"
             android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:padding="3dp"
+            android:background="@drawable/custom_button_control"
             android:src="@drawable/ic_friend_status" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtSend"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/imgSend"
+        android:layout_width="40dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:background="@color/selector_bar_color"
-        android:gravity="center"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Send"
-        android:textColor="#fff"
-        android:textSize="10pt"
-        android:textStyle="bold"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:padding="3dp"
+        android:background="@drawable/custom_button_control"
+        android:src="@drawable/ic_send"
         android:visibility="gone" />
 
 </RelativeLayout>

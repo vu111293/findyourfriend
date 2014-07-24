@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.FriendManager;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.History;
 import com.sgu.findyourfriend.net.PostData;
@@ -90,7 +91,7 @@ public class MapController {
 
 	public void callTask(int friendId) {
 
-		ArrayList<String> phs = FriendManager.getInstance().friends.get(
+		ArrayList<String> phs = FriendManager.getInstance().hmMemberFriends.get(
 				friendId).getNumberLogin();
 
 		if (phs.size() == 0) {
@@ -159,7 +160,7 @@ public class MapController {
 						.currentTimeMillis() - 1000), new LatLng(
 						13.173887272186989, 107.1006023606658)));
 
-				f = FriendManager.getInstance().friends.get(friendId);
+				f = FriendManager.getInstance().hmMemberFriends.get(friendId);
 				if (null == f.getSteps())
 					f.setSteps(PostData.historyGetUserHistory(context, f
 							.getUserInfo().getId()));
@@ -208,11 +209,10 @@ public class MapController {
 		// clear marker history before
 		clearnMarkerHistory();
 
-		LatLng dest = FriendManager.getInstance().friends.get(friendId)
+		LatLng dest = FriendManager.getInstance().hmMemberFriends.get(friendId)
 				.getLastLocation();
-		Location myLocation = mMap.getMyLocation();
-		LatLng myLatLng = new LatLng(myLocation.getLatitude(),
-				myLocation.getLongitude());
+//		Location myLocation = mMap.getMyLocation();
+		LatLng myLatLng = MyProfileManager.getInstance().myLocation;
 
 		gpsDirection.excuteDirection(myLatLng, dest, true);
 		isRouting = true;
@@ -322,7 +322,7 @@ public class MapController {
 
 	}
 
-	// --------------- getaddress utilities ---------------------- //
+	// --------------- get address utilities ---------------------- //
 	public String getAddress(LatLng point) {
 		try {
 			Geocoder geocoder;

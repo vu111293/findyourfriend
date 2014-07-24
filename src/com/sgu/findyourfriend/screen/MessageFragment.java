@@ -1,7 +1,9 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,6 +25,7 @@ import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.MessageAdapter;
 import com.sgu.findyourfriend.ctr.ControlOptions;
 import com.sgu.findyourfriend.mgr.MessageManager;
+import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.model.Message;
 
 public class MessageFragment extends Fragment {
@@ -41,11 +44,18 @@ public class MessageFragment extends Fragment {
 	private MessageFragment mThis = this;
 
 	public MessageFragment() {
+
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+
+		// check and notify
+		if (SettingManager.getInstance().getNoNewMesssage() > 0) {
+			SettingManager.getInstance().setNoNewMessage(0);
+			MessageManager.getInstance().sendUpdateMessageWidget();
+		}
 
 		View rootView = inflater.inflate(R.layout.fragment_message, container,
 				false);
@@ -53,7 +63,7 @@ public class MessageFragment extends Fragment {
 		// set actionbar
 		View bar = getActivity().getActionBar().getCustomView();
 		bar.findViewById(R.id.grpItemControl).setVisibility(View.VISIBLE);
-		bar.findViewById(R.id.txtSend).setVisibility(View.GONE);
+		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
 
 		return rootView;
 	}
@@ -83,6 +93,13 @@ public class MessageFragment extends Fragment {
 		messages = MessageManager.getInstance().getAllMessage();
 		Log.i("MESSAGE", "numbwe sms db: " + messages.size());
 
+		
+//		List<Message> ls = new ArrayList<Message>();
+//		ls.add(new Message("message", true));
+//		ls.add(new Message("message", false));
+//		ls.add(new Message("message", true));
+//		ls.add(new Message("message", false));
+		
 		adapter = new MessageAdapter(context, messages);
 
 		// setup listview
@@ -102,8 +119,8 @@ public class MessageFragment extends Fragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						MessageManager.getInstance().deleteMessage(messages
-								.get(position));
+						MessageManager.getInstance().deleteMessage(
+								messages.get(position));
 						messages.remove(messages.get(position));
 						adapter.notifyDataSetChanged();
 						smsListView.setSelection(messages.size() - 1);
@@ -120,12 +137,11 @@ public class MessageFragment extends Fragment {
 			}
 		});
 		smsListView.setSelection(messages.size() - 1);
-		
-		
+
 		// check require from sliding friend event
 		if (ControlOptions.getInstance().isRequire()) {
 			Log.i("REQUIRE", "####################################");
-			int fId = Integer.parseInt(ControlOptions.getInstance().getHashMap("friendId"));
+			int fId = ControlOptions.getInstance().getHashMap("friendId");
 			openEditMessageScene(fId);
 			ControlOptions.getInstance().finish();
 		}

@@ -85,11 +85,16 @@ public class FriendJSONParser {
 					+ (h == null ? "?" : h.getLocation().latitude) + ":"
 					+ (h == null ? "?" : h.getLocation().longitude) + "");
 
-			f = new Friend(u, numberLogin, state, share > 0, share == 3,
+			f = new Friend(u, numberLogin, state, share, share == 3,
 					(h == null ? null : h.getLocation()), null);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return f;
 	}
+	
+	// 0 is don't accept
+	// 1 2 3 is accept
+	// 1 is wait
+	// 2 is accept
 }

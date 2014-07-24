@@ -11,17 +11,20 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
+import com.sgu.findyourfriend.GCMIntentService;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.CustomAdapterFriendStatus;
 import com.sgu.findyourfriend.ctr.ControlOptions;
@@ -45,6 +48,8 @@ public class MainActivity extends FragmentActivity {
 	private int currentTab;
 
 	private DrawerLayout mDrawerLayout;
+	private CustomAdapterFriendStatus adapter;
+
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	TextView TitleTextView;
@@ -57,16 +62,21 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.loadingscreen);
-
-		LayoutInflater mInflater = LayoutInflater.from(this);
-		mRootView = mInflater.inflate(R.layout.activity_main, null);
-
-		// get loader
-		pbLoader = (ProgressBar) findViewById(R.id.pbLoader);
-		pbLoader.setVisibility(View.VISIBLE);
 
 		(new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected void onPreExecute() {
+				setContentView(R.layout.loadingscreen);
+
+				LayoutInflater mInflater = LayoutInflater
+						.from(getApplicationContext());
+				mRootView = mInflater.inflate(R.layout.activity_main, null);
+
+				// get loader
+				pbLoader = (ProgressBar) findViewById(R.id.pbLoader);
+				pbLoader.setVisibility(View.VISIBLE);
+			}
 
 			@Override
 			protected Void doInBackground(Void... arg0) {
@@ -78,7 +88,7 @@ public class MainActivity extends FragmentActivity {
 				FriendManager.getInstance().init(getApplicationContext());
 
 				// init message manager
-				MessageManager.getInstance().init(getApplicationContext());
+				MessageManager.getInstance().init(mMain);
 
 				// init sound manager
 				SoundManager.getInstance().init(getApplicationContext());
@@ -129,22 +139,18 @@ public class MainActivity extends FragmentActivity {
 		mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
 		mTabHost.addTab(
-				mTabHost.newTabSpec(MAP_TAG).setIndicator(
-						"",
-						getResources().getDrawable(
-								R.drawable.ic_location_silver)),
+				mTabHost.newTabSpec(MAP_TAG).setIndicator("",
+						getResources().getDrawable(R.drawable.ic_location)),
 				MapContainerFragment.class, null);
 
 		mTabHost.addTab(
 				mTabHost.newTabSpec(MESSAGE_TAG).setIndicator("",
-						getResources().getDrawable(R.drawable.ic_grp_silver)),
+						getResources().getDrawable(R.drawable.ic_grp)),
 				MessageContainerFragment.class, null);
 
 		mTabHost.addTab(
-				mTabHost.newTabSpec(REQUEST_TAG).setIndicator(
-						"",
-						getResources()
-								.getDrawable(R.drawable.ic_request_silver)),
+				mTabHost.newTabSpec(REQUEST_TAG).setIndicator("",
+						getResources().getDrawable(R.drawable.ic_usercheck)),
 				FriendRequestsContainerFragment.class, null);
 
 		mTabHost.addTab(
@@ -175,7 +181,6 @@ public class MainActivity extends FragmentActivity {
 					keyboard.hideSoftInputFromWindow(
 							mTabHost.getApplicationWindowToken(), 0);
 				}
-
 			}
 		});
 
@@ -202,9 +207,9 @@ public class MainActivity extends FragmentActivity {
 		mDrawerList = (ListView) mRootView.findViewById(R.id.drawer_list_right);
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		CustomAdapterFriendStatus adapter = new CustomAdapterFriendStatus(this,
+		adapter = new CustomAdapterFriendStatus(this,
 				R.layout.custom_friend_status,
-				FriendManager.getInstance().friends);
+				FriendManager.getInstance().memberFriends);
 		mDrawerList.setAdapter(adapter);
 
 		mDrawerList.setOnItemClickListener(new OnItemClickListener() {
@@ -213,8 +218,7 @@ public class MainActivity extends FragmentActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int pos, long arg3) {
 				String[] items = { "Xem trên bản đồ", "Gọi", "Nhắn tin", "Khác" };
-				AlertDialog.Builder builder = new AlertDialog.Builder(mTabHost
-						.getContext());
+				AlertDialog.Builder builder = new AlertDialog.Builder(mMain);
 				builder.setTitle("Your choices are:");
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -222,7 +226,7 @@ public class MainActivity extends FragmentActivity {
 						case 0:
 							ControlOptions.getInstance().edit();
 							ControlOptions.getInstance().putHashMap("friendId",
-									pos + "");
+									adapter.getItem(pos).getUserInfo().getId());
 
 							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
 							mTabHost.setCurrentTabByTag(MAP_TAG);
@@ -231,8 +235,7 @@ public class MainActivity extends FragmentActivity {
 							Intent callIntent = new Intent(Intent.ACTION_CALL);
 							callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							callIntent.setData(Uri.parse("tel:"
-									+ FriendManager.getInstance().friends
-											.get(pos).getUserInfo()
+									+ adapter.getItem(pos).getUserInfo()
 											.getPhoneNumber()));
 							mTabHost.getContext().startActivity(callIntent);
 							break;
@@ -240,7 +243,7 @@ public class MainActivity extends FragmentActivity {
 						case 2:
 							ControlOptions.getInstance().edit();
 							ControlOptions.getInstance().putHashMap("friendId",
-									pos + "");
+									adapter.getItem(pos).getUserInfo().getId());
 
 							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
 							mTabHost.setCurrentTabByTag(MESSAGE_TAG);
@@ -259,9 +262,7 @@ public class MainActivity extends FragmentActivity {
 						});
 
 				builder.show();
-
 			}
-
 		});
 
 		mMain.getActionBar().setCustomView(mCustomView);
@@ -289,11 +290,14 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onClick(View v) {
-						ImagenceDialog dialog = new ImagenceDialog(mTabHost
-								.getContext());
+						ImagenceDialog dialog = new ImagenceDialog(mMain);
 						dialog.show();
 					}
 				});
+	}
+
+	public void notifyDataChange() {
+		adapter.notifyDataSetChanged();
 	}
 
 	// public Animation inFromRightAnimation() {
@@ -321,6 +325,9 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onBackPressed() {
 		boolean isPopFragment = false;
+		if (null == mTabHost)
+			finish();
+
 		String currentTabTag = mTabHost.getCurrentTabTag();
 		if (currentTabTag.equals(MAP_TAG)) {
 			isPopFragment = ((BaseContainerFragment) getSupportFragmentManager()
@@ -334,13 +341,12 @@ public class MainActivity extends FragmentActivity {
 		} else if (currentTabTag.equals(CATEGORIES_TAG)) {
 			isPopFragment = ((BaseContainerFragment) getSupportFragmentManager()
 					.findFragmentByTag(CATEGORIES_TAG)).popFragment();
-
 		}
 
 		if (!isPopFragment) {
 			finish();
+			Log.i(TAG, "finish screen " + currentTabTag);
 		}
-
 	}
 
 	public void gotoTabByTagName(String tabTag) {
@@ -348,4 +354,31 @@ public class MainActivity extends FragmentActivity {
 		mTabHost.setCurrentTabByTag(tabTag);
 	}
 
+	public void newMessageNotify(boolean isNew) {
+		if (isNew) {
+			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(1)
+					.findViewById(android.R.id.icon))
+					.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_grp_trigger));
+		} else {
+			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(1)
+					.findViewById(android.R.id.icon))
+					.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_grp));
+		}
+	}
+
+	public void newRequestNotify(boolean isNew) {
+		if (isNew) {
+			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(2)
+					.findViewById(android.R.id.icon))
+					.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_usercheck_trigger));
+		} else {
+			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(2)
+					.findViewById(android.R.id.icon))
+					.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_usercheck));
+		}
+	}
 }

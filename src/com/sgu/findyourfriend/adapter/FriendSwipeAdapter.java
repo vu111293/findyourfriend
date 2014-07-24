@@ -4,32 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.model.Friend;
 
 public class FriendSwipeAdapter extends ArrayAdapter<Friend> {
 	int LayoutResID;
 	Context ctx;
 	List<Friend> DataList = new ArrayList<Friend>();
-	ImageLoader imageLoader;
-	DisplayImageOptions options;
+	
+	private int itemIdOldHightLight = -1;
 	private int itemIdHightLight = -1;
 
-	@SuppressWarnings("deprecation")
 	public FriendSwipeAdapter(Context context, int resource,
 			List<Friend> objects) {
 		super(context, resource, objects);
@@ -38,51 +31,72 @@ public class FriendSwipeAdapter extends ArrayAdapter<Friend> {
 		LayoutResID = resource;
 		DataList = objects;
 
-		options = new DisplayImageOptions.Builder().cacheInMemory(true)
-				.cacheOnDisc(true).considerExifParams(true)
-				.bitmapConfig(Bitmap.Config.RGB_565).build();
-		imageLoader = ImageLoader.getInstance();
-//		File cacheDir = StorageUtils.getCacheDirectory(context);
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context)
-				.memoryCacheExtraOptions(480, 800)
-				// default = device screen dimensions
-
-				.taskExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-				.taskExecutorForCachedImages(AsyncTask.THREAD_POOL_EXECUTOR)
-				.threadPoolSize(3)
-				// default
-				.threadPriority(Thread.NORM_PRIORITY - 1)
-				// default
-				.tasksProcessingOrder(QueueProcessingType.FIFO)
-				// default
-				.denyCacheImageMultipleSizesInMemory()
-				.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024))
-				// default
-				.memoryCacheSize(2 * 1024 * 1024)
-				.imageDownloader(new BaseImageDownloader(context)) // default
-				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
-				.build();
-		imageLoader.init(config);
 	}
 
 	public void hightLightItem(int pos) {
+		itemIdOldHightLight = itemIdHightLight;
 		itemIdHightLight = pos;
+		notifyDataSetChanged();
 	}
 	
+	public void unHightLightItem() {
+		itemIdHightLight = -1;
+		notifyDataSetChanged();
+	}
+
+	@Override
+	public Friend getItem(int position) {
+		return DataList.get(position);
+	}
+
+	public List<Friend> getData() {
+		return DataList;
+	}
+	
+	// return -1 if not found
+	public int getPositionByFriendID(int friendID) {
+		for (int i = 0; i < DataList.size(); ++i) {
+			if (DataList.get(i).getUserInfo().getId() == friendID) 
+				return i;
+		}
+		return -1;
+	}
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Friend friend = this.getItem(position);
 
-		convertView = LayoutInflater.from(ctx).inflate(LayoutResID, parent, false);
+		convertView = LayoutInflater.from(ctx).inflate(LayoutResID, parent,
+				false);
 		ImageView imgAvatar = (ImageView) convertView
 				.findViewById(R.id.imgAvatar);
 
-		imageLoader.displayImage(friend.getUserInfo().getAvatar(), imgAvatar);
+		Log.i("IMAGE PATH", friend.getUserInfo().getAvatar());
 
-		if (itemIdHightLight == position) 
-			convertView.setBackgroundColor(0xff086EBC);
+		imgAvatar.setImageDrawable(FriendManager.getInstance().hmImageP
+				.get(friend.getUserInfo().getId()));
 		
+		if (friend.isShare()) {
+			((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
+			((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
+		} else {
+			
+			if (friend.getAcceptState() == Friend.ACCEPT_STATE) {
+				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.VISIBLE);
+				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
+			} else {
+				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
+				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.VISIBLE);
+			}
+		}
+
+		if (itemIdOldHightLight > 0 && itemIdOldHightLight == position) 
+			convertView.setBackgroundColor(0x000000);
+		
+		if (itemIdHightLight == position)
+			convertView.setBackgroundColor(0xff2F497A);
+			// convertView.setBackgroundColor(0xff7f0700);
+
 		return convertView;
 	}
 

@@ -553,7 +553,10 @@ public class PostData {
 	
 	// ----------------- function require --------------------------//
 	
-	public static ArrayList<FriendRequest> getFriendRequesttList(Context ctx, int id) {
+	
+	// get friend request list 
+	// ham get friends co lấy tất cả bạn bè chưa?
+	public static ArrayList<FriendRequest> getFriendRequestList(Context ctx, int id) {
 		// some here
 		
 		
@@ -563,5 +566,28 @@ public class PostData {
 	
 	
 	
+	public static void sendMessage(Context ctx, int senderID, int receiverID, String msg) {
+		
+	}
+	
+	public static void acceptFriendRequest(Context ctx, int senderID, int receiverID) {
+		// content message       ex:      FRIEND_ACCEPT + APPID
+		
+	}
+	
+	public static void acceptShareRequest(Context ctx, int senderID, int receiverID) {
+		// content message       ex:      SHARE_ACCEPT + APPID
+		
+	}
+	
+	public static void friendRequest(Context ctx, int senderID, int receiverID) {
+		// content message       ex:      FRIEND_REQUEST + APPID
+		
+	}
+	
+	public static void shareRequest(Context ctx, int senderID, int receiverID) {
+		// content message        ex:     SHARE_REQUEST + APPID
+		
+	}
 	
 }

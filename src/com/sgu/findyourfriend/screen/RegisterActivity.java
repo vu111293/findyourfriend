@@ -1,25 +1,25 @@
 package com.sgu.findyourfriend.screen;
 
+import java.sql.Timestamp;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.Config;
-import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
+import com.sgu.findyourfriend.model.User;
 import com.sgu.findyourfriend.utils.Controller;
 
 public class RegisterActivity extends Activity {
@@ -97,23 +97,31 @@ public class RegisterActivity extends Activity {
 				String email = txtEmail.getText().toString();
 
 				// Check if user filled the form
-				if (name.trim().length() > 0 && email.trim().length() > 0) {
+				// if (name.trim().length() > 0 && email.trim().length() > 0) {
 
-					// save info
-//					MyProfileManager.name = name;
-//					MyProfileManager.email = email;
+				// save info
+				// MyProfileManager.name = name;
+				// MyProfileManager.email = email;
 
-					// setup account
-					accountRegist(name, email);
+//				Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+//						.setDataAndType(Uri.parse("file://raw/widgetwc.apk"),
+//								"application/vnd.android.package-archive");
+//				startActivity(promptInstall);
 
-					finish();
+				
+				MyProfileManager.getInstance().mine = new User(0, name, 0, "", email, "", "", new Timestamp(0));
+				
+				// setup account
+				accountRegist(name, email);
+				// new PrepareDataTask().execute();
+				finish();
 
-				} else {
-					// user doen't filled that data
-					aController.showAlertDialog(RegisterActivity.this,
-							"Registration Error!", "Please enter your details",
-							false);
-				}
+				// } else {
+				// // user doen't filled that data
+				// aController.showAlertDialog(RegisterActivity.this,
+				// "Registration Error!", "Please enter your details",
+				// false);
+				// }
 			}
 		});
 	}
@@ -121,28 +129,31 @@ public class RegisterActivity extends Activity {
 	private class PrepareDataTask extends AsyncTask<Void, Void, Void> {
 
 		protected Void doInBackground(Void... vd) {
-			
+
 			// new LoadViewTask().execute();
-			
+
 			// fwait.setVisibility(View.VISIBLE);
 			// init profile
-			/* ProfileInfo.instance = new ProfileInfo(getApplicationContext());
-			ProfileInfo.gcmMyId = GCMRegistrar
-					.getRegistrationId(getApplicationContext());
-
-			// init friend manager
-			FriendManager.instance = new FriendManager(getApplicationContext()); */
+			/*
+			 * ProfileInfo.instance = new ProfileInfo(getApplicationContext());
+			 * ProfileInfo.gcmMyId = GCMRegistrar
+			 * .getRegistrationId(getApplicationContext());
+			 * 
+			 * // init friend manager FriendManager.instance = new
+			 * FriendManager(getApplicationContext());
+			 */
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
 			// fwait.setVisibility(View.GONE);
-			
+
 			// Launch Main Activity
 			Intent i = new Intent(getApplicationContext(),
 					com.sgu.findyourfriend.screen.MainActivity.class);
 			startActivity(i);
+			finish();
 		}
 	}
 
@@ -151,7 +162,7 @@ public class RegisterActivity extends Activity {
 		final String regId = GCMRegistrar.getRegistrationId(this);
 
 		// reference to ProfileInfo class
-//		MyProfileManager.gcmMyId = regId;
+		// MyProfileManager.gcmMyId = regId;
 
 		Log.i("GCM", regId);
 

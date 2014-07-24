@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
+import com.sgu.findyourfriend.mgr.Config;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.utils.Controller;
 
@@ -16,12 +18,21 @@ public class GCMIntentService extends GCMBaseIntentService {
 	private static final String TAG = "GCMIntentService";
 
 	private Controller aController = null;
-
+	private static MainActivity mainActivity = null;
+	
+	
 	public GCMIntentService() {
 		// Call extended class Constructor GCMBaseIntentService
 		super(Config.GOOGLE_SENDER_ID);
+		
+	}
+	
+	public static void setMainActivity(MainActivity mainActivity) {
+		GCMIntentService.mainActivity = mainActivity;
 	}
 
+	
+	
 	/**
 	 * Method called on device registered
 	 **/
@@ -37,7 +48,10 @@ public class GCMIntentService extends GCMBaseIntentService {
 		aController.displayMessageOnScreen(context,
 				"Your device registred with GCM");
 		Log.d("NAME", MyProfileManager.getInstance().mine.getName());
-		aController.register(context, MyProfileManager.getInstance().mine.getName(), MyProfileManager.getInstance().mine.getEmail(),
+//		aController.register(context, MyProfileManager.getInstance().mine.getName(), MyProfileManager.getInstance().mine.getEmail(),
+//				registrationId);
+		
+		aController.register(context, "quocvu", "email@g.com",
 				registrationId);
 	}
 
@@ -67,6 +81,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 		String message = intent.getExtras().getString("price");
 
 		aController.displayMessageOnScreen(context, message);
+		
+		//change ui
+		// if (null != mainActivity)
+		// 	mainActivity.newMessageNotify();
+		
 		// notifies user
 		generateNotification(context, message);
 	}
@@ -117,6 +136,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 	/**
 	 * Create a notification to inform the user that server has sent a message.
 	 */
+	@SuppressWarnings("deprecation")
 	private static void generateNotification(Context context, String message) {
 		int icon = R.drawable.ic_launcher;
 		long when = System.currentTimeMillis();

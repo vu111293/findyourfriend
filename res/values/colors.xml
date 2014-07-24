@@ -29,11 +29,17 @@
     <color name="selector_bar_color">#2F497A</color>
     <color name="bottom_bar_color">#E6E9F0</color>
     <color name="selector_color">#2D4979</color>
+    <color name="bkg_bar">#2F497A</color>
+    <color name="bkg_bar_selected">#003182</color>
     
     <!-- status color -->
     <color name="share">#1395FE</color>
-    <color name="none_accept">#7B7D7B</color>
-    <color name="offine">#FF0000</color>
-    <color name="online">#00FF00</color>
+    <color name="pending">#FF9900</color>
+    <color name="offine">#A0A0A0</color>
+    <color name="online">#318C01</color>
+    
+    <!-- basic color -->
+    <color name="white">#FFFFFF</color>
+	<color name="gray">#EEEEEE</color>
 
 </resources>

@@ -7,11 +7,15 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class Friend {
 
+	public static final int ACCEPT_STATE = 2;
+	public static final int WAIT_STATE = 1;
+	public static final int DONT_ACCEPT_STATE = 0;
+	
 	// attribute
 	private User userInfo;
 	private ArrayList<String> numberLogin;
 	private boolean isAvailable;
-	private boolean isAccepted;
+	private int acceptState;
 	private boolean isShare;
 	
 	private int accurency = 15; // not available
@@ -19,13 +23,13 @@ public class Friend {
 	private ArrayList<History> steps;
 
 	public Friend(User userInfo, ArrayList<String> numberLogin, boolean isAvailable,
-			boolean isAccepted, boolean isShare, LatLng lastLocation,
+			int acceptState, boolean isShare, LatLng lastLocation,
 			ArrayList<History> steps) {
 		super();
 		this.userInfo = userInfo;
 		this.numberLogin = numberLogin;
 		this.isAvailable = isAvailable;
-		this.isAccepted = isAccepted;
+		this.acceptState = acceptState;
 		this.isShare = isShare;
 		this.lastLocation = lastLocation;
 		this.steps = steps;
@@ -55,12 +59,12 @@ public class Friend {
 		this.isAvailable = isAvailable;
 	}
 
-	public boolean isAccepted() {
-		return isAccepted;
+	public int getAcceptState() {
+		return acceptState;
 	}
 
-	public void setAccepted(boolean isAccepted) {
-		this.isAccepted = isAccepted;
+	public void setAcceptState(int acceptState) {
+		this.acceptState = acceptState;
 	}
 
 	public boolean isShare() {

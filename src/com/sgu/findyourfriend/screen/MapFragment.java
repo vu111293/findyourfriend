@@ -10,14 +10,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -30,13 +33,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.devsmart.android.ui.HorizontalListView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -45,17 +51,11 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.FriendSwipeAdapter;
 import com.sgu.findyourfriend.ctr.ControlOptions;
 import com.sgu.findyourfriend.mgr.FriendManager;
+import com.sgu.findyourfriend.mgr.MyLocationChangeListener;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.model.Friend;
@@ -63,7 +63,10 @@ import com.sgu.findyourfriend.utils.Controller;
 import com.sgu.findyourfriend.utils.GpsPosition;
 import com.sgu.findyourfriend.utils.Utility;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements MyLocationChangeListener {
+
+	// point to itself
+	private MapFragment mThis = this;
 
 	private Context context;
 
@@ -84,12 +87,13 @@ public class MapFragment extends Fragment {
 	private FriendSwipeAdapter swipeAdapter;
 
 	// friend's id current
-	private int idFriendCur = -1;
+	// private int idFriendCur = -1;
+	private int fIDCurrent = -1;
 
 	private Controller aController;
 
 	// GPS Controller
-	GpsPosition gpsPosition;
+	private GpsPosition gpsPosition;
 
 	private List<LatLng> locationsHis = null;
 
@@ -104,6 +108,8 @@ public class MapFragment extends Fragment {
 	private Button btnRequest;
 
 	private ProgressBar pbOnMap;
+	
+	private FrameLayout frWaitLayout;
 
 	private boolean isMapStarted = false;
 
@@ -115,13 +121,16 @@ public class MapFragment extends Fragment {
 
 	private MapController mapController;
 
-	// image loader
-	private ImageLoader imageLoader;
-	private DisplayImageOptions options;
-
 	// management
 	private Resources resource;
 	private FriendManager friendManager;
+
+	// bi map resource for control view icon
+	private HashMap<Integer, Integer> hmToCap20;
+	private HashMap<Integer, Integer> hmFromCap20;
+
+	// vibrator
+	private Vibrator vibrator;
 
 	public static final String TAG = "MAP FRAGMENT";
 
@@ -130,12 +139,14 @@ public class MapFragment extends Fragment {
 		friendManager = FriendManager.getInstance();
 		isMapStarted = false;
 		isShowMarker = true;
-
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+
+		Log.i(TAG,
+				"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ start view");
 
 		if (view != null) {
 			ViewGroup parent = (ViewGroup) view.getParent();
@@ -150,6 +161,48 @@ public class MapFragment extends Fragment {
 
 		}
 
+		
+		if (!FriendManager.getInstance().isReady) {
+			(new AsyncTask<Void, Void, Void>() {
+
+				@Override
+				protected void onPreExecute() {
+					// get progress bar
+					frWaitLayout = (FrameLayout) view.findViewById(R.id.frWaitLayout);
+					frWaitLayout.setVisibility(View.VISIBLE);
+//					pbOnMap = (ProgressBar) view.findViewById(R.id.pbOnMap);
+//					pbOnMap.setVisibility(View.VISIBLE);
+				}
+				
+				@Override
+				protected Void doInBackground(Void... arg0) {
+					FriendManager.getInstance().loadFriend();
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void result) {
+					FriendManager.getInstance().setupAfterLoading();
+					swipeAdapter.notifyDataSetChanged();
+					FriendManager.getInstance().isReady = true;
+					
+					
+					((MainActivity) myContext).notifyDataChange();
+					
+					
+					loadFriendsPosition(10000);
+					frWaitLayout.setVisibility(View.GONE);
+					
+					Toast.makeText(getActivity(), "loaded!", Toast.LENGTH_SHORT).show();
+				}
+
+			}).execute();
+
+		}
+		
+		
+		
+		
 		afterViewCreate(view);
 
 		return view;
@@ -166,6 +219,12 @@ public class MapFragment extends Fragment {
 		super.onAttach(activity);
 		context = activity.getApplicationContext();
 		myContext = (FragmentActivity) activity;
+		
+		
+		
+		Log.i("context 1", activity.getApplication().toString());
+		
+		
 	}
 
 	// ----------------- init variable and setup methods ----------- //
@@ -173,10 +232,17 @@ public class MapFragment extends Fragment {
 		// set actionbar
 		View bar = getActivity().getActionBar().getCustomView();
 		bar.findViewById(R.id.grpItemControl).setVisibility(View.VISIBLE);
-		bar.findViewById(R.id.txtSend).setVisibility(View.GONE);
+		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
 
+		// ((Button) view.findViewById(R.id.btnMessage)).setAlpha(0.5f);
+
+		// get progress bar
+		pbOnMap = (ProgressBar) view.findViewById(R.id.pbOnMap);
+		pbOnMap.setVisibility(View.GONE);
+		
+		
 		// get Gps position
-		gpsPosition = new GpsPosition(context);
+		gpsPosition = new GpsPosition(context, this);
 
 		// get resources
 		resource = getActivity().getResources();
@@ -198,18 +264,16 @@ public class MapFragment extends Fragment {
 		markerPoints = new ArrayList<LatLng>();
 		markerManager = new HashMap<Integer, Marker>();
 
-		// get progress bar
-		pbOnMap = (ProgressBar) view.findViewById(R.id.pbOnMap);
-		pbOnMap.setVisibility(View.GONE);
+		
+
+		// setup control item hashmap
+		setupForSelectionControl();
 
 		// setup control layout and avatar list view
 		inc = view.findViewById(R.id.inc_horixontal_container);
 
 		// setup friend list
 		setupFriendList();
-
-		// setup send location to server
-		gpsPosition.startRecording();
 
 		// setup map
 		setupMap();
@@ -219,46 +283,82 @@ public class MapFragment extends Fragment {
 				.getActivity(), this, mMap, pbOnMap);
 		setupControlView();
 
+		// setup send location to server
+		gpsPosition.startRecording();
+
 		// load friends position after 1 mins
 		loadFriendsPosition(60000);
 		updateFriendsPosition(60000);
 
-		// generateLocation(NEWARK);
-
-		// test friend list
-		for (Friend f : friendManager.friends) {
-			Log.i(TAG, f.getUserInfo().getName());
-		}
-
 		// check require from sliding friend event
 		if (ControlOptions.getInstance().isRequire()) {
 			Log.i("REQUIRE", "####################################");
-			int fId = Integer.parseInt(ControlOptions.getInstance().getHashMap(
-					"friendId"));
-			mapController.zoomToPosition(friendManager.getInstance().friends
-					.get(fId).getLastLocation());
+			int fId = ControlOptions.getInstance().getHashMap("friendId");
+			mapController
+					.zoomToPosition(friendManager.getInstance().hmMemberFriends
+							.get(fId).getLastLocation());
 			ControlOptions.getInstance().finish();
 		}
 
 		// check bundle from detail info fragment
 		Bundle bundle = getArguments();
 
+		Log.i(TAG,
+				"################################################################################# start");
+
 		if (null != bundle) {
-			idFriendCur = bundle.getInt("friendId");
-			String task = bundle.getString("task");
+			fIDCurrent = bundle.getInt("friendId");
+			String task = bundle.getString("task", "");
 
 			if (task.equals("route")) {
-				hideControl();
-				hideMarker(friendManager.getInstance().friends.get(0),
-						friendManager.getInstance().friends
-								.get(idFriendCur));
-				mapController.routeTask(idFriendCur);
+
+				final Handler mUpdateHandler = new Handler();
+				Runnable mUpdateRunnable = new Runnable() {
+					public void run() {
+
+						hideControl();
+						hideMarker(friendManager.getInstance().getMine(),
+								friendManager.getInstance().hmMemberFriends
+										.get(fIDCurrent));
+						mapController.routeTask(fIDCurrent);
+					}
+				};
+
+				mUpdateHandler.postDelayed(mUpdateRunnable, 50);
+
 			} else if (task.equals("history")) {
-				hideControl();
-				hideMarker();
-				mapController.drawHistoryTask(idFriendCur);
+				Log.i(TAG, "map history!!! " + markerManager.size());
+
+				final Handler mUpdateHandler = new Handler();
+				Runnable mUpdateRunnable = new Runnable() {
+					public void run() {
+
+						hideControl();
+						hideMarker();
+						mapController.drawHistoryTask(fIDCurrent);
+					}
+				};
+
+				mUpdateHandler.postDelayed(mUpdateRunnable, 50);
+
 			}
+
+			bundle.clear();
 		}
+
+		Log.i(TAG,
+				"################################################################################# end");
+
+		// vibrator setup
+		vibrator = (Vibrator) context
+				.getSystemService(Context.VIBRATOR_SERVICE);
+
+		// hide control console
+		hideControl();
+	}
+
+	public void tickVibrator() {
+		vibrator.vibrate(100);
 	}
 
 	// ---------------- setup map ----------------------- //
@@ -269,12 +369,15 @@ public class MapFragment extends Fragment {
 				.findFragmentById(R.id.mapFragment);
 
 		mMap = mySpFrg.getMap();
-		mMap.setMyLocationEnabled(true);
+		mMap.setMyLocationEnabled(false);
 
 		// load setup map from setting activity
 		mMap.setMapType(SettingManager.getInstance().getMapType());
 
 		mMap.getUiSettings().setZoomControlsEnabled(false);
+
+		// hide control my center
+		// mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
 		// demo overlay
 		final LatLng NEWARK = new LatLng(40.714086, -74.228697);
@@ -291,21 +394,16 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onInfoWindowClick(final Marker marker) {
 
-				int friendId = 0;
+				// int friendId = 0;
 				for (int k : markerManager.keySet()) {
 					if (markerManager.get(k).equals(marker)) {
-						friendId = k;
+						fIDCurrent = k;
 						break;
 					}
 				}
 
-				for (int i = 0; i < friendManager.friends.size(); ++i)
-					if (friendManager.friends.get(i).getUserInfo().getId() == friendId) {
-						idFriendCur = i;
-						break;
-					}
-
-				if (idFriendCur == -1) {
+				// warning
+				if (fIDCurrent == -1) {
 					Log.i(TAG, "id not found!");
 					return;
 				}
@@ -315,16 +413,19 @@ public class MapFragment extends Fragment {
 				Runnable mUpdateRunnable = new Runnable() {
 					public void run() {
 
-						PositionDetailFragment fragment = new PositionDetailFragment();
+						PositionDetailFragment fragment = new PositionDetailFragment(
+								mThis);
 
 						Bundle bundle = new Bundle();
-						bundle.putInt("friendId", idFriendCur);
+						bundle.putInt("friendId", fIDCurrent);
 						bundle.putString("address",
 								mapController.getAddress(marker.getPosition()));
-						bundle.putDouble("myLat", mMap.getMyLocation()
-								.getLatitude());
-						bundle.putDouble("myLng", mMap.getMyLocation()
-								.getLongitude());
+						bundle.putDouble(
+								"myLat",
+								MyProfileManager.getInstance().myLocation.latitude);
+						bundle.putDouble(
+								"myLng",
+								MyProfileManager.getInstance().myLocation.longitude);
 
 						fragment.setArguments(bundle);
 
@@ -340,6 +441,35 @@ public class MapFragment extends Fragment {
 			}
 		});
 
+		mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+
+			@Override
+			public boolean onMarkerClick(final Marker marker) {
+				Log.i(TAG, "marker on click!");
+
+				for (int k : markerManager.keySet()) {
+					if (marker.equals(markerManager.get(k))) {
+						if (fIDCurrent != k) {
+							changleSelectMarker(fIDCurrent, false);
+							fIDCurrent = k;
+							changleSelectMarker(fIDCurrent, true);
+							
+							// setup control
+							swipeAdapter.hightLightItem(swipeAdapter.getPositionByFriendID(k));
+							changeVisibilityView();
+							showControl();
+						}
+						
+						marker.setTitle(mapController.getAddress(
+								FriendManager.getInstance().hmMemberFriends.get(k).getLastLocation()));						
+						
+						break;
+					}
+				}
+				return false;
+			}
+		});
+
 		// setup onclick on map
 		mMap.setOnMapClickListener(new OnMapClickListener() {
 
@@ -347,63 +477,27 @@ public class MapFragment extends Fragment {
 			public void onMapClick(LatLng point) {
 				Log.i("POS", point.latitude + " # " + point.longitude);
 
-				if (viewSelected != null) {
-					hideControl();
-					changleSelectMarker(idFriendCur, false);
-					idFriendCur = -1;
-				}
+				swipeAdapter.unHightLightItem();
+				hideControl();
+				changleSelectMarker(fIDCurrent, false);
+//				
+//				
+//				if (viewSelected != null) {
+//					hideControl();
+//					changleSelectMarker(fIDCurrent, false);
+//					fIDCurrent = -1;
+//				}
 			}
 		});
 
-		// zoom to my location
-		mMap.setOnMyLocationChangeListener(new OnMyLocationChangeListener() {
-
-			@Override
-			public void onMyLocationChange(Location location) {
-				Log.i(TAG, "update! " + markerManager.size());
-				Friend f = friendManager.friends.get(0);
-				LatLng latlng = new LatLng(location.getLatitude(), location
-						.getLongitude());
-				MyProfileManager.getInstance().myLocation = latlng;
-				f.setLastLocation(latlng);
-
-				updatePositionOf(f);
-
-				if (!isMapStarted) {
-					mapController.zoomToPosition(location);
-					isMapStarted = true;
-				}
-			}
-		});
-
-		// setup image loader
-		options = new DisplayImageOptions.Builder().cacheInMemory(true)
-				.cacheOnDisc(true).considerExifParams(true)
-				.bitmapConfig(Bitmap.Config.RGB_565).build();
-		imageLoader = ImageLoader.getInstance();
-		// File cacheDir = StorageUtils.getCacheDirectory(context);
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context)
-				.memoryCacheExtraOptions(480, 800)
-				// default = device screen dimensions
-
-				.taskExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-				.taskExecutorForCachedImages(AsyncTask.THREAD_POOL_EXECUTOR)
-				.threadPoolSize(3)
-				// default
-				.threadPriority(Thread.NORM_PRIORITY - 1)
-				// default
-				.tasksProcessingOrder(QueueProcessingType.FIFO)
-				// default
-				.denyCacheImageMultipleSizesInMemory()
-				.memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024))
-				// default
-				.memoryCacheSize(2 * 1024 * 1024)
-				.imageDownloader(new BaseImageDownloader(context)) // default
-				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
-				.build();
-		imageLoader.init(config);
-
+//		// zoom to my location
+//		mMap.setOnMyLocationChangeListener(new OnMyLocationChangeListener() {
+//
+//			@Override
+//			public void onMyLocationChange(Location location) {
+//
+//			}
+//		});
 	}
 
 	// ---------------- setup friend list ------------------ //
@@ -412,9 +506,11 @@ public class MapFragment extends Fragment {
 				.findViewById(R.id.avatarListView);
 
 		swipeAdapter = new FriendSwipeAdapter(context,
-				R.layout.item_friend_accepted, friendManager.friends);
+				R.layout.item_friend_accepted,
+				friendManager.getInstance().memberFriends);
 		avatarListView.setAdapter(swipeAdapter);
 
+		
 		avatarListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -422,41 +518,53 @@ public class MapFragment extends Fragment {
 					int position, long id) {
 				Log.i(TAG, "click at " + position);
 
-				if (idFriendCur >= 0)
-					changleSelectMarker(idFriendCur, false);
+				if (fIDCurrent >= 0)
+					changleSelectMarker(fIDCurrent, false);
 
-				idFriendCur = position;
-				changleSelectMarker(idFriendCur, true);
+				fIDCurrent = swipeAdapter.getItem(position).getUserInfo()
+						.getId();
+
+				changleSelectMarker(fIDCurrent, true);
 
 				// dis/en visible on control view
 				changeVisibilityView();
 
-				if (viewSelected != null) {
-					if (!viewSelected.equals(view)) {
-						viewSelected.setBackgroundColor(0x00);
-						view.setBackgroundColor(resource
-								.getColor(R.color.selector_color));
-
-						mapController.zoomToPosition(friendManager.friends.get(
-								position).getLastLocation());
-					}
-				} else {
-					showControl();
-					view.setBackgroundColor(resource
-							.getColor(R.color.selector_color));
-
-					mapController.zoomToPosition(friendManager.friends.get(
+				
+				
+				swipeAdapter.hightLightItem(position);
+				showControl();
+				
+				if (swipeAdapter.getItem(position).isShare())
+					mapController.zoomToPosition(swipeAdapter.getItem(
 							position).getLastLocation());
-				}
-
-				viewSelected = view;
+				
+//				
+//				if (viewSelected != null) {
+//					if (!viewSelected.equals(view)) {
+//						viewSelected.setBackgroundColor(0x00);
+//						view.setBackgroundColor(resource
+//								.getColor(R.color.selector_color));
+//
+//						if (swipeAdapter.getItem(position).isShare())
+//							mapController.zoomToPosition(swipeAdapter.getItem(
+//									position).getLastLocation());
+//					}
+//				} else {
+//					showControl();
+//					view.setBackgroundColor(resource
+//							.getColor(R.color.selector_color));
+//					if (swipeAdapter.getItem(position).isShare())
+//						mapController.zoomToPosition(swipeAdapter.getItem(
+//								position).getLastLocation());
+//				}
+//
+//				viewSelected = view;
 
 			}
 		});
 	}
 
-	
-	// ----------------- setup controll at bottom screen ----------- //
+	// ----------------- setup control at bottom screen ----------- //
 	private void setupControlView() {
 		inc = view.findViewById(R.id.inc_horixontal_container);
 		btnMessage = (Button) inc.findViewById(R.id.btnMessage);
@@ -471,8 +579,9 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				if (maskEn[0] == 1) {
+					tickVibrator();
 					hideControl();
-					mapController.sendMessageTask(idFriendCur);
+					mapController.sendMessageTask(fIDCurrent);
 				}
 			}
 		});
@@ -482,8 +591,9 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (maskEn[1] == 1) {
+					tickVibrator();
 					hideControl();
-					mapController.callTask(idFriendCur);
+					mapController.callTask(fIDCurrent);
 				}
 			}
 		});
@@ -493,9 +603,10 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (maskEn[2] == 1) {
+					tickVibrator();
 					hideControl();
 					hideMarker();
-					mapController.drawHistoryTask(idFriendCur);
+					mapController.drawHistoryTask(fIDCurrent);
 				}
 			}
 		});
@@ -505,9 +616,10 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (maskEn[3] == 1) {
+					tickVibrator();
 					hideControl();
 					showMarker();
-					mapController.updatePositionTask(idFriendCur);
+					mapController.updatePositionTask(fIDCurrent);
 				}
 			}
 		});
@@ -517,11 +629,12 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (maskEn[4] == 1) {
+					tickVibrator();
 					hideControl();
-					hideMarker(friendManager.getInstance().friends.get(0),
-							friendManager.getInstance().friends
-									.get(idFriendCur));
-					mapController.routeTask(idFriendCur);
+					hideMarker(friendManager.getInstance().getMine(),
+							friendManager.getInstance().hmMemberFriends
+									.get(fIDCurrent));
+					mapController.routeTask(fIDCurrent);
 				}
 			}
 		});
@@ -531,19 +644,20 @@ public class MapFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (maskEn[5] == 1) {
+					tickVibrator();
 					hideControl();
 					showMarker();
-					mapController.requestTask(idFriendCur);
+					mapController.requestTask(fIDCurrent);
 				}
 			}
 		});
 	}
 
-	
-	/// --------------------- utilities methods --------------------- ///
-	
+	// / --------------------- utilities methods --------------------- ///
+
 	// ---------- hide/show marker on map ----------------- //
 	private void hideMarker() {
+		Log.i(TAG, "----------------------------------------hide marker");
 		for (int k : markerManager.keySet()) {
 			markerManager.get(k).setVisible(false);
 		}
@@ -568,54 +682,158 @@ public class MapFragment extends Fragment {
 		isShowMarker = false;
 	}
 
-	// ------------------ hide/show view on control console --------------------- //
-	private void disableView(int idControlView) {
-		((LinearLayout) ((ViewGroup) getView().findViewById(idControlView)
-				.getParent())).setBackgroundColor(Color.GRAY);
+	// ------------------ hide/show view on control console ---------- //
+
+	private void setupForSelectionControl() {
+		// allways enable
+		// maskEn[2] = maskEn[3] = 1;
+
+		hmToCap20 = new HashMap<Integer, Integer>(6);
+		hmToCap20.put(R.id.btnMessage, R.drawable.ic_message_cap20);
+		hmToCap20.put(R.id.btnCall, R.drawable.ic_call_cap20);
+		hmToCap20.put(R.id.btnRequest, R.drawable.ic_request_cap20);
+		hmToCap20.put(R.id.btnRoute, R.drawable.ic_route_cap20);
+		hmToCap20.put(R.id.btnHistory, R.drawable.ic_history_cap20);
+		hmToCap20.put(R.id.btnUpdate, R.drawable.ic_update_cap20);
+
+		hmFromCap20 = new HashMap<Integer, Integer>(6);
+		hmFromCap20.put(R.id.btnMessage, R.drawable.ic_message);
+		hmFromCap20.put(R.id.btnCall, R.drawable.ic_call);
+		hmFromCap20.put(R.id.btnRequest, R.drawable.ic_request);
+		hmFromCap20.put(R.id.btnRoute, R.drawable.ic_route);
+		hmFromCap20.put(R.id.btnHistory, R.drawable.ic_history);
+		hmFromCap20.put(R.id.btnUpdate, R.drawable.ic_update);
 
 	}
 
-	private void enableView(int idControlView) {
-		((LinearLayout) ((ViewGroup) getView().findViewById(idControlView)
-				.getParent())).setBackgroundColor(Color.TRANSPARENT);
+	public void disableView(View rView, int idRaw) {
+		((LinearLayout) ((ViewGroup) rView.findViewById(idRaw).getParent()))
+				.getChildAt(1).setAlpha(0.2f);
+
+		((Button) rView.findViewById(idRaw)).setBackgroundDrawable(resource
+				.getDrawable(hmToCap20.get(idRaw)));
+	}
+
+	public void enableView(View rView, int idRaw) {
+		((LinearLayout) ((ViewGroup) rView.findViewById(idRaw).getParent()))
+				.getChildAt(1).setAlpha(1f);
+
+		((Button) rView.findViewById(idRaw)).setBackgroundDrawable(resource
+				.getDrawable(hmFromCap20.get(idRaw)));
 
 	}
-	
+
 	private void changeVisibilityView() {
+		View rView = getView();
 		// check view visiable
-		if (idFriendCur == 0) {
-			disableView(R.id.btnMessage);
+		if (fIDCurrent == MyProfileManager.getInstance().mine.getId()) {
+			disableView(rView, R.id.btnMessage);
 			maskEn[0] = 0;
-			disableView(R.id.btnCall);
+
+			disableView(rView, R.id.btnCall);
 			maskEn[1] = 0;
-			disableView(R.id.btnRoute);
+
+			enableView(rView, R.id.btnHistory);
+			maskEn[2] = 1;
+
+			enableView(rView, R.id.btnUpdate);
+			maskEn[3] = 1;
+
+			disableView(rView, R.id.btnRoute);
 			maskEn[4] = 0;
-			maskEn[2] = maskEn[3] = maskEn[5] = 1;
+
+			disableView(rView, R.id.btnRequest);
+			maskEn[5] = 0;
 
 		} else {
-			enableView(R.id.btnMessage);
-			maskEn[0] = 1;
-			enableView(R.id.btnCall);
-			maskEn[1] = 1;
-			enableView(R.id.btnRoute);
-			maskEn[4] = 1;
-			maskEn[2] = maskEn[3] = 1;
-			if (friendManager.friends.get(idFriendCur).isShare()) {
-				disableView(R.id.btnRequest);
-				maskEn[5] = 0;
-			} else {
-				enableView(R.id.btnRequest);
+
+			Friend f = FriendManager.getInstance().hmMemberFriends
+					.get(fIDCurrent);
+			if (f.isShare()) {
+				// full options
+				enableView(rView, R.id.btnMessage);
+				maskEn[0] = 1;
+
+				enableView(rView, R.id.btnCall);
+				maskEn[1] = 1;
+
+				enableView(rView, R.id.btnHistory);
+				maskEn[2] = 1;
+
+				enableView(rView, R.id.btnUpdate);
+				maskEn[3] = 1;
+
+				enableView(rView, R.id.btnRoute);
+				maskEn[4] = 1;
+
+				enableView(rView, R.id.btnRequest);
 				maskEn[5] = 1;
+
+			} else {
+				if (f.getAcceptState() == Friend.ACCEPT_STATE) {
+					disableView(rView, R.id.btnMessage);
+					maskEn[0] = 0;
+
+					disableView(rView, R.id.btnCall);
+					maskEn[1] = 0;
+
+					disableView(rView, R.id.btnHistory);
+					maskEn[2] = 0;
+
+					enableView(rView, R.id.btnUpdate);
+					maskEn[3] = 1;
+
+					disableView(rView, R.id.btnRoute);
+					maskEn[4] = 0;
+
+					enableView(rView, R.id.btnRequest);
+					maskEn[5] = 1;
+				} else {
+					// Friend.WAIT_STATE
+					disableView(rView, R.id.btnMessage);
+					maskEn[0] = 0;
+
+					disableView(rView, R.id.btnCall);
+					maskEn[1] = 0;
+
+					disableView(rView, R.id.btnHistory);
+					maskEn[2] = 0;
+
+					enableView(rView, R.id.btnUpdate);
+					maskEn[3] = 1;
+
+					disableView(rView, R.id.btnRoute);
+					maskEn[4] = 0;
+
+					disableView(rView, R.id.btnRequest);
+					maskEn[5] = 0;
+				}
+
 			}
 
+			// enableView(rView, R.id.btnMessage);
+			// maskEn[0] = 1;
+			//
+			// enableView(rView, R.id.btnCall);
+			// maskEn[1] = 1;
+			//
+			// enableView(rView, R.id.btnRoute);
+			// maskEn[4] = 1;
+			//
+			// if (friendManager.hmMemberFriends.get(fIDCurrent).isShare()) {
+			// disableView(rView, R.id.btnRequest);
+			// maskEn[5] = 0;
+			// } else {
+			// enableView(rView, R.id.btnRequest);
+			// maskEn[5] = 1;
+			// }
 		}
 	}
 
 	// --------------------- changle color marker --------------------- //
 	private void changleSelectMarker(int idFriendCur, boolean isSelected) {
-		Marker m = markerManager.get(friendManager.friends.get(idFriendCur)
-				.getUserInfo().getId());
-		Friend f = friendManager.friends.get(idFriendCur);
+		Marker m = markerManager.get(idFriendCur);
+		Friend f = friendManager.hmMemberFriends.get(idFriendCur);
 
 		if (m != null) {
 			if (isSelected)
@@ -625,8 +843,6 @@ public class MapFragment extends Fragment {
 		}
 	}
 
-	
-	
 	// -------------- show/hide control console ---------------- //
 	private void showControl() {
 		inc.setAlpha(1.0f);
@@ -648,15 +864,13 @@ public class MapFragment extends Fragment {
 		}
 	}
 
-	//  -------------------- should load with timer --------------- //
+	// -------------------- should load with timer --------------- //
 	private void loadFriendsPosition(final long interval) {
 		mMap.clear();
 
 		// update for friend
-		for (int i = 0; i < friendManager.friends.size(); ++i) {
-			Friend f = friendManager.friends.get(i);
-
-			if (f.getLastLocation() == null)
+		for (Friend f : swipeAdapter.getData()) {
+			if (!f.isShare() || f.getLastLocation() == null)
 				continue;
 
 			createMakerOnMap(f);
@@ -664,13 +878,12 @@ public class MapFragment extends Fragment {
 	}
 
 	// -------------------------- update position ------------------------ //
-	
 	private void updateFriendsPosition(final long interval) {
 
-//		for (int key : markerManager.keySet()) {
-//			// PostData.updateLastLoation(friendManager.hmFriends.get(key),
-//			// markerManager.get(key));
-//		}
+		// for (int key : markerManager.keySet()) {
+		// // PostData.updateLastLoation(friendManager.hmFriends.get(key),
+		// // markerManager.get(key));
+		// }
 
 	}
 
@@ -681,8 +894,8 @@ public class MapFragment extends Fragment {
 			m.setTitle(mapController.getAddress(f.getLastLocation()));
 		}
 	}
-	
-	//  ----------------------- setup iconview on map ---------------- //
+
+	// ----------------------- setup iconview on map ---------------- //
 	private BitmapDescriptor combileLocationIcon(final Friend f,
 			boolean isSelected) {
 		final Bitmap brbitmap;
@@ -694,36 +907,8 @@ public class MapFragment extends Fragment {
 			brbitmap = BitmapFactory.decodeResource(getResources(),
 					R.drawable.boder_location_unselected);
 
-		if (f != null) {
-			imageLoader.loadImage(f.getUserInfo().getAvatar(),
-					new SimpleImageLoadingListener() {
-						@Override
-						public void onLoadingComplete(String imageUri,
-								View view, Bitmap loadedImage) {
-							// Do whatever you want with Bitmap
-
-							int idUser = f.getUserInfo().getId();
-
-							Marker m = markerManager.get(idUser);
-
-							MarkerOptions opt = new MarkerOptions();
-							opt.position(m.getPosition());
-							opt.title(m.getTitle());
-							opt.snippet(m.getSnippet());
-							opt.icon(combileBorder(loadedImage, brbitmap));
-
-							m.remove();
-
-							m = mMap.addMarker(opt);
-							markerManager.put(idUser, m);
-
-							Log.i(TAG, "load ok");
-						}
-					});
-		}
-
-		return combileBorder(BitmapFactory.decodeResource(getResources(),
-				R.drawable.ic_no_imgprofile), brbitmap);
+		return combileBorder(drawableToBitmap(Drawable.createFromPath(f
+				.getUserInfo().getAvatar())), brbitmap);
 	}
 
 	private BitmapDescriptor combileBorder(Bitmap bmAvatar, Bitmap brbitmap) {
@@ -755,12 +940,25 @@ public class MapFragment extends Fragment {
 		return bmOverlay;
 	}
 
+	private Bitmap drawableToBitmap(Drawable drawable) {
+		if (drawable instanceof BitmapDrawable) {
+			return ((BitmapDrawable) drawable).getBitmap();
+		}
+
+		Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+				drawable.getIntrinsicHeight(), Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+		drawable.draw(canvas);
+
+		return bitmap;
+	}
 
 	// ----------------------- create map's marker ----------------- //
 	private void createMakerOnMap(Friend f) {
 		MarkerOptions options = new MarkerOptions();
 		options.position(f.getLastLocation());
-		options.title(mapController.getAddress(f.getLastLocation()));
+		// options.title(mapController.getAddress(f.getLastLocation()));
 		options.snippet("cập nhật "
 				+ Utility.convertMicTimeToString(System.currentTimeMillis()
 						- f.getUserInfo().getLastestlogin().getTime())
@@ -772,6 +970,23 @@ public class MapFragment extends Fragment {
 		markerManager.put(f.getUserInfo().getId(), m);
 	}
 
-	
+	@Override
+	public void onMyLocationChanged(Location location) {
+
+		Log.i(TAG, "update! " + markerManager.size());
+		Friend f = friendManager.getMine();
+		LatLng latlng = new LatLng(location.getLatitude(),
+				location.getLongitude());
+		MyProfileManager.getInstance().myLocation = latlng;
+		f.setLastLocation(latlng);
+
+		updatePositionOf(f);
+
+		if (!isMapStarted) {
+			mapController.zoomToPosition(location);
+			isMapStarted = true;
+		}
+
+	}
 
 }

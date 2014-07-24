@@ -22,8 +22,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ TABLE_MESSAGES + "(" 
 			+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_MESSAGE + " text not null, "
-			+ COLUMN_SENDER_ID + " text not null, "
-			+ COLUMN_RECEVIER_ID + " text not null, "
+			+ COLUMN_SENDER_ID + " integer not null, "
+			+ COLUMN_RECEVIER_ID + " integer not null, "
 			+ COLUMN_SMS_DATE + " timestamp not null);";
 
 	public MySQLiteHelper(Context context) {

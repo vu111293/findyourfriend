@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sgu.findyourfriend.mgr.MyLocationChangeListener;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.net.PostData;
 
@@ -29,8 +30,12 @@ public class GpsPosition {
 	private long lastprovidertimestamp = 0;
 	private LocationManager myLocationManager = null;
 
-	public GpsPosition(Context conext) {
+	private MyLocationChangeListener myLocationListener;
+
+	
+	public GpsPosition(Context conext, MyLocationChangeListener myLocationListener) {
 		this.context = conext;
+		this.myLocationListener = myLocationListener;
 		lastprovidertimestamp = 0;
 	}
 
@@ -42,6 +47,10 @@ public class GpsPosition {
 		// receive updates
 		LocationManager locationManager = (LocationManager) context
 				.getSystemService(Context.LOCATION_SERVICE);
+		
+		// get now
+		myLocationListener.onMyLocationChanged(getBestLocation());
+		
 		for (String s : locationManager.getAllProviders()) {
 			locationManager.requestLocationUpdates(s, checkInterval,
 					minDistance, new LocationListener() {
@@ -68,6 +77,7 @@ public class GpsPosition {
 										Toast.LENGTH_SHORT).show();
 
 								doLocationUpdate(location, true);
+								myLocationListener.onMyLocationChanged(location);
 							}
 						}
 					});
@@ -258,4 +268,38 @@ public class GpsPosition {
 		this.lastLocation = lastLocation;
 	}
 
+	
+//	public String getMyAddressNow() {
+//		// Location bLocation = getBestLocation();
+//		return getAddress(new LatLng(12.073887272186989, 106.5946023606658));
+//	}
+//	
+//	private String getAddress(LatLng point) {
+//		try {
+//			Geocoder geocoder;
+//			List<Address> addresses;
+//			geocoder = new Geocoder(context);
+//			if (point.latitude != 0 || point.longitude != 0) {
+//				addresses = geocoder.getFromLocation(point.latitude,
+//						point.longitude, 1);
+//
+//				Address address = addresses.get(0);
+//
+//				String addressText = String.format(
+//						"%s, %s",
+//						address.getMaxAddressLineIndex() > 0 ? address
+//								.getAddressLine(0) : "", address
+//								.getCountryName());
+//
+//				return addressText;
+//			} else {
+//				Toast.makeText(context, "latitude and longitude are null",
+//						Toast.LENGTH_LONG).show();
+//				return "";
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
 }
