@@ -71,24 +71,45 @@ public class FriendSwipeAdapter extends ArrayAdapter<Friend> {
 		ImageView imgAvatar = (ImageView) convertView
 				.findViewById(R.id.imgAvatar);
 
-		Log.i("IMAGE PATH", friend.getUserInfo().getAvatar());
+		// Log.i("IMAGE PATH", friend.getUserInfo().getAvatar());
 
 		imgAvatar.setImageDrawable(FriendManager.getInstance().hmImageP
 				.get(friend.getUserInfo().getId()));
 		
-		if (friend.isShare()) {
-			((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
-			((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
-		} else {
+		
+		((ImageView) convertView.findViewById(R.id.imgWaitAlert)).setVisibility(View.GONE);
+		((ImageView) convertView.findViewById(R.id.imgRequestAlert)).setVisibility(View.GONE);
+		((ImageView) convertView.findViewById(R.id.imgResponseAlert)).setVisibility(View.GONE);
+		
+		if (friend.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
+			// share
 			
-			if (friend.getAcceptState() == Friend.ACCEPT_STATE) {
-				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.VISIBLE);
-				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
-			} else {
-				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
-				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.VISIBLE);
-			}
+		} else if (friend.getAcceptState() == Friend.REQUEST_SHARE) {
+			// wait accept (not show) display waiting state
+			((ImageView) convertView.findViewById(R.id.imgWaitAlert)).setVisibility(View.VISIBLE);
+		} else if (friend.getAcceptState() == Friend.REQUESTED_SHARE) {
+			// request (not show) display accept request
+			((ImageView) convertView.findViewById(R.id.imgResponseAlert)).setVisibility(View.VISIBLE);
+		} else if (friend.getAcceptState() == Friend.FRIEND_RELATIONSHIP) {
+			// friend (not show) display request 
+			((ImageView) convertView.findViewById(R.id.imgRequestAlert)).setVisibility(View.VISIBLE);
 		}
+		
+		
+		
+//		if (friend.isShare()) {
+//			((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
+//			((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
+//		} else {
+//			
+//			if (friend.getAcceptState() == Friend.FRIEND_RELATIONSHIP) {
+//				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.VISIBLE);
+//				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.GONE);
+//			} else {
+//				((ImageView) convertView.findViewById(R.id.imgNotShare)).setVisibility(View.GONE);
+//				((ImageView) convertView.findViewById(R.id.imgWait)).setVisibility(View.VISIBLE);
+//			}
+//		}
 
 		if (itemIdOldHightLight > 0 && itemIdOldHightLight == position) 
 			convertView.setBackgroundColor(0x000000);

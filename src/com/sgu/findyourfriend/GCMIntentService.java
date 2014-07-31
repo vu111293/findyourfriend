@@ -5,11 +5,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
+import com.sgu.findyourfriend.mgr.SettingManager;
+import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.utils.Controller;
 
@@ -19,20 +22,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	private Controller aController = null;
 	private static MainActivity mainActivity = null;
-	
-	
+
 	public GCMIntentService() {
 		// Call extended class Constructor GCMBaseIntentService
 		super(Config.GOOGLE_SENDER_ID);
-		
+
 	}
-	
+
 	public static void setMainActivity(MainActivity mainActivity) {
 		GCMIntentService.mainActivity = mainActivity;
 	}
 
-	
-	
 	/**
 	 * Method called on device registered
 	 **/
@@ -48,11 +48,22 @@ public class GCMIntentService extends GCMBaseIntentService {
 		aController.displayMessageOnScreen(context,
 				"Your device registred with GCM");
 		Log.d("NAME", MyProfileManager.getInstance().mine.getName());
-//		aController.register(context, MyProfileManager.getInstance().mine.getName(), MyProfileManager.getInstance().mine.getEmail(),
-//				registrationId);
+
 		
-		aController.register(context, "quocvu", "email@g.com",
-				registrationId);
+		aController.register(context,
+				MyProfileManager.getInstance().numberLogins.get(0),
+				MyProfileManager.getInstance().mine.getEmail(), registrationId);
+
+		MyProfileManager.getInstance().mine.setGcmid(registrationId);
+		
+		PostData.userEdit(context,
+				MyProfileManager.getInstance().mine.getId(), 
+				MyProfileManager.getInstance().mine.getName(),
+				MyProfileManager.getInstance().mine.getGender(),
+				MyProfileManager.getInstance().mine.getProvince(), 
+				MyProfileManager.getInstance().mine.getEmail(),
+				MyProfileManager.getInstance().mine.getAvatar(),
+				MyProfileManager.getInstance().mine.getGcmId());
 	}
 
 	/**
@@ -81,11 +92,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 		String message = intent.getExtras().getString("price");
 
 		aController.displayMessageOnScreen(context, message);
-		
-		//change ui
+
+		// change ui
 		// if (null != mainActivity)
-		// 	mainActivity.newMessageNotify();
-		
+		// mainActivity.newMessageNotify();
+
 		// notifies user
 		generateNotification(context, message);
 	}
@@ -156,13 +167,25 @@ public class GCMIntentService extends GCMBaseIntentService {
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		// Play default notification sound
-		notification.defaults |= Notification.DEFAULT_SOUND;
+		// notification.defaults |= Notification.DEFAULT_SOUND;
+
+		if (SettingManager.getInstance().isMessageRingtone()) {
+			String uriRingtone = SettingManager.getInstance().getRingtoneUri();
+
+			if (!uriRingtone.equals("")) {
+				notification.sound = Uri.parse(uriRingtone);
+			} else {
+				notification.defaults |= Notification.DEFAULT_SOUND;
+			}
+			Log.i("NOTIFY", uriRingtone);
+		}
 
 		// notification.sound = Uri.parse("android.resource://" +
 		// context.getPackageName() + "your_sound_file_name.mp3");
 
 		// Vibrate if vibrate is enabled
-		notification.defaults |= Notification.DEFAULT_VIBRATE;
+		if (SettingManager.getInstance().isVibrate())
+			notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notificationManager.notify(0, notification);
 
 	}

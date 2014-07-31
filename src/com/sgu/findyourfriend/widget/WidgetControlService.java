@@ -75,27 +75,15 @@ public class WidgetControlService extends Service {
 	public void onStart(Intent intent, int startId) {
 		Log.i(APP_TAG, "start!");
 
-		
-		
 		super.onStart(intent, startId);
-		
-		// if (intent.getAction().equals(Config.DISPLAY_MESSAGE_ACTION)) {
-			
-			
-		//}
-		
+
 		waitForGPSCoorinates();
-		// AppWidgetManager widgetManager = AppWidgetManager.getInstance(this
-		// .getApplicationContext());
 
 		// fetch widgets to be updated
 		int[] widgetIds = intent
 				.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 		if (widgetIds.length > 0) {
-			// fetching timeout, setting status
 			for (int widgetId : widgetIds) {
-				// RemoteViews remoteViews = new RemoteViews(getPackageName(),
-				// R.layout.main_widget_ui);
 				if (intent.hasExtra(EXTRA_EMERGENCY)) {
 					Log.d(APP_TAG, "intent has extra enableLock");
 					if (intent.getBooleanExtra(EXTRA_EMERGENCY, true)) {
@@ -104,10 +92,6 @@ public class WidgetControlService extends Service {
 				} else {
 					Log.d(APP_TAG, "intent has no extra enableLock");
 				}
-				// // printStatus(getApplicationContext(), remoteViews);
-				// widgetManager.updateAppWidget(widgetId, remoteViews);
-				// }
-				// stopSelf();
 			}
 		}
 
@@ -168,7 +152,8 @@ public class WidgetControlService extends Service {
 
 		Geocoder coder = new Geocoder(this);
 		List<Address> addresses = null;
-		String info = "";
+		StringBuilder address = new StringBuilder();
+		String latlng = "";
 
 		Log.i(APP_TAG, "update location");
 
@@ -180,15 +165,17 @@ public class WidgetControlService extends Service {
 
 				if (-1 != addressCount) {
 					for (int index = 0; index <= addressCount; ++index) {
-						info += addresses.get(0).getAddressLine(index);
+						address.append(addresses.get(0).getAddressLine(index));
 
 						if (index < addressCount)
-							info += ", ";
+							address.append(", ");
 					}
 				} else {
-					info += addresses.get(0).getFeatureName() + ", "
-							+ addresses.get(0).getSubAdminArea() + ", "
-							+ addresses.get(0).getAdminArea();
+					address.append(addresses.get(0).getFeatureName());
+					address.append(", ");
+					address.append(addresses.get(0).getSubAdminArea());
+					address.append(", ");
+					address.append(addresses.get(0).getAdminArea());
 				}
 			}
 
@@ -200,53 +187,56 @@ public class WidgetControlService extends Service {
 		coder = null;
 		addresses = null;
 
-		if (info.length() <= 0) {
-			info = "lat " + latitude + ", lon " + longitude;
-		} else {
-			info += ("\n" + "(lat " + latitude + ", lon " + longitude + ")");
-		}
+		latlng = "lat " + latitude + ", lng " + longitude;
 
 		RemoteViews views = new RemoteViews(getPackageName(),
 				R.layout.main_widget_ui);
 
-		views.setTextViewText(R.id.txtMyAddress, info);
+		views.setTextViewText(
+				R.id.txtMyAddress,
+				address.toString().equals("") ? "không có sẵn" : address
+						.toString());
+		views.setTextViewText(R.id.txtLatLng, latlng);
 
 		ComponentName thisWidget = new ComponentName(this, SimpleWidget.class);
 		AppWidgetManager manager = AppWidgetManager.getInstance(this);
 		manager.updateAppWidget(thisWidget, views);
 	}
 
-//	private void onUpdate(Context context, RemoteViews remoteViews,
-//			String mAddress) {
-//		String address = (new GpsPosition(context).getMyAddressNow());
-//		// String address = (new GpsWidget().getNow());
-//		remoteViews.setTextViewText(R.id.txtMyAddress, address);
-//		Toast.makeText(context, "Update me " + mAddress, Toast.LENGTH_SHORT)
-//				.show();
-//	}
+	// private void onUpdate(Context context, RemoteViews remoteViews,
+	// String mAddress) {
+	// String address = (new GpsPosition(context).getMyAddressNow());
+	// // String address = (new GpsWidget().getNow());
+	// remoteViews.setTextViewText(R.id.txtMyAddress, address);
+	// Toast.makeText(context, "Update me " + mAddress, Toast.LENGTH_SHORT)
+	// .show();
+	// }
 
 	private void onEmergency(final Context context) {
-		
+
 		(new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected void onPreExecute() {
-				Toast.makeText(context, "Emergency! sending", Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, "Emergency! sending",
+						Toast.LENGTH_SHORT).show();
 			}
-			
+
 			@Override
 			protected Void doInBackground(Void... params) {
-				(new Controller()).sendMessage(context, Config.GCM_ID, Config.GCM_ID, "emergency");
+				(new Controller()).sendMessage(context, Config.GCM_ID,
+						Config.GCM_ID, "emergency");
 				return null;
 			}
-			
+
 			@Override
 			protected void onPostExecute(Void result) {
-				Toast.makeText(context, "Emergency! sent!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, "Emergency! sent!", Toast.LENGTH_SHORT)
+						.show();
 			}
-			
+
 		}).execute();
-		
+
 	}
 
 	@Override

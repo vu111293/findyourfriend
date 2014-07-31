@@ -38,4 +38,11 @@ public interface Config {
 	
 	static final String REQUEST_FRIEND_MESSAGE = PREFIX + "_FRIEND";
 	
+	
+	static final String PREFIX_FRIEND_REQUEST = "FRIEND_REQUEST";
+	static final String PREFIX_SHARE_REQUEST = "SHARE_REQUEST";
+	static final String PREFIX_FRIEND_RESPONSE = "FRIEND_RESPONSE";
+	static final String PREFIX_SHARE_RESPONSE = "SHARE_RESPONSE";
+	
+	
 }

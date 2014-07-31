@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,7 +18,9 @@ import android.widget.Toast;
 
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.FriendManager;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.net.PostData;
 
 public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 
@@ -59,6 +62,46 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 				.setVisibility(View.VISIBLE);
 		// }
 
+		((Button) convertView.findViewById(R.id.btnConfirm))
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						// request to server
+
+						(new AsyncTask<Void, Void, Boolean>() {
+
+							@Override
+							protected Boolean doInBackground(Void... params) {
+								return PostData.sendFriendAccept(context,
+										MyProfileManager.getInstance().mine
+												.getId(), fr.getUserInfo()
+												.getId());
+							}
+
+							@Override
+							protected void onPostExecute(Boolean isOk) {
+								if (isOk) {
+									Data.remove(fr);
+									notifyDataSetChanged();
+									
+									fr.setAcceptState(Friend.FRIEND_RELATIONSHIP);
+									FriendManager.getInstance().updateFriend(fr);
+									
+									
+									Toast.makeText(context, "đã chấp nhận",
+											Toast.LENGTH_SHORT).show();
+								} else {
+									Toast.makeText(context, "thử lại sau",
+											Toast.LENGTH_SHORT).show();
+								}
+							}
+
+						}).execute();
+
+					}
+				});
+
 		((Button) convertView.findViewById(R.id.btnNotNow))
 				.setOnClickListener(new OnClickListener() {
 
@@ -66,25 +109,31 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 					public void onClick(View arg0) {
 						// request to server
 
-						Data.remove(fr);
-						notifyDataSetChanged();
+						(new AsyncTask<Void, Void, Boolean>() {
 
-						Toast.makeText(context, "remove item ",
-								Toast.LENGTH_SHORT).show();
-					}
-				});
+							@Override
+							protected Boolean doInBackground(Void... params) {
+								return PostData.sendFriendNotAccept(context,
+										MyProfileManager.getInstance().mine
+												.getId(), fr.getUserInfo()
+												.getId());
+							}
 
-		((Button) convertView.findViewById(R.id.btnConfirm))
-				.setOnClickListener(new OnClickListener() {
+							@Override
+							protected void onPostExecute(Boolean isOk) {
+								if (isOk) {
+									Data.remove(fr);
+									notifyDataSetChanged();
+									
+									FriendManager.getInstance().removeFriendRequest(fr);
+								} else {
+									Toast.makeText(context, "thử lại sau",
+											Toast.LENGTH_SHORT).show();
+								}
+							}
 
-					@Override
-					public void onClick(View arg0) {
-						// request to server
-						Data.remove(fr);
-						notifyDataSetChanged();
+						}).execute();
 
-						Toast.makeText(context, "remove item ",
-								Toast.LENGTH_SHORT).show();
 					}
 				});
 

@@ -1,0 +1,95 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        tools:context=".LoginActivity" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Find Your Friend"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#4c67a1" />
+
+        <ImageView
+            android:id="@+id/ImageView_AddFriendFromContact_Used"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_launcher" />
+
+        <EditText
+            android:id="@+id/EditText_Login_ID"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/ImageView_AddFriendFromContact_Used"
+            android:layout_marginTop="34dp"
+            android:background="@drawable/edit_text"
+            android:ems="10"
+            android:hint="Số điện thoại"
+            android:paddingLeft="10dp" />
+
+        <EditText
+            android:id="@+id/EditText_Login_Password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignLeft="@+id/EditText_Login_ID"
+            android:layout_below="@+id/EditText_Login_ID"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text"
+            android:ems="10"
+            android:hint="Mật khẩu"
+            android:inputType="textPassword"
+            android:paddingLeft="10dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/EditText_Login_Password"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/Button_Login_BtnLogin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_friendrequests_blue"
+                android:text="Đăng Nhập"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/TextView_Login_Register"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_attractive"
+                android:text="Đăng Kí"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/TextView_Login_ForgetPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayoutButton"
+            android:layout_marginTop="10dp"
+            android:text="quên mật khẩu?"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#4c67a1"
+            android:textStyle="italic" />
+    </RelativeLayout>
+
+</ScrollView>

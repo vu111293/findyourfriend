@@ -5,22 +5,6 @@
     android:background="#ffffff"
     android:orientation="vertical" >
 
-    <!--
-    <FrameLayout
-        android:id="@+id/fwait"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#11c0c0c0" >
-
-        <ProgressBar
-            android:id="@+id/progressBar1"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|center_vertical" />
-    </FrameLayout>
-    -->
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

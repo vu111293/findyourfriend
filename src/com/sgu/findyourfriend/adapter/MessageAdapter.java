@@ -40,7 +40,7 @@ public class MessageAdapter extends BaseAdapter {
 		this.mMessages = messages;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		 sdfDate = new SimpleDateFormat("dd/MM");
+		 sdfDate = new SimpleDateFormat("hh:mm dd/MM");
 	}
 
 	@Override

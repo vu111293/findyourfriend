@@ -4,15 +4,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -24,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
-import com.sgu.findyourfriend.GCMIntentService;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.CustomAdapterFriendStatus;
 import com.sgu.findyourfriend.ctr.ControlOptions;
@@ -33,6 +36,8 @@ import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.mgr.SoundManager;
+import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class MainActivity extends FragmentActivity {
 
@@ -45,7 +50,7 @@ public class MainActivity extends FragmentActivity {
 	private FragmentTabHost mTabHost;
 	private MainActivity mMain = this;
 
-	private int currentTab;
+	// private int currentTab;
 
 	private DrawerLayout mDrawerLayout;
 	private CustomAdapterFriendStatus adapter;
@@ -56,8 +61,9 @@ public class MainActivity extends FragmentActivity {
 
 	private View mRootView;
 
-	// private int counter; // delay time = counter * 0.25s
 	private ProgressBar pbLoader;
+
+	private int backButtonCount;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,7 @@ public class MainActivity extends FragmentActivity {
 			protected void onPreExecute() {
 				setContentView(R.layout.loadingscreen);
 
+				backButtonCount = 1;
 				LayoutInflater mInflater = LayoutInflater
 						.from(getApplicationContext());
 				mRootView = mInflater.inflate(R.layout.activity_main, null);
@@ -82,10 +89,13 @@ public class MainActivity extends FragmentActivity {
 			protected Void doInBackground(Void... arg0) {
 
 				// inti profile
-				MyProfileManager.getInstance().init(getApplicationContext());
+				// MyProfileManager.getInstance().init(getApplicationContext());
 
 				// init friend manager
 				FriendManager.getInstance().init(getApplicationContext());
+
+				// demo for virtual device test
+				// FriendManager.getInstance().loadFriend();
 
 				// init message manager
 				MessageManager.getInstance().init(mMain);
@@ -94,26 +104,13 @@ public class MainActivity extends FragmentActivity {
 				SoundManager.getInstance().init(getApplicationContext());
 
 				// init setting
-				SettingManager.getInstance().init(getApplicationContext());
-
-				// PostData.historyCreate(getApplicationContext(), 5, new
-				// LatLng(18.073887272186989, 120.1006023606658));
+				// SettingManager.getInstance().init(getApplicationContext());
 
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				// Log.d("MINE", MyProfileManager.getInstance().mine.getName());
-				// Log.d("MINE",
-				// MyProfileManager.getInstance().mine.getGcmId());
-				// Log.d("MINE", MyProfileManager.getInstance().mine.getId() +
-				// "");
-				// Log.d("MINE",
-				// MyProfileManager.getInstance().mine.getLastestlogin().toGMTString());
-				// Log.d("MINE",
-				// MyProfileManager.getInstance().myLocation.toString());
-
 				FriendManager.getInstance().setup();
 				initView();
 
@@ -160,21 +157,14 @@ public class MainActivity extends FragmentActivity {
 								R.drawable.ic_action_settings)),
 				CategoriesContainerFragment.class, null);
 
-		currentTab = mTabHost.getCurrentTab();
+		// currentTab = mTabHost.getCurrentTab();
 
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 
 			@Override
 			public void onTabChanged(String tabId) {
-
-				// View currentView = mTabHost.getCurrentView();
-				// if (mTabHost.getCurrentTab() > currentTab) {
-				// currentView.setAnimation(inFromRightAnimation());
-				// } else {
-				// currentView.setAnimation(outToRightAnimation());
-				// }
-
-				currentTab = mTabHost.getCurrentTab();
+				
+				backButtonCount = 1;
 
 				if (!mTabHost.getCurrentTabTag().equals(MESSAGE_TAG)) {
 					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -198,6 +188,7 @@ public class MainActivity extends FragmentActivity {
 
 		mActionBar.setDisplayShowHomeEnabled(true);
 		mActionBar.setDisplayShowTitleEnabled(false);
+		mActionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.bar_color)));
 		LayoutInflater mInflater = LayoutInflater.from(this);
 
 		View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
@@ -217,9 +208,10 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int pos, long arg3) {
+
 				String[] items = { "Xem trên bản đồ", "Gọi", "Nhắn tin", "Khác" };
 				AlertDialog.Builder builder = new AlertDialog.Builder(mMain);
-				builder.setTitle("Your choices are:");
+				builder.setTitle("Chọn chức năng:");
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
@@ -290,7 +282,17 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onClick(View v) {
-						ImagenceDialog dialog = new ImagenceDialog(mMain);
+						EmergenceDialog dialog = new EmergenceDialog(mMain);
+						dialog.show();
+					}
+				});
+		
+		mCustomView.findViewById(R.id.imgContacts).setOnClickListener(
+				new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						ContactsDialog dialog = new ContactsDialog(mMain);
 						dialog.show();
 					}
 				});
@@ -325,8 +327,6 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onBackPressed() {
 		boolean isPopFragment = false;
-		if (null == mTabHost)
-			finish();
 
 		String currentTabTag = mTabHost.getCurrentTabTag();
 		if (currentTabTag.equals(MAP_TAG)) {
@@ -344,8 +344,17 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		if (!isPopFragment) {
-			finish();
-			Log.i(TAG, "finish screen " + currentTabTag);
+			if (backButtonCount < 1) {
+				Intent intent = new Intent(Intent.ACTION_MAIN);
+				intent.addCategory(Intent.CATEGORY_HOME);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+				finish();
+			} else {
+				Utility.showMessage(getApplicationContext(),
+						"Nhấn nút trở lại thêm lần nữa nếu bạn thật sự muốn thoát.");
+				backButtonCount--;
+			}
 		}
 	}
 
@@ -380,5 +389,30 @@ public class MainActivity extends FragmentActivity {
 					.setImageDrawable(getResources().getDrawable(
 							R.drawable.ic_usercheck));
 		}
+	}
+
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		// Inflate the menu; this adds items to the action bar if it is present.
+//		getMenuInflater().inflate(R.menu.menu, menu);
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+//
+//		if (item.getItemId() == R.id.action_settings) {
+//			Intent intent = new Intent(this, SettingActivity.class);
+//			startActivity(intent);
+//			return true;
+//		}
+//
+//		return false;
+//	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		MessageManager.getInstance().destroy();
 	}
 }

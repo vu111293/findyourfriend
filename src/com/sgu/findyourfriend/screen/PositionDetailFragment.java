@@ -1,6 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -114,11 +116,15 @@ public class PositionDetailFragment extends Fragment {
 		txtName.setText(friend.getUserInfo().getName());
 		txtAddress.setText(bundle.getString("address"));
 		txtEmail.setText(friend.getUserInfo().getEmail());
-		txtUpdateTime
-				.setText(Utility.convertMicTimeToString(System
-						.currentTimeMillis()
-						- friend.getUserInfo().getLastestlogin().getNanos())
-						+ " trước");
+		txtUpdateTime.setText(Utility.convertMicTimeToString(System
+				.currentTimeMillis()
+				- friend.getUserInfo().getLastestlogin().getTime()) + " trước");
+
+		Log.i("Time", (System.currentTimeMillis() - friend.getUserInfo()
+				.getLastestlogin().getTime())
+				+ " # " +friend.getUserInfo().getLastestlogin().toGMTString()  
+				+ " # " + (new Date().toGMTString()));
+
 		txtAccuracy.setText(friend.getAccurency() + " km");
 
 		txtPhoneNumber.setText(friend.getNumberLogin().get(0));
@@ -274,7 +280,7 @@ public class PositionDetailFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (friendId != MyProfileManager.getInstance().mine.getId()
-						&& friend.isShare()) {
+						&& friend.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
 					Utility.showMessage(getActivity(), "Yêu cầu đã được gửi.");
 					parentFragment.tickVibrator();
 
@@ -291,7 +297,7 @@ public class PositionDetailFragment extends Fragment {
 			parentFragment.enableView(view, R.id.btnMessage);
 			parentFragment.enableView(view, R.id.btnCall);
 			parentFragment.enableView(view, R.id.btnRoute);
-			if (friend.isShare()) {
+			if (friend.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
 				parentFragment.disableView(view, R.id.btnRequest);
 			} else {
 				parentFragment.enableView(view, R.id.btnRequest);

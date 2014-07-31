@@ -1,20 +1,25 @@
 package com.sgu.findyourfriend.mgr;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.sgu.findyourfriend.utils.PreferenceKeys;
 
 public class SettingManager {
 
 	private static SettingManager instance;
-	
+
 	public static String SHARE_PREFERENCES_KEY = "com.sgu.findyourfriend.sharepreferences.11007";
 	public static String MESSAGE_COUNTER_KEY = "newMessage";
 	public static String REQUEST_COUNTER_KEY = "newRequest";
-	
+
 	private SharedPreferences prefs;
-	
+
 	public void init(Context context) {
 		prefs = context.getSharedPreferences(
 				"com.sgu.findyourfriend.sharepreferences.11007",
@@ -22,7 +27,7 @@ public class SettingManager {
 	}
 
 	public SettingManager() {
-		
+
 	}
 
 	public synchronized static SettingManager getInstance() {
@@ -33,24 +38,104 @@ public class SettingManager {
 	}
 
 	public int getMapType() {
-		return GoogleMap.MAP_TYPE_NORMAL;
+		String type = prefs.getString(PreferenceKeys.mapType, "normal");
+
+		if (type.equals("normal"))
+			return GoogleMap.MAP_TYPE_NORMAL;
+		else if (type.equals("terrain"))
+			return GoogleMap.MAP_TYPE_TERRAIN;
+		else
+			return GoogleMap.MAP_TYPE_HYBRID;
 	}
 
-	
 	public int getNoNewMesssage() {
-		return prefs.getInt(MESSAGE_COUNTER_KEY, 0); 
+		return prefs.getInt(MESSAGE_COUNTER_KEY, 0);
 	}
-	
+
 	public void setNoNewMessage(int num) {
 		prefs.edit().putInt(MESSAGE_COUNTER_KEY, num).commit();
 	}
-	
+
 	public int getNoNewRequest() {
-		return prefs.getInt(REQUEST_COUNTER_KEY, 0); 
+		return prefs.getInt(REQUEST_COUNTER_KEY, 0);
 	}
-	
+
 	public void setNoNewRequest(int num) {
 		prefs.edit().putInt(REQUEST_COUNTER_KEY, num).commit();
 	}
+
+	public boolean isUploadMyPosition() {
+		return prefs.getBoolean(PreferenceKeys.runBackground, true);
+	}
+
+	public int getIntervalUpdatePosition() {
+		return prefs.getInt(PreferenceKeys.timeToUpdateLocation, 60) * 1000;
+	}
+
+	public int getAccuracyUpdatePosition() {
+		return prefs.getInt(PreferenceKeys.accuracy, 1000);
+	}
+
+	public long getIntervalUpdateFriend() {
+		return prefs.getInt(PreferenceKeys.timeToUpdateFriend, 2) * 60000;
+	}
+
+	public boolean isAlertRingtone() {
+		return prefs.getBoolean(PreferenceKeys.isAlertRingTone, false);
+	}
+
+	public boolean isMessageRingtone() {
+		return prefs.getBoolean(PreferenceKeys.isMessageRingTone, false);
+	}
+
+	public String getRingtoneUri() {
+		return prefs.getString(PreferenceKeys.ringTone, "");
+	}
+
+	public boolean isVibrate() {
+		return prefs.getBoolean(PreferenceKeys.vibrate, false);
+	}
+
+	public boolean isEmailWarning() {
+		return prefs.getBoolean(PreferenceKeys.email, false);
+	}
+
+	public boolean isMessageWarning() {
+		return prefs.getBoolean(PreferenceKeys.sms, false);
+	}
+
+	public Set<String> getFriendsWarning() {
+
+		for (String id : prefs.getStringSet(PreferenceKeys.friendsWarning,
+				new HashSet<String>())) {
+			Log.i("share:", id);
+		}
+
+		return prefs.getStringSet(PreferenceKeys.friendsWarning,
+				new HashSet<String>());
+	}
+
+	public String getDefaultMsg() {
+		return prefs.getString(PreferenceKeys.defaultMsg, "HELP");
+	}
+
+	public boolean isAutoLogin() {
+		return prefs.getBoolean(PreferenceKeys.AUTO_LOGIN, false);
+	}
+
+	public String getPhoneAutoLogin() {
+		return prefs.getString(PreferenceKeys.PHONENUMBER_AUTO_LOGIN, "01668074215");
+	}
+
+	public String getPasswordAutoLogin() {
+		return prefs.getString(PreferenceKeys.PASSWORD_AUTO_LOGIN, "123456");
+	}
 	
+	public void savePhoneAutoLogin(String phoneNumber) {
+		prefs.edit().putString(PreferenceKeys.PHONENUMBER_AUTO_LOGIN, phoneNumber).commit();
+	}
+
+	public void savePasswordAutoLogin(String password) {
+		prefs.edit().putString(PreferenceKeys.PASSWORD_AUTO_LOGIN, password).commit();
+	}
 }

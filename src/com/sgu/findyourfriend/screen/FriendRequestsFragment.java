@@ -18,8 +18,7 @@ import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 
-public class FriendRequestsFragment extends Fragment implements
-		OnItemClickListener {
+public class FriendRequestsFragment extends Fragment {
 	private CustomAdapterFriendRequests adapter = null;
 	private ListView lv = null;
 	private Context ctx;
@@ -58,34 +57,12 @@ public class FriendRequestsFragment extends Fragment implements
 				R.layout.custom_friendrequests,
 				FriendManager.getInstance().requestFriends);
 		lv.setAdapter(adapter);
-		lv.setOnItemClickListener(this);
-
-		// Data.add(new FriendRequest(1, "Nguyễn Chí Hùng", "",false));
-		// Data.add(new FriendRequest(2, "Quốc Vũ", "", false));
-		// Data.add(new FriendRequest(3, "Trương Toàn", "", false));
 
 		// load friend request list from server
 		(new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				// TODO Auto-generated method stub
-
-				// Data.add(new FriendRequest(
-				// 12,
-				// "Nguyễn Chí Hùng",
-				// "http://findicons.com/files/icons/175/halloween_avatar/128/bat.png",
-				// false));
-				// Data.add(new FriendRequest(
-				// 2,
-				// "Quốc Vũ",
-				// "http://findicons.com/files/icons/175/halloween_avatar/128/freddie.png",
-				// false));
-				// Data.add(new FriendRequest(
-				// 7,
-				// "Trương Toàn",
-				// "http://findicons.com/files/icons/175/halloween_avatar/128/frankenstein.png",
-				// false));
 
 				return null;
 			}
@@ -99,11 +76,6 @@ public class FriendRequestsFragment extends Fragment implements
 		}).execute();
 
 		return rootView;
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int pos, long arg3) {
-
 	}
 
 }

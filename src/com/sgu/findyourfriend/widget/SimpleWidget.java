@@ -9,23 +9,26 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.google.android.gms.drive.internal.RemoveEventListenerRequest;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.screen.RegisterActivity;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class SimpleWidget extends AppWidgetProvider {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
+		AppWidgetManager appWidgetManager = AppWidgetManager
+				.getInstance(context.getApplicationContext());
+		ComponentName thisWidget = new ComponentName(
+				context.getApplicationContext(), SimpleWidget.class);
+		int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+
 		if (intent.getAction().equals(Config.DISPLAY_MESSAGE_ACTION)) {
 
-			AppWidgetManager appWidgetManager = AppWidgetManager
-					.getInstance(context.getApplicationContext());
-			ComponentName thisWidget = new ComponentName(
-					context.getApplicationContext(), SimpleWidget.class);
-			int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 			if (appWidgetIds != null && appWidgetIds.length > 0) {
 				for (int widgetId : appWidgetIds) {
 
@@ -38,35 +41,13 @@ public class SimpleWidget extends AppWidgetProvider {
 
 					// get instance prefs
 					SettingManager.getInstance().init(context);
-					if (message.startsWith(Config.PREFIX)) {
-						// new request
-						if (SettingManager.getInstance().getNoNewRequest() > 0)
-							remoteViews.setImageViewResource(
-									R.id.imgNewRequest,
-									R.drawable.ic_check_small_trigger);
-						else
-							remoteViews.setImageViewResource(
-									R.id.imgNewRequest,
-									R.drawable.ic_check_small);
 
-						remoteViews.setTextViewText(
-								R.id.txtNewRequest,
-								String.valueOf(SettingManager.getInstance()
-										.getNoNewRequest()) + " mới");
+					if (Utility.verifyRequest(message)) {
+						// new request
+						updateNewRequest(remoteViews);
 					} else {
 						// new message
-						if (SettingManager.getInstance().getNoNewMesssage() > 0)
-							remoteViews.setImageViewResource(
-									R.id.imgNewMessage,
-									R.drawable.ic_message_small_trigger);
-						else
-							remoteViews.setImageViewResource(
-									R.id.imgNewMessage,
-									R.drawable.ic_message_small);
-
-						remoteViews.setTextViewText(R.id.txtNewMessage,
-								SettingManager.getInstance().getNoNewMesssage()
-										+ " mới");
+						updateNewMessage(remoteViews);
 					}
 					appWidgetManager.updateAppWidget(widgetId, remoteViews);
 				}
@@ -75,11 +56,6 @@ public class SimpleWidget extends AppWidgetProvider {
 					.show();
 		} else if (intent.getAction().equals(
 				Config.UPDATE_MESSAGE_WIDGET_ACTION)) {
-			AppWidgetManager appWidgetManager = AppWidgetManager
-					.getInstance(context.getApplicationContext());
-			ComponentName thisWidget = new ComponentName(
-					context.getApplicationContext(), SimpleWidget.class);
-			int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 			if (appWidgetIds != null && appWidgetIds.length > 0) {
 				for (int widgetId : appWidgetIds) {
 					RemoteViews remoteViews = new RemoteViews(context
@@ -88,29 +64,10 @@ public class SimpleWidget extends AppWidgetProvider {
 
 					// get instance prefs
 					SettingManager.getInstance().init(context);
-					// update request counter
-					if (SettingManager.getInstance().getNoNewRequest() > 0)
-						remoteViews.setImageViewResource(R.id.imgNewRequest,
-								R.drawable.ic_check_small_trigger);
-					else
-						remoteViews.setImageViewResource(R.id.imgNewRequest,
-								R.drawable.ic_check_small);
 
-					remoteViews.setTextViewText(
-							R.id.txtNewRequest,
-							String.valueOf(SettingManager.getInstance()
-									.getNoNewRequest()) + " mới");
-					// update message counter
-					if (SettingManager.getInstance().getNoNewMesssage() > 0)
-						remoteViews.setImageViewResource(R.id.imgNewMessage,
-								R.drawable.ic_message_small_trigger);
-					else
-						remoteViews.setImageViewResource(R.id.imgNewMessage,
-								R.drawable.ic_message_small);
+					updateNewMessage(remoteViews);
+					updateNewRequest(remoteViews);
 
-					remoteViews.setTextViewText(R.id.txtNewMessage,
-							SettingManager.getInstance().getNoNewMesssage()
-									+ " mới");
 					appWidgetManager.updateAppWidget(widgetId, remoteViews);
 				}
 			}
@@ -127,6 +84,12 @@ public class SimpleWidget extends AppWidgetProvider {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
 				R.layout.main_widget_ui);
 
+		// get instance prefs
+		SettingManager.getInstance().init(context);
+		
+		updateNewMessage(remoteViews);
+		updateNewRequest(remoteViews);
+		
 		// emergency intent
 		final Intent emerIntent = createIntent(context, appWidgetIds);
 		emerIntent.putExtra(WidgetControlService.EXTRA_EMERGENCY, true);
@@ -148,10 +111,10 @@ public class SimpleWidget extends AppWidgetProvider {
 
 		remoteViews.setOnClickPendingIntent(R.id.imgNewMessage,
 				pendingOpenAppIntent);
-		
+
 		remoteViews.setOnClickPendingIntent(R.id.imgNewRequest,
 				pendingOpenAppIntent);
-		
+
 		remoteViews.setOnClickPendingIntent(R.id.txtMyAddress,
 				pendingOpenAppIntent);
 
@@ -166,26 +129,26 @@ public class SimpleWidget extends AppWidgetProvider {
 
 	@Override
 	public void onEnabled(Context context) {
-//		AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-//
-//		Intent i = new Intent();
-//		i.setClassName("com.sgu.findyourfriend.screen",
-//				"com.sgu.findyourfriend.screen.RegisterActivity");
-//		PendingIntent myPI = PendingIntent.getService(context, 0, i, 0);
-//
-//		RemoteViews views = new RemoteViews(context.getPackageName(),
-//				R.layout.main_widget_ui);
-//
-//		// attach the click listener for the service start command intent
-//		views.setOnClickPendingIntent(R.id.txtMyAddress, myPI);
-////		views.setOnClickPendingIntent(R.id.imgNewRequest, myPI);
-//
-//		
-//		// define the componenet for self
-//		ComponentName comp = new ComponentName(context.getPackageName(),
-//				SimpleWidget.class.getName());
-//
-//		mgr.updateAppWidget(comp, views);
+		// AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+		//
+		// Intent i = new Intent();
+		// i.setClassName("com.sgu.findyourfriend.screen",
+		// "com.sgu.findyourfriend.screen.RegisterActivity");
+		// PendingIntent myPI = PendingIntent.getService(context, 0, i, 0);
+		//
+		// RemoteViews views = new RemoteViews(context.getPackageName(),
+		// R.layout.main_widget_ui);
+		//
+		// // attach the click listener for the service start command intent
+		// views.setOnClickPendingIntent(R.id.txtMyAddress, myPI);
+		// // views.setOnClickPendingIntent(R.id.imgNewRequest, myPI);
+		//
+		//
+		// // define the componenet for self
+		// ComponentName comp = new ComponentName(context.getPackageName(),
+		// SimpleWidget.class.getName());
+		//
+		// mgr.updateAppWidget(comp, views);
 	}
 
 	private Intent createIntent(Context context, int[] appWidgetIds) {
@@ -206,6 +169,31 @@ public class SimpleWidget extends AppWidgetProvider {
 
 	private void uiMessageStatusUpdate(Context context) {
 
+	}
+
+	private void updateNewMessage(RemoteViews remoteViews) {
+		if (SettingManager.getInstance().getNoNewMesssage() > 0)
+			remoteViews.setImageViewResource(R.id.imgNewMessage,
+					R.drawable.ic_message_small_trigger);
+		else
+			remoteViews.setImageViewResource(R.id.imgNewMessage,
+					R.drawable.ic_message_small);
+
+		remoteViews.setTextViewText(R.id.txtNewMessage, SettingManager
+				.getInstance().getNoNewMesssage() + " mới");
+	}
+
+	private void updateNewRequest(RemoteViews remoteViews) {
+		if (SettingManager.getInstance().getNoNewRequest() > 0)
+			remoteViews.setImageViewResource(R.id.imgNewRequest,
+					R.drawable.ic_check_small_trigger);
+		else
+			remoteViews.setImageViewResource(R.id.imgNewRequest,
+					R.drawable.ic_check_small);
+
+		remoteViews.setTextViewText(R.id.txtNewRequest,
+				String.valueOf(SettingManager.getInstance().getNoNewRequest())
+						+ " mới");
 	}
 
 }

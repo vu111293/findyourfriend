@@ -28,18 +28,11 @@ public class RegisterActivity extends Activity {
 	private EditText txtName;
 	private EditText txtEmail;
 
-	// private FrameLayout fwait;
-
-	// creates a ViewSwitcher object, to switch between Views
-	private ViewSwitcher viewSwitcher;
-
-	// Async task
 	private AsyncTask<Void, Void, Void> mRegisterTask;
 
 	// Controller
 	private Controller aController;
 
-	// Register button
 	private Button btnRegister;
 
 	@Override
@@ -47,20 +40,14 @@ public class RegisterActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_register);
 
-		// Get Global Controller Class object (see application tag in
-		// AndroidManifest.xml)
 		aController = (Controller) getApplicationContext();
-		// fwait = (FrameLayout) findViewById(R.id.fwait);
 
 		// Check if Internet Connection present
 		if (!aController.isConnectingToInternet()) {
-
 			// Internet Connection is not present
 			aController.showAlertDialog(RegisterActivity.this,
 					"Internet Connection Error",
 					"Please connect to working Internet connection", false);
-
-			// stop executing code by return
 			return;
 		}
 
@@ -80,7 +67,11 @@ public class RegisterActivity extends Activity {
 
 		// check register
 		if (GCMRegistrar.isRegisteredOnServer(this)) {
-			new PrepareDataTask().execute();
+			Intent i = new Intent(getApplicationContext(),
+					com.sgu.findyourfriend.screen.MainActivity.class);
+			startActivity(i);
+			finish();
+
 		}
 
 		txtName = (EditText) findViewById(R.id.txtName);
@@ -97,64 +88,31 @@ public class RegisterActivity extends Activity {
 				String email = txtEmail.getText().toString();
 
 				// Check if user filled the form
-				// if (name.trim().length() > 0 && email.trim().length() > 0) {
+				if (name.trim().length() > 0 && email.trim().length() > 0) {
 
-				// save info
-				// MyProfileManager.name = name;
-				// MyProfileManager.email = email;
+					// save info
+					// MyProfileManager.name = name;
+					// MyProfileManager.email = email;
 
-//				Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-//						.setDataAndType(Uri.parse("file://raw/widgetwc.apk"),
-//								"application/vnd.android.package-archive");
-//				startActivity(promptInstall);
+					MyProfileManager.getInstance().mine = new User(0, name, 0,
+							"", email, "", "", new Timestamp(0));
 
-				
-				MyProfileManager.getInstance().mine = new User(0, name, 0, "", email, "", "", new Timestamp(0));
-				
-				// setup account
-				accountRegist(name, email);
-				// new PrepareDataTask().execute();
-				finish();
+					// setup account
+					accountRegist(name, email);
 
-				// } else {
-				// // user doen't filled that data
-				// aController.showAlertDialog(RegisterActivity.this,
-				// "Registration Error!", "Please enter your details",
-				// false);
-				// }
+					Intent i = new Intent(getApplicationContext(),
+							com.sgu.findyourfriend.screen.MainActivity.class);
+					startActivity(i);
+					finish();
+
+				} else {
+					// user doen't filled that data
+					aController.showAlertDialog(RegisterActivity.this,
+							"Registration Error!", "Please enter your details",
+							false);
+				}
 			}
 		});
-	}
-
-	private class PrepareDataTask extends AsyncTask<Void, Void, Void> {
-
-		protected Void doInBackground(Void... vd) {
-
-			// new LoadViewTask().execute();
-
-			// fwait.setVisibility(View.VISIBLE);
-			// init profile
-			/*
-			 * ProfileInfo.instance = new ProfileInfo(getApplicationContext());
-			 * ProfileInfo.gcmMyId = GCMRegistrar
-			 * .getRegistrationId(getApplicationContext());
-			 * 
-			 * // init friend manager FriendManager.instance = new
-			 * FriendManager(getApplicationContext());
-			 */
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			// fwait.setVisibility(View.GONE);
-
-			// Launch Main Activity
-			Intent i = new Intent(getApplicationContext(),
-					com.sgu.findyourfriend.screen.MainActivity.class);
-			startActivity(i);
-			finish();
-		}
 	}
 
 	private void accountRegist(final String name, final String email) {
@@ -207,10 +165,10 @@ public class RegisterActivity extends Activity {
 						mRegisterTask = null;
 
 						// start main activity
-						Intent i = new Intent(
-								getApplicationContext(),
-								com.sgu.findyourfriend.screen.MainActivity.class);
-						startActivity(i);
+						// Intent i = new Intent(
+						// getApplicationContext(),
+						// com.sgu.findyourfriend.screen.MainActivity.class);
+						// startActivity(i);
 					}
 
 				};

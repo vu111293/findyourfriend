@@ -1,79 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="1dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:paddingBottom="1dp"
-    android:orientation="vertical" >
+    android:paddingTop="1dp" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/row_status_bkg" >
+
+        <ImageView
+            android:id="@+id/imgStatusBar"
+            android:layout_width="5dp"
+            android:layout_height="@dimen/status_image_size"
+            android:background="@color/pending"
+            android:contentDescription="@string/item_status_description" />
+
+        <ImageView
+            android:id="@+id/imgProfile"
+            android:layout_width="@dimen/status_image_size"
+            android:layout_height="@dimen/status_image_size"
+            android:contentDescription="@string/item_imgprofile_description"
+            android:src="@drawable/ic_no_imgprofile" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:orientation="vertical" >
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#E6E6E6" >
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/name_demo"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageView
-                android:id="@+id/imgStatusBar"
-                android:layout_width="5dp"
-                android:layout_height="50dp"
-                android:background="#FFAA20" />
-
-            <ImageView
-                android:id="@+id/imgProfile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_no_imgprofile" />
-
-            <ImageView
-                android:id="@+id/imgNoneAccept"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="-50dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/triangle" />
+                android:id="@+id/imgShare"
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="10dp"
+                android:contentDescription="@string/item_status_description"
+                android:src="@drawable/ic_share" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:orientation="vertical" >
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:orientation="horizontal" >
 
             <TextView
-                android:id="@+id/txtName"
+                android:id="@+id/txtPhoneNumber"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="Nguyễn Chí Hùng"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="@string/phone_number_demo"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/txtStatusText"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.6"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/txtPhoneNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="0904001021"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/txtStatusText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:gravity="right"
-                    android:text="trực tuyến"
-                    android:textColor="#838183" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:gravity="right"
+                android:text="@string/status_demo"
+                android:textColor="@color/text_color_status" />
         </LinearLayout>
     </LinearLayout>
 

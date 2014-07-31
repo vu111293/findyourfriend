@@ -12,8 +12,8 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:gravity="center_vertical"
-        android:text="Find Your Friend"
-        android:textColor="#fff"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
         android:textSize="10pt" />
 
     <LinearLayout
@@ -25,19 +25,32 @@
         android:visibility="visible" >
 
         <ImageView
-            android:id="@+id/imgAlert"
-            android:layout_width="40dp"
+            android:contentDescription="@string/item_alert_description"
+            android:id="@+id/imgContacts"
+            android:layout_width="@dimen/item_actionbar_width"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center_vertical"
+            android:padding="3dp"
+            android:background="@drawable/custom_button_control"
+            android:src="@drawable/ic_contacts" />
+        
+        <ImageView
+            android:contentDescription="@string/item_alert_description"
+            android:id="@+id/imgAlert"
+            android:layout_width="@dimen/item_actionbar_width"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
             android:gravity="center_vertical"
             android:padding="3dp"
             android:background="@drawable/custom_button_control"
             android:src="@drawable/ic_alert" />
 
         <ImageView
+            android:contentDescription="@string/item_friend_description"
             android:id="@+id/imgFriendList"
-            android:layout_width="40dp"
+            android:layout_width="@dimen/item_actionbar_width"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:padding="3dp"
@@ -46,8 +59,9 @@
     </LinearLayout>
 
     <ImageView
+        android:contentDescription="@string/item_send_message_description"
         android:id="@+id/imgSend"
-        android:layout_width="40dp"
+        android:layout_width="@dimen/item_actionbar_width"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"

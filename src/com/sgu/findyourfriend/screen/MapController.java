@@ -47,7 +47,7 @@ import com.sgu.findyourfriend.utils.GpsDirection;
 
 public class MapController {
 
-	private Fragment baseFragment;
+	private MapFragment mapFragment;
 	private Context context;
 	private GoogleMap mMap;
 	private GpsDirection gpsDirection;
@@ -61,12 +61,14 @@ public class MapController {
 
 	private ProgressBar pbOnMap;
 
-	public MapController(Context context, Fragment f, GoogleMap map,
-			ProgressBar pbOnMap) {
-		this.context = context;
-		this.baseFragment = f;
-		this.mMap = map;
-		this.pbOnMap = pbOnMap;
+	// public MapController(Context context, Fragment f, GoogleMap map,
+	// ProgressBar pbOnMap) {
+
+	public MapController(MapFragment parentFragment) {
+		this.mapFragment = parentFragment;
+		this.context = parentFragment.getParentFragment().getActivity();
+		this.mMap = parentFragment.getmMap();
+		this.pbOnMap = parentFragment.getPbOnMap();
 
 		isRouting = false;
 
@@ -85,14 +87,14 @@ public class MapController {
 		bundle.putInt("friendId", friendId);
 		fragment.setArguments(bundle);
 
-		((BaseContainerFragment) baseFragment.getParentFragment())
+		((BaseContainerFragment) mapFragment.getParentFragment())
 				.replaceFragment(fragment, true);
 	}
 
 	public void callTask(int friendId) {
 
-		ArrayList<String> phs = FriendManager.getInstance().hmMemberFriends.get(
-				friendId).getNumberLogin();
+		ArrayList<String> phs = FriendManager.getInstance().hmMemberFriends
+				.get(friendId).getNumberLogin();
 
 		if (phs.size() == 0) {
 			Toast.makeText(context, "Not phone number", Toast.LENGTH_LONG)
@@ -199,9 +201,44 @@ public class MapController {
 		mLoadLocationTask.execute(null, null, null);
 	}
 
-	public void updatePositionTask(int friendId) {
+	public void updatePositionTask(final int friendId) {
 		clearnMarkerHistory();
 		gpsDirection.clearRoute();
+
+		(new AsyncTask<Void, Void, Void>() {
+
+			Friend friend;
+
+			@Override
+			protected void onPreExecute() {
+				friend = FriendManager.getInstance().hmMemberFriends
+						.get(friendId);
+			}
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				LatLng lastLocation = PostData.historyGetLastUserLocation(
+						context, friendId);
+				friend.setLastLocation(lastLocation);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				FriendManager.getInstance().updateFriend(friend);
+
+				// update adapter
+				mapFragment.updateAdapter();
+				zoomToPosition(friend.getLastLocation());
+
+				Log.i("NewPosition", friend.getLastLocation().latitude + " # "
+						+ friend.getLastLocation().longitude);
+
+				Toast.makeText(context, "updated!", Toast.LENGTH_SHORT).show();
+			}
+
+		}).execute();
 
 	}
 
@@ -211,7 +248,7 @@ public class MapController {
 
 		LatLng dest = FriendManager.getInstance().hmMemberFriends.get(friendId)
 				.getLastLocation();
-//		Location myLocation = mMap.getMyLocation();
+		// Location myLocation = mMap.getMyLocation();
 		LatLng myLatLng = MyProfileManager.getInstance().myLocation;
 
 		gpsDirection.excuteDirection(myLatLng, dest, true);
@@ -223,8 +260,68 @@ public class MapController {
 		zoomBoundPosition(latlngs);
 	}
 
-	public void requestTask(int friendId) {
+	public void requestTask(final int friendId) {
 
+		(new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				PostData.sendShareRequest(context,
+						MyProfileManager.getInstance().mine.getId(), friendId);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				Toast.makeText(context, "sent!", Toast.LENGTH_SHORT).show();
+				Friend friend = FriendManager.getInstance().hmMemberFriends.get(friendId);
+				friend.setAcceptState(Friend.REQUEST_SHARE);
+				FriendManager.getInstance().updateFriend(friend);
+				mapFragment.updateAfterAcceptRequest(friendId);
+			}
+
+		}).execute();
+
+	}
+
+	public void acceptTask(final int fIDCurrent) {
+		(new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected void onPreExecute() {
+
+			
+			}
+			
+			@Override
+			protected Void doInBackground(Void... params) {
+				mapFragment.getActivity().runOnUiThread(new Runnable() {
+					  public void run() {
+					    Toast.makeText(mapFragment.getActivity(), "Hello", Toast.LENGTH_SHORT).show();
+					  }
+					});
+				
+				// Toast.makeText(context, "sending accept", Toast.LENGTH_SHORT).show();
+				PostData.sendShareAccept(context,
+						MyProfileManager.getInstance().mine.getId(), fIDCurrent);
+				
+				
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				
+				Friend friend = FriendManager.getInstance().hmMemberFriends.get(fIDCurrent);
+				friend.setAcceptState(Friend.SHARE_RELATIONSHIP);
+				FriendManager.getInstance().updateFriend(friend);
+				mapFragment.updateAfterAcceptRequest(fIDCurrent);
+				
+				
+				// sound 
+			}
+
+		}).execute();
 	}
 
 	// --------------- utilities methods -------------------- //
@@ -240,9 +337,8 @@ public class MapController {
 		opt.title(hisP.getTimest().toGMTString());
 		hisMarkerList.add(m);
 	}
-	
-	
-	private void clearnMarkerHistory() {
+
+	public void clearnMarkerHistory() {
 		for (Marker m : hisMarkerList) {
 			m.remove();
 		}

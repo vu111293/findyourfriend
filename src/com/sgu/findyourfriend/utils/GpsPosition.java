@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.mgr.MyLocationChangeListener;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
+import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.net.PostData;
 
 public class GpsPosition {
@@ -31,19 +32,24 @@ public class GpsPosition {
 	private LocationManager myLocationManager = null;
 
 	private MyLocationChangeListener myLocationListener;
+	private boolean isUploadMyPosition;
 
+	private int checkInterval;
+	private int minDistance;
+	
 	
 	public GpsPosition(Context conext, MyLocationChangeListener myLocationListener) {
 		this.context = conext;
 		this.myLocationListener = myLocationListener;
 		lastprovidertimestamp = 0;
+		isUploadMyPosition = false;
 	}
 
 	public void startRecording() {
 		gpsTimer.cancel();
 		gpsTimer = new Timer();
-		long checkInterval = getGPSCheckMillisFromPrefs();
-		long minDistance = getMinDistanceFromPrefs();
+		setCheckInterval(SettingManager.getInstance().getIntervalUpdatePosition()); // = getGPSCheckMillisFromPrefs();
+		setMinDistance(SettingManager.getInstance().getAccuracyUpdatePosition()); // = getMinDistanceFromPrefs();
 		// receive updates
 		LocationManager locationManager = (LocationManager) context
 				.getSystemService(Context.LOCATION_SERVICE);
@@ -52,8 +58,8 @@ public class GpsPosition {
 		myLocationListener.onMyLocationChanged(getBestLocation());
 		
 		for (String s : locationManager.getAllProviders()) {
-			locationManager.requestLocationUpdates(s, checkInterval,
-					minDistance, new LocationListener() {
+			locationManager.requestLocationUpdates(s, getCheckInterval(),
+					getMinDistance(), new LocationListener() {
 
 						@Override
 						public void onStatusChanged(String provider,
@@ -91,36 +97,42 @@ public class GpsPosition {
 				Location location = getBestLocation();
 				doLocationUpdate(location, false);
 			}
-		}, 0, checkInterval);
-	}
-
-	private long getGPSCheckMillisFromPrefs() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		int checkminutes = 300000;
-		try {
-			checkminutes = Integer.parseInt(prefs.getString(
-					"gps_check_interval", "300000"));
-		} catch (NumberFormatException e) {
-		}
+		}, 0, getCheckInterval());
 		
-		return checkminutes;
+		
+	}
+	
+	public void setUploadMyPosition(boolean upload) {
+		isUploadMyPosition = upload;
 	}
 
-	private long getMinDistanceFromPrefs() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		int minDist = 1000;
-		try {
-			minDist = Integer.parseInt(prefs.getString("gps_min_distance",
-					"1000"));
-		} catch (NumberFormatException e) {
-		}
-		return minDist;
-	}
+//	private long getGPSCheckMillisFromPrefs() {
+//		SharedPreferences prefs = PreferenceManager
+//				.getDefaultSharedPreferences(context);
+//		int checkminutes = 300000;
+//		try {
+//			checkminutes = Integer.parseInt(prefs.getString(
+//					"gps_check_interval", "300000"));
+//		} catch (NumberFormatException e) {
+//		}
+//		
+//		return checkminutes;
+//	}
+//
+//	private long getMinDistanceFromPrefs() {
+//		SharedPreferences prefs = PreferenceManager
+//				.getDefaultSharedPreferences(context);
+//		int minDist = 1000;
+//		try {
+//			minDist = Integer.parseInt(prefs.getString("gps_min_distance",
+//					"1000"));
+//		} catch (NumberFormatException e) {
+//		}
+//		return minDist;
+//	}
 
 	public void doLocationUpdate(Location l, boolean force) {
-		long minDistance = getMinDistanceFromPrefs();
+		// long minDistance = getMinDistanceFromPrefs();
 		// Log.d(TAG, "update received:" + l);
 		if (l == null) {
 			// Log.d(TAG, "Empty location");
@@ -132,7 +144,7 @@ public class GpsPosition {
 		if (getLastLocation() != null) {
 			float distance = l.distanceTo(getLastLocation());
 			// Log.d(TAG, "Distance to last: " + distance);
-			if (l.distanceTo(getLastLocation()) < minDistance && !force) {
+			if (l.distanceTo(getLastLocation()) < getMinDistance() && !force) {
 				// Log.d(TAG, "Position didn't change");
 				return;
 			}
@@ -152,7 +164,7 @@ public class GpsPosition {
 
 		setLastLocation(l);
 		Log.i(TAG, "update server here!");
-		if (getLastLocation() != null) {
+		if (isUploadMyPosition && getLastLocation() != null) {
 
 			double lat = getLastLocation().getLatitude();
 			double lng = getLastLocation().getLongitude();
@@ -183,7 +195,7 @@ public class GpsPosition {
 		// a location update is considered 'old' if its older than the configured
 		// update interval. this means, we didn't get a
 		// update from this provider since the last check
-		long old = System.currentTimeMillis() - getGPSCheckMillisFromPrefs();
+		long old = System.currentTimeMillis() - getCheckInterval(); //getGPSCheckMillisFromPrefs();
 		boolean gpsIsOld = (gpslocation.getTime() < old);
 		boolean networkIsOld = (networkLocation.getTime() < old);
 		// gps is current and available, gps is better than network
@@ -266,6 +278,22 @@ public class GpsPosition {
 
 	public void setLastLocation(Location lastLocation) {
 		this.lastLocation = lastLocation;
+	}
+
+	public long getCheckInterval() {
+		return checkInterval;
+	}
+
+	public void setCheckInterval(int checkInterval) {
+		this.checkInterval = checkInterval;
+	}
+
+	public int getMinDistance() {
+		return minDistance;
+	}
+
+	public void setMinDistance(int minDistance) {
+		this.minDistance = minDistance;
 	}
 
 	

@@ -34,53 +34,53 @@ public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 	public Friend getItem(int position) {
 		return DataList.get(position);
 	}
-	
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
 		convertView = inflater.inflate(LayoutResID, null);
-		TextView name = (TextView) convertView
-				.findViewById(R.id.txtName);
+		TextView name = (TextView) convertView.findViewById(R.id.txtName);
 		TextView phoneNumber = (TextView) convertView
 				.findViewById(R.id.txtPhoneNumber);
 		ImageView imgProfile = (ImageView) convertView
 				.findViewById(R.id.imgProfile);
 		ImageView imgStatusBar = (ImageView) convertView
 				.findViewById(R.id.imgStatusBar);
-		TextView txtStatusText = (TextView) convertView.findViewById(R.id.txtStatusText);
-		ImageView imgNoneAccept = (ImageView) convertView.findViewById(R.id.imgNoneAccept);
-		
-		
+		TextView txtStatusText = (TextView) convertView
+				.findViewById(R.id.txtStatusText);
+		ImageView imgShare = (ImageView) convertView
+				.findViewById(R.id.imgShare);
+
 		Friend fr = DataList.get(position);
-		
-		
+
 		name.setText(fr.getUserInfo().getName());
-		phoneNumber.setText(fr.getNumberLogin().get(0));
-		
-		imgProfile.setImageDrawable(FriendManager.getInstance().hmImageP
-				.get(fr.getUserInfo().getId()));
-		
+
+		if (fr.getNumberLogin().size() > 0)
+			phoneNumber.setText(fr.getNumberLogin().get(0));
+		else
+			phoneNumber.setText("chưa có");
+
+		imgProfile.setImageDrawable(FriendManager.getInstance().hmImageP.get(fr
+				.getUserInfo().getId()));
+
 		// set img
-		if (fr.getAcceptState() == Friend.ACCEPT_STATE) {
-			imgNoneAccept.setVisibility(View.GONE);
-			if (fr.isAvailable()) {
-				imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.online));
-				if (fr.isShare()) {
-					txtStatusText.setText("chia sẻ");
-				} else {
-					txtStatusText.setText("trực tuyến");
-				}
-			} else {
-				imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.offine));
-				txtStatusText.setText("đang ẩn");
-			}
-			
-		} else if(fr.getAcceptState() == Friend.WAIT_STATE){
-			imgNoneAccept.setVisibility(View.VISIBLE);
-			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(R.color.pending));
-			txtStatusText.setText("chờ");
+		if (fr.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
+			// share image
+			imgShare.setVisibility(View.VISIBLE);
+		} else {
+			// don't share
+			imgShare.setVisibility(View.GONE);
+		}
+
+		if (fr.isAvailable()) {
+			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(
+					R.color.online));
+			txtStatusText.setText("trực tuyến");
+		} else {
+			imgStatusBar.setBackgroundColor(ctx.getResources().getColor(
+					R.color.offine));
+			txtStatusText.setText("ẩn");
 		}
 		return convertView;
 	}
-
 }

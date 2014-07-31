@@ -12,9 +12,10 @@
         android:layout_margin="15dp" >
 
         <ImageView
+            android:contentDescription="@string/item_imgprofile_description"
             android:id="@+id/imgAvatar"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/image_profile_info"
+            android:layout_height="@dimen/image_profile_info"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:paddingRight="15dp"
@@ -31,23 +32,23 @@
                 android:id="@+id/txtUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="nguyen van a"
+                android:text="@string/name_demo"
                 android:textSize="@dimen/big_title_text" />
 
             <TextView
                 android:id="@+id/txtPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="+84979742138"
-                android:textColor="#0677CC"
+                android:text="@string/phone_number_demo"
+                android:textColor="@color/phone_number_info"
                 android:textSize="@dimen/medium_contain_text" />
 
             <TextView
                 android:id="@+id/txtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="quocvu@gmail.com"
-                android:textColor="#0677CC"
+                android:text="@string/email_demo"
+                android:textColor="@color/email_info"
                 android:textSize="@dimen/medium_contain_text" />
         </LinearLayout>
     </RelativeLayout>
@@ -63,16 +64,15 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="địa chỉ"
-            android:textColor="#818185"
+            android:text="@string/address"
+            android:textColor="@color/title_info"
             android:textSize="@dimen/tite_text" />
 
         <TextView
             android:id="@+id/txtAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="tổ 80, ấp Cây Trâm, Phú Hòa Đông, Củ Chi, TP.HCM"
-            android:textColor="#445261"
+            android:textColor="@color/main_addres_info"
             android:textSize="@dimen/big_contain_text" />
 
         <LinearLayout
@@ -90,16 +90,15 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="được cập nhật"
-                    android:textColor="#818185"
+                    android:text="@string/update"
+                    android:textColor="@color/title_info"
                     android:textSize="@dimen/tite_text" />
 
                 <TextView
                     android:id="@+id/txtUpdateTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="30 phút trước"
-                    android:textColor="#445261"
+                    android:textColor="@color/value_info"
                     android:textSize="@dimen/small_text_contain" />
             </LinearLayout>
 
@@ -112,25 +111,21 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="chính xác trong"
-                    android:textColor="#818185"
+                    android:text="@string/accuracy"
+                    android:textColor="@color/title_info"
                     android:textSize="@dimen/tite_text" />
 
                 <TextView
                     android:id="@+id/txtAccuracy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="30 km"
-                    android:textColor="#445261"
+                    android:textColor="@color/value_info"
                     android:textSize="@dimen/small_text_contain" />
             </LinearLayout>
         </LinearLayout>
 
         <!-- thông tin phương tiện di chuyển -->
-
-
         <!-- do dai quan duong -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,8 +139,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="5dp"
-                android:text="Độ dài quảng đường: "
-                android:textColor="#434343"
+                android:text="@string/long_street"
+                android:textColor="@color/value_info"
                 android:textSize="@dimen/small_text_contain" />
 
             <TextView
@@ -154,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="5dp"
-                android:textColor="#434343"
+                android:textColor="@color/value_info"
                 android:textSize="@dimen/small_text_contain"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -163,10 +158,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:baselineAligned="false" >
 
             <!-- thoi gian di bo -->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -176,6 +171,7 @@
                 android:orientation="horizontal" >
 
                 <ImageView
+                    android:contentDescription="@string/item_walk_description"
                     android:layout_width="13dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
@@ -187,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:paddingLeft="5dp"
-                    android:textColor="#434343"
+                    android:textColor="@color/value_info"
                     android:textSize="@dimen/small_text_contain"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -203,6 +199,7 @@
                 android:orientation="horizontal" >
 
                 <ImageView
+                    android:contentDescription="@string/item_moto_description"
                     android:layout_width="28dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
@@ -214,7 +211,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:paddingLeft="5dp"
-                    android:textColor="#434343"
+                    android:textColor="@color/value_info"
                     android:textSize="@dimen/small_text_contain"
                     android:textStyle="bold" />
             </LinearLayout>

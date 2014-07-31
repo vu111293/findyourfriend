@@ -63,8 +63,8 @@ public class Controller extends Application {
 
 				for (int i = 0; i < ls.length(); ++i) {
 					JSONObject o = ls.getJSONObject(i);
-					fs.add(new LatLng(o.getDouble("latitute"),
-							o.getDouble("longtitute")));
+					fs.add(new LatLng(o.getDouble("latitute"), o
+							.getDouble("longtitute")));
 				}
 			} catch (Exception e) {
 				Log.d(Config.TAG, "Parsed json error: " + e.getMessage());
@@ -486,14 +486,16 @@ public class Controller extends Application {
 
 	// Notifies UI to display a message.
 	public void displayMessageOnScreen(Context context, String message) {
-//		// update num msg for widget
-//		SettingManager.getInstance().init(context);
-//		
-//		if (message.startsWith(Config.PREFIX))
-//			SettingManager.getInstance().setNoNewRequest(SettingManager.getInstance().getNoNewRequest() + 1);
-//		else 
-//			SettingManager.getInstance().setNoNewMessage(SettingManager.getInstance().getNoNewMesssage() + 1);
-		
+		// // update num msg for widget
+		// SettingManager.getInstance().init(context);
+		//
+		// if (message.startsWith(Config.PREFIX))
+		// SettingManager.getInstance().setNoNewRequest(SettingManager.getInstance().getNoNewRequest()
+		// + 1);
+		// else
+		// SettingManager.getInstance().setNoNewMessage(SettingManager.getInstance().getNoNewMesssage()
+		// + 1);
+
 		Intent intent = new Intent(Config.DISPLAY_MESSAGE_ACTION);
 		intent.putExtra(Config.EXTRA_MESSAGE, message);
 
@@ -515,15 +517,15 @@ public class Controller extends Application {
 
 		if (status != null)
 			// Set alert dialog icon
-//			alertDialog
-//					.setIcon((status) ? R.drawable.success : R.drawable.fail);
+			// alertDialog
+			// .setIcon((status) ? R.drawable.success : R.drawable.fail);
 
-		// Set OK Button
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+			// Set OK Button
+			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
 
-			}
-		});
+				}
+			});
 
 		// Show Alert Message
 		alertDialog.show();

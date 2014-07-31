@@ -2,65 +2,86 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:layout_margin="2dip"
-    android:background="@drawable/bkg_widget"
+    android:layout_height="wrap_content"
+    android:layout_margin="0dp"
+    android:background="@drawable/widget_bkg"
     android:orientation="horizontal" >
 
-    <ImageButton
-        android:id="@+id/bntEmergency"
-        android:src="@drawable/ic_alert_big"
-        style="@style/CustomStyleButton"
-        android:layout_width="72dp"
-        android:layout_height="match_parent"
-        android:textSize="18pt"
-        android:gravity="center"
-        android:layout_margin="5dip"
-        android:textStyle="bold" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:contentDescription="@string/item_emergency_button_description"
+            android:id="@+id/bntEmergency"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:src="@drawable/custom_button"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:contentDescription="@string/item_icon_description"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|right"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_location_small" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="3dp"
-        android:paddingLeft="5dp" >
+        android:layout_marginBottom="40dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/txtMyAddress"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:background="@drawable/shape_bk_widget"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:text="@string/not_available"
+            android:textColor="@color/gray"
+            android:textSize="7pt" />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:src="@drawable/ic_location_small" />
-
-            <TextView
-                android:id="@+id/txtMyAddress"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingLeft="5dp"
-                android:text="87/5 nguyen thi ne, ap cay tram, xa phu hoa dong, cu chi, tp.HCM"
-                android:textColor="@color/gray"
-                android:textSize="7pt" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/txtLatLng"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1.8"
+            android:background="@drawable/shape_bk_widget"
+            android:gravity="center_vertical|center_horizontal"
+            android:textSize="5pt" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:layout_weight="1.5"
             android:orientation="horizontal" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/shape_bk_widget"
                 android:layout_weight="1"
                 android:gravity="center_vertical" >
 
                 <ImageView
+                    android:contentDescription="@string/item_icon_description"
                     android:id="@+id/imgNewMessage"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
@@ -71,7 +92,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
-                    android:text="0 mới"
                     android:textColor="@color/gray" />
             </LinearLayout>
 
@@ -79,9 +99,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/shape_bk_widget"
                 android:gravity="center_vertical" >
 
                 <ImageView
+                    android:contentDescription="@string/item_icon_description"
                     android:id="@+id/imgNewRequest"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
@@ -92,11 +115,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
-                    android:text="0 mới"
                     android:textColor="@color/gray" />
             </LinearLayout>
 
             <ImageView
+                android:contentDescription="@string/item_icon_description"
                 android:id="@+id/imgReload"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

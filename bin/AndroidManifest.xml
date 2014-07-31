@@ -30,11 +30,18 @@
         <activity
             android:name="com.sgu.findyourfriend.screen.RegisterActivity"
             android:label="@string/app_name" >
+            
+        </activity>
+        <activity
+            android:name="com.sgu.findyourfriend.screen.MainLoginActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.DELETE" />
@@ -48,6 +55,13 @@
         <!-- Main Activity -->
         <activity
             android:name="com.sgu.findyourfriend.screen.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name" >
+        </activity>
+
+        <!-- Setting Activity -->
+        <activity
+            android:name="com.sgu.findyourfriend.screen.SettingActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name" >
         </activity>
@@ -67,24 +81,26 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.androidexample.gcm.DISPLAY_MESSAGE" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.androidexample.gcm.UPDATE_MESSAGE_WIDGET" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_provider" />
         </receiver>
 
         <service android:name="com.sgu.findyourfriend.GCMIntentService" />
+        <!--
         <service
             android:name="com.sgu.findyourfriend.widget.WidgetControlService"
             android:enabled="true" >
         </service>
+        -->
     </application>
 
     <permission

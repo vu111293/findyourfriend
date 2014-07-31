@@ -85,7 +85,7 @@ public class FriendJSONParser {
 					+ (h == null ? "?" : h.getLocation().latitude) + ":"
 					+ (h == null ? "?" : h.getLocation().longitude) + "");
 
-			f = new Friend(u, numberLogin, state, share, share == 3,
+			f = new Friend(u, numberLogin, state, share,
 					(h == null ? null : h.getLocation()), null);
 		} catch (JSONException e) {
 			e.printStackTrace();

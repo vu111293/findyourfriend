@@ -110,6 +110,8 @@ public class UserJSONParser {
 			// out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+			return ""; 
 		}
 
 		return file.getPath();

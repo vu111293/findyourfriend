@@ -15,6 +15,7 @@ import com.sgu.findyourfriend.model.Message;
 import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.utils.Controller;
 import com.sgu.findyourfriend.utils.MessagesDataSource;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class MessageManager {
 
@@ -138,11 +139,13 @@ public class MessageManager {
 			// update num msg for widget
 			SettingManager.getInstance().init(context);
 
-			if (newMessage.startsWith(Config.PREFIX)) {
+			if (Utility.verifyRequest(newMessage)) {
 				SettingManager.getInstance().setNoNewRequest(
 						SettingManager.getInstance().getNoNewRequest() + 1);
 				mainActivity.newRequestNotify(true);
-			} else {
+			} else if (Utility.verifyResponse(newMessage)) {
+				
+ 			} else {
 				SettingManager.getInstance().setNoNewMessage(
 						SettingManager.getInstance().getNoNewMesssage() + 1);
 				mainActivity.newMessageNotify(true);
@@ -187,6 +190,7 @@ public class MessageManager {
 
 	public void destroy() {
 		context.unregisterReceiver(mHandleMessageReceiver);
+		dataSource.close();
 	}
 
 }

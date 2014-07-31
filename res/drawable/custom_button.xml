@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:state_pressed="true"><shape>
-            <gradient android:angle="270" android:endColor="#720B00" android:startColor="#F65E4E" />
-
-            <stroke android:width="2dp" android:color="@color/white" />
-        </shape></item>
-    <item><shape>
-            <gradient android:angle="270" android:endColor="#9C0F00" android:startColor="#F65E4E" />
-
-            <stroke android:width="2dp" android:color="@color/white" />
-        </shape></item>
-
+    <item android:state_pressed="true"
+      android:drawable="@drawable/widget_pressed_btn" />
+    <item android:drawable="@drawable/widget_btn" />
 </selector>

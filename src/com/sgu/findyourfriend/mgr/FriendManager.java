@@ -54,29 +54,8 @@ public class FriendManager {
 
 	public void init(Context context) {
 		this.context = context;
-
 		friends = new ArrayList<Friend>();
-		// friends = PostData.friendGetFriendList(context, 7);
-
-		// ArrayList<String> arrNumber = new ArrayList<String>();
-		// arrNumber.add("016680600004");
-		//
-		// friends.add(new Friend(
-		// new User(2, "nguyen huy dung", 1, "Ca mau", "admin@gmail.com",
-		// "http://findicons.com/files/icons/175/halloween_avatar/128/mike.png",
-		// "APA91bGZdyFkSv-T5A2s_ulCjB45bVM6tPU2uGSAf2jmaOxVwSDoqNtF8_h78qZoAeTFJUmSAWfynNqEktOTpLeIS6otCGpP9xlkSGX87mc4qH63LIpeiEPHs3U2C5lUh__z3XgHyudRG5E5by7vF7X59xVyo9KMjg",
-		// new Timestamp(System.currentTimeMillis()))
-		// , arrNumber, true, true, true, new LatLng(13.073887272186989,
-		// 106.1006023606658), null));
-		//
-		// friends.add(new Friend(
-		// new User(12, "tran van bi", 0, "Nui ne", "admin@gmail.com",
-		// "http://findicons.com/files/icons/1072/face_avatars/300/fh04.png",
-		// "APA91bGZdyFkSv-T5A2s_ulCjB45bVM6tPU2uGSAf2jmaOxVwSDoqNtF8_h78qZoAeTFJUmSAWfynNqEktOTpLeIS6otCGpP9xlkSGX87mc4qH63LIpeiEPHs3U2C5lUh__z3XgHyudRG5E5by7vF7X59xVyo9KMjg",
-		// new Timestamp(System.currentTimeMillis()))
-		// , arrNumber, true, false, false, new LatLng(10.673887272186989,
-		// 106.5906023606658), null));
-		// new RetrieveFriendListTask().execute();
+		friends = PostData.friendGetFriendList(context, MyProfileManager.getInstance().mine.getId());
 	}
 
 	public synchronized static FriendManager getInstance() {
@@ -87,19 +66,23 @@ public class FriendManager {
 	}
 
 	public void loadFriend() {
-		friends.addAll(PostData.friendGetFriendList(context, 7));
+		friends.clear();
+		friends.add(MyProfileManager.getInstance().mineF);
+		friends.addAll(PostData.friendGetFriendList(context, MyProfileManager.getInstance().mine.getId()));
 	}
 
-	public void setupAfterLoading() {
-		
+	synchronized public void setupAfterLoading() {
+
 		Log.i("DEBUG friend size", friends.size() + "");
-		
+
+		hmFriends.clear();
+
 		for (Friend f : friends) {
 			hmFriends.put(f.getUserInfo().getId(), f);
 		}
 
 		Log.i("DEBUG hm size", hmFriends.size() + "");
-		
+
 		hmImageP.clear();
 		// setup drawable icon
 		for (Friend f : friends) {
@@ -109,16 +92,21 @@ public class FriendManager {
 
 		hmMemberFriends.clear();
 		memberFriends.clear();
-		
+
 		hmRequestFriends.clear();
 		requestFriends.clear();
-		
+
 		// filter request friend
 		for (Friend f : friends) {
-			if (f.getAcceptState() != Friend.DONT_ACCEPT_STATE) {
+			if (f.getAcceptState() == Friend.FRIEND_RELATIONSHIP
+					|| f.getAcceptState() == Friend.REQUEST_SHARE
+					|| f.getAcceptState() == Friend.REQUESTED_SHARE
+					|| f.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
 				hmMemberFriends.put(f.getUserInfo().getId(), f);
 				memberFriends.add(f);
-			} else {
+			}
+
+			if (f.getAcceptState() == Friend.REQUESTED_FRIEND) {
 				hmRequestFriends.put(f.getUserInfo().getId(), f);
 				requestFriends.add(f);
 			}
@@ -133,10 +121,7 @@ public class FriendManager {
 		// MyProfileManager.getInstance().numberLogin,
 		// true, true, true, MyProfileManager.getInstance().myLocation, null));
 
-		friends.add(0, new Friend(MyProfileManager.getInstance().mine,
-				MyProfileManager.getInstance().numberLogins, true,
-				Friend.ACCEPT_STATE, true,
-				MyProfileManager.getInstance().myLocation, null));
+		friends.add(0, MyProfileManager.getInstance().mineF);
 
 		// for (Friend fr : friends) {
 		// Log.i(TAG, "user info");
@@ -179,10 +164,15 @@ public class FriendManager {
 
 		// filter request friend
 		for (Friend f : friends) {
-			if (f.getAcceptState() != Friend.DONT_ACCEPT_STATE) {
+			if (f.getAcceptState() == Friend.FRIEND_RELATIONSHIP
+					|| f.getAcceptState() == Friend.REQUEST_SHARE
+					|| f.getAcceptState() == Friend.REQUESTED_SHARE
+					|| f.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
 				hmMemberFriends.put(f.getUserInfo().getId(), f);
 				memberFriends.add(f);
-			} else {
+			}
+
+			if (f.getAcceptState() == Friend.REQUESTED_FRIEND) {
 				hmRequestFriends.put(f.getUserInfo().getId(), f);
 				requestFriends.add(f);
 			}
@@ -197,6 +187,52 @@ public class FriendManager {
 	private List<Friend> getFriendList() {
 		return this.friends;
 	}
+
+	public void updateFriend(Friend friend) {
+
+		int key = friend.getUserInfo().getId();
+
+		for (Friend f : friends) {
+			if (f.getUserInfo().getId() == key) {
+				f = friend;
+				break;
+			}
+		}
+
+		if (hmFriends.containsKey(key))
+			hmFriends.put(key, friend);
+
+		for (Friend f : requestFriends) {
+			if (f.getUserInfo().getId() == key) {
+				f = friend;
+				break;
+			}
+		}
+
+		if (hmRequestFriends.containsKey(key))
+			hmRequestFriends.put(key, friend);
+
+		for (Friend f : memberFriends) {
+			if (f.getUserInfo().getId() == key) {
+				f = friend;
+				break;
+			}
+		}
+
+		if (hmMemberFriends.containsKey(key))
+			hmMemberFriends.put(key, friend);
+
+	}
+
+	public void removeFriendRequest(Friend fr) {
+		requestFriends.remove(fr);
+		hmRequestFriends.remove(fr.getUserInfo().getId());
+	}
+
+	// public void updateFriendsState() {
+	// friends.clear();
+	// friends = PostData.friendGetFriendList(context, 7);
+	// }
 
 	// private class RetrieveFriendListTask extends AsyncTask<Void, Void, Void>
 	// {

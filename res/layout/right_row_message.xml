@@ -7,14 +7,16 @@
     android:orientation="horizontal" >
 
     <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:contentDescription="@string/item_imgprofile_description"
+        android:layout_width="@dimen/image_profile_message"
+        android:layout_height="@dimen/image_profile_message"
         android:layout_gravity="bottom"
         android:layout_margin="5dp"
         android:src="@android:color/transparent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:minWidth="250dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="15dp"
@@ -32,18 +34,18 @@
                 android:id="@+id/txtSenderName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Van"
-                android:textColor="#227bbf"
+                android:textColor="@color/white"
                 android:textSize="16sp"
+                android:text="Phuong"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txtReceiverName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" send to me"
-                android:textColor="#000000"
+                android:textColor="@color/white"
                 android:textSize="16sp"
+                android:text="toi Phuong"
                 android:textStyle="bold" />
 
             <TextView
@@ -53,9 +55,9 @@
                 android:layout_marginRight="5dp"
                 android:gravity="right"
                 android:paddingRight="1dp"
-                android:text="15 tháng 10"
-                android:textColor="#707070"
+                android:textColor="@color/white"
                 android:textSize="12sp"
+                android:text="17:20 5th8"
                 android:textStyle="italic|bold" />
         </LinearLayout>
 
@@ -67,15 +69,16 @@
             android:shadowColor="@color/textShadow"
             android:shadowDx="1"
             android:shadowDy="1"
-            android:text="thi s is new message  t thi thi s is new message  t thi thi s is new message  t thi "
-            android:textColor="#707070"
+            android:text="message................................................................."
+            android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
 
     <ImageView
+        android:contentDescription="@string/item_imgprofile_description"
         android:id="@+id/imgIconMessage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/image_profile_message"
+        android:layout_height="@dimen/image_profile_message"
         android:layout_gravity="bottom"
         android:layout_marginRight="5dp"
         android:layout_marginTop="15dp"

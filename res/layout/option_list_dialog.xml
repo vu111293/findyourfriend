@@ -14,8 +14,8 @@
         android:id="@+id/btnCancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đóng"
-        android:textColor="#FFF"
+        android:text="@string/close"
+        android:textColor="@color/white"
         android:textSize="12pt"
         android:textStyle="bold" />
 

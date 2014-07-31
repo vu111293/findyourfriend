@@ -3,7 +3,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/white"
     tools:context=".MainActivity" >
 
     <LinearLayout
@@ -36,8 +36,8 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="#FFFFFF"
-        android:divider="#E6E6E6" 
+        android:background="@color/white"
+        android:divider="@color/divider" 
         android:dividerHeight="1dp"/>
 
 </android.support.v4.widget.DrawerLayout>

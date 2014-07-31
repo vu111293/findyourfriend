@@ -2,30 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:background="@color/white"
     android:orientation="vertical" >
-
-    <!-- neo layout -->
-
-    <LinearLayout
-        android:id="@+id/blankLayout"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:visibility="visible" >
-    </LinearLayout>
-
+    
     <fragment
         android:id="@+id/mapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/blankLayout"
         android:layout_alignParentTop="true"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
     <!-- remove black blank -->
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,14 +23,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
-
+        
+        <ImageButton
+            android:contentDescription="@string/item_show_description"
+            android:id="@+id/btnShow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+           	android:layout_marginRight="10dp"
+           	android:layout_marginTop="10dp"
+           	android:src="@drawable/ic_tap"/>
+        
     </FrameLayout>
     
     <FrameLayout
         android:id="@+id/frWaitLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#aac0c0c0" >
+        android:background="@color/wait_frame_layout_bkg" 
+        android:visibility="gone">
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -51,9 +49,9 @@
             android:layout_gravity="center" />
 
     </FrameLayout>
+    
 
     <!-- controller layout -->
-
     <include 
         android:id="@+id/inc_horixontal_container"
         android:layout_width="match_parent"
@@ -65,7 +63,7 @@
         android:id="@+id/avatarListView"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_alignBottom="@id/blankLayout"
+        android:layout_alignParentBottom="true"
         android:background="@color/bottom_bar_color" />
 
 </RelativeLayout>
