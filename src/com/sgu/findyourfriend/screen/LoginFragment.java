@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,10 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
-import com.google.android.gms.internal.hp;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
@@ -26,6 +25,7 @@ import com.sgu.findyourfriend.utils.Utility;
 
 public class LoginFragment extends BaseFragment {
 
+	private ProgressDialogCustom progress;
 	private EditText ID, Password;
 	private Button BtnLogin, Signin;
 	private TextView Forgetpassword;
@@ -64,6 +64,9 @@ public class LoginFragment extends BaseFragment {
 
 						@Override
 						protected void onPreExecute() {
+							progress = new ProgressDialogCustom(ctx);
+							progress.show();
+							
 							phoneNumber = ID.getText().toString().trim();
 							password = Password.getText().toString().trim();
 							if (GCMRegistrar.isRegisteredOnServer(ctx)) {
@@ -81,10 +84,14 @@ public class LoginFragment extends BaseFragment {
 										password, gcmId);
 							}
 
+							gcmId = GCMRegistrar.getRegistrationId(ctx);
+							Log.i("GCM - do in background", gcmId);
+							
 							// login
 							int id = PostData.login(ctx, phoneNumber, password);
 
 							if (id >= 0) {
+								PostData.updateGcmId(ctx, id, gcmId);
 								MyProfileManager.getInstance().init(ctx, id);
 								return true;
 							}
@@ -94,6 +101,7 @@ public class LoginFragment extends BaseFragment {
 
 						@Override
 						protected void onPostExecute(Boolean isOk) {
+							progress.dismiss();
 							if (isOk) {
 								// save info
 								SettingManager.getInstance()
@@ -169,6 +177,16 @@ public class LoginFragment extends BaseFragment {
 			return;
 		}
 
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		if (progress!=null) {
+	        if (progress.isShowing()) {
+	            progress.dismiss();       
+	        }
+	    }
 	}
 
 }

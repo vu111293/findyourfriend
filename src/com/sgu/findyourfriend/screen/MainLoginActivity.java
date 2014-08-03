@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.sgu.findyourfriend.R;
@@ -77,8 +78,15 @@ public class MainLoginActivity extends Activity {
 							phoneNumber, password);
 
 					if (id >= 0) {
+
+						Log.i("GCM MY ID", gcmId);
+
+						boolean suc = PostData.updateGcmId(getApplicationContext(), id, gcmId);
+						
+						Log.i("GCM UPDATE", suc + "");
 						MyProfileManager.getInstance().init(
 								getApplicationContext(), id);
+
 						return true;
 					}
 
@@ -118,4 +126,9 @@ public class MainLoginActivity extends Activity {
 		ft.commit();
 	}
 
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
 }

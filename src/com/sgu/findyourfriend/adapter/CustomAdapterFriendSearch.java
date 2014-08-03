@@ -75,6 +75,8 @@ public class CustomAdapterFriendSearch extends ArrayAdapter<User> {
 										MyProfileManager.getInstance().mine
 												.getId(), ur.getId());
 
+								// ************ here add now
+								
 								return null;
 							}
 

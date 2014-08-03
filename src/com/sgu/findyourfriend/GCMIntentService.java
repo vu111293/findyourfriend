@@ -47,23 +47,23 @@ public class GCMIntentService extends GCMBaseIntentService {
 		Log.i(TAG, "Device registered: regId = " + registrationId);
 		aController.displayMessageOnScreen(context,
 				"Your device registred with GCM");
-		Log.d("NAME", MyProfileManager.getInstance().mine.getName());
+//		Log.d("NAME", MyProfileManager.getInstance().mine.getName());
 
 		
-		aController.register(context,
-				MyProfileManager.getInstance().numberLogins.get(0),
-				MyProfileManager.getInstance().mine.getEmail(), registrationId);
-
-		MyProfileManager.getInstance().mine.setGcmid(registrationId);
-		
-		PostData.userEdit(context,
-				MyProfileManager.getInstance().mine.getId(), 
-				MyProfileManager.getInstance().mine.getName(),
-				MyProfileManager.getInstance().mine.getGender(),
-				MyProfileManager.getInstance().mine.getProvince(), 
-				MyProfileManager.getInstance().mine.getEmail(),
-				MyProfileManager.getInstance().mine.getAvatar(),
-				MyProfileManager.getInstance().mine.getGcmId());
+//		aController.register(context,
+//				MyProfileManager.getInstance().numberLogins.get(0),
+//				MyProfileManager.getInstance().mine.getEmail(), registrationId);
+//
+//		MyProfileManager.getInstance().mine.setGcmid(registrationId);
+//		
+//		PostData.userEdit(context,
+//				MyProfileManager.getInstance().mine.getId(), 
+//				MyProfileManager.getInstance().mine.getName(),
+//				MyProfileManager.getInstance().mine.getGender(),
+//				MyProfileManager.getInstance().mine.getProvince(), 
+//				MyProfileManager.getInstance().mine.getEmail(),
+//				MyProfileManager.getInstance().mine.getAvatar(),
+//				MyProfileManager.getInstance().mine.getGcmId());
 	}
 
 	/**
@@ -169,6 +169,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 		// Play default notification sound
 		// notification.defaults |= Notification.DEFAULT_SOUND;
 
+		SettingManager.getInstance().init(context);
 		if (SettingManager.getInstance().isMessageRingtone()) {
 			String uriRingtone = SettingManager.getInstance().getRingtoneUri();
 

@@ -17,6 +17,7 @@ public class PreferenceKeys {
 	public static final String isMessageRingTone = "com.sgu.findyourfriend.ismessageringtone";
 	public static final String ringTone = "com.sgu.findyourfriend.ringtone";
 	public static final String friendsWarning = "com.sgu.findyourfriend.defaultwarning";
+	public static final String timeUpdateOnlineStatus = "com.sgu.findyourfriend.timeupdateonlinestatus";
 	
 	public static final String PHONENUMBER_AUTO_LOGIN = "com.sgu.findyourfriend.phonenumberautologin";
 	public static final String PASSWORD_AUTO_LOGIN = "com.sgu.findyourfriend.passwordautologin";

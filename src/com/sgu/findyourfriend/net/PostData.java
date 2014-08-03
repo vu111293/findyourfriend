@@ -1,8 +1,12 @@
 package com.sgu.findyourfriend.net;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,8 +19,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.model.Friend;
@@ -55,6 +61,7 @@ public class PostData {
 	public static final String userChangeAvatarType = "CHANGE_AVATAR";
 	public static final String userGetUsersWithoutFriendType = "GET_NEW_USERLIST";
 	public static final String userGetUsersByNameWithoutFriendType = "GET_USER_LIST_BY_NAME";
+	public static final String userUpdateGcmIdType = "UPDATE_GCMID";
 
 	public static final String accountCreateType = "CREATE";
 	public static final String accountDeleteOneType = "DELETE_ONE";
@@ -69,6 +76,7 @@ public class PostData {
 
 	public static final String friendGetFriendListType = "GET_FRIEND_LIST";
 	public static final String friendRemoveType = "FRIEND_REMOVE";
+	private static final String friendGetFriendInfoType = "GET_FRIEND_BY_FID";
 
 	public static final String chatsSendMsgType = "SEND_MSG";
 	// public static final String chatsHelpMsgType = "HELP_MSG";
@@ -931,6 +939,55 @@ public class PostData {
 		return report;
 	}
 
+	public static boolean updateGcmId(Context ctx, int id, String gcmid) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userUpdateGcmIdType);
+		params.put("id", id + "");
+		params.put("gcmid", gcmid);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Remove ads from free host
+			String[] jssplit = jsonResponse
+					.split("\n<!-- Hosting24 Analytics Code -->");
+			jsonResponse = jssplit[0];
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+		return Integer.parseInt(jsonResponse) > 0;
+	}
+
+	public static Friend friendGetFriend(Context ctx, int fid) {
+		String serverUrl = friendManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", friendGetFriendInfoType);
+		params.put("fid", fid + "");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		Friend f = null;
+		if (!jsonResponse.equals("")) {
+			// Remove ads from free host
+			String[] jssplit = jsonResponse
+					.split("\n<!-- Hosting24 Analytics Code -->");
+			jsonResponse = jssplit[0];
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				f = FriendJSONParser.getFriend(json);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		return f;
+	}
+
 	public static int login(Context ctx, String number, String password) {
 		String serverUrl = loginLink;
 		Map<String, String> params = new HashMap<String, String>();
@@ -955,7 +1012,7 @@ public class PostData {
 		}
 	}
 
-	public static int uploadFile(String fullPath) {
+	public static int uploadFile(Context ctx, String fullPath, String rename) {
 		int serverResponseCode = 0;
 		HttpURLConnection conn = null;
 		DataOutputStream dos = null;
@@ -967,27 +1024,46 @@ public class PostData {
 		int maxBufferSize = 1 * 1024 * 1024;
 		File sourceFile = new File(fullPath);
 
+		// getimage
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+		// create a file to write bitmap data
+		File f = new File(ctx.getCacheDir(), rename);
+		if (f.exists()) {
+			f.delete();
+			f = new File(ctx.getCacheDir(), rename);
+		}
+
+		// Convert bitmap to byte array
+		Bitmap bitmap = BitmapFactory.decodeFile(fullPath, options);
+		
+		// resize bitmap
+		bitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bitmap.compress(CompressFormat.PNG, 0, bos);
+		byte[] bitmapdata = bos.toByteArray();
+
+		// write the bytes in file
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(f);
+			fos.write(bitmapdata);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+		fullPath = f.getPath();
+
 		if (!sourceFile.isFile()) {
-
-			// dialog.dismiss();
-
 			Log.e("uploadFile", "Source File not exist :" + fullPath);
-
-			// runOnUiThread(new Runnable() {
-			// public void run() {
-			// messageText.setText("Source File not exist :"
-			// +uploadFilePath + "" + uploadFileName);
-			// }
-			// });
-
 			return 0;
 
 		} else {
 			try {
-
 				// open a URL connection to the Servlet
-				FileInputStream fileInputStream = new FileInputStream(
-						sourceFile);
+				FileInputStream fileInputStream = new FileInputStream(f);
 				URL url = new URL(upLoadServerUri);
 
 				// Open a HTTP connection to the URL

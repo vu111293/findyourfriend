@@ -14,8 +14,7 @@ public interface Config {
 	static final String GET_LOCATION_HISTORY_SERVER_URL = "http://sgudev2014.comuv.com/cfindyourfriend/get_locations_history.php";
 
 	// Google project id
-	static final String GOOGLE_SENDER_ID = "100128594910"; // Place here your
-															// Google project id
+	static final String GOOGLE_SENDER_ID = "100128594910"; 
 
 	/**
 	 * Tag used on log messages.
@@ -25,6 +24,10 @@ public interface Config {
 	static final String DISPLAY_MESSAGE_ACTION = "com.androidexample.gcm.DISPLAY_MESSAGE";
 	
 	static final String UPDATE_MESSAGE_WIDGET_ACTION = "com.androidexample.gcm.UPDATE_MESSAGE_WIDGET";
+	
+	static final String UPDATE_UI = "com.sgu.findyourfriend.UPDATE_UI";
+	static final String UPDATE_TYPE = "com.sgu.findyourfriend.UPDATE_TYPE";
+	static final String UPDATE_ACTION = "com.sgu.findyourfriend.UPDATE_ACTION";
 
 	static final String EXTRA_MESSAGE = "message";
 

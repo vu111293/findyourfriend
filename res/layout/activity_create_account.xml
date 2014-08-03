@@ -103,16 +103,16 @@
                 android:id="@+id/radioSex"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal" >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center_horizontal"
                     android:layout_marginTop="5dp"
+                    android:gravity="center_horizontal"
                     android:text="Giới tính: "
                     android:textSize="9pt" />
 
@@ -184,5 +184,4 @@
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
-
 </ScrollView>

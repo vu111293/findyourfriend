@@ -1,13 +1,15 @@
 package com.sgu.findyourfriend.screen;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -33,7 +35,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -68,6 +69,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	// point to itself
 	private MapFragment mThis = this;
 
+	private static boolean isRegister = false;
+
 	private Context context;
 
 	// view replace
@@ -76,7 +79,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	// map for app
 	private GoogleMap mMap;
-	private ArrayList<LatLng> markerPoints;
 
 	private HashMap<Integer, Marker> markerManager;
 
@@ -87,15 +89,12 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	private FriendSwipeAdapter swipeAdapter;
 
 	// friend's id current
-	// private int idFriendCur = -1;
 	private int fIDCurrent = -1;
 
 	private Controller aController;
 
 	// GPS Controller
 	private GpsPosition gpsPosition;
-
-	private List<LatLng> locationsHis = null;
 
 	private View viewSelected = null;
 
@@ -111,8 +110,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	private ProgressBar pbOnMap;
 
-	private FrameLayout frWaitLayout;
-
 	private boolean isMapStarted = false;
 
 	// state marker hide/show
@@ -125,7 +122,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	// management
 	private Resources resource;
-	private FriendManager friendManager;
 
 	// bi map resource for control view icon
 	private HashMap<Integer, Integer> hmToCap20;
@@ -141,7 +137,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	public MapFragment() {
 		// init
-		friendManager = FriendManager.getInstance();
 		isMapStarted = false;
 		isShowMarker = true;
 	}
@@ -166,39 +161,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 		}
 
-//		if (!FriendManager.getInstance().isReady) {
-//			(new AsyncTask<Void, Void, Void>() {
-//
-//				@Override
-//				protected void onPreExecute() {
-//					// get progress bar
-//					frWaitLayout = (FrameLayout) view
-//							.findViewById(R.id.frWaitLayout);
-//					frWaitLayout.setVisibility(View.VISIBLE);
-//					// pbOnMap = (ProgressBar) view.findViewById(R.id.pbOnMap);
-//					// pbOnMap.setVisibility(View.VISIBLE);
-//				}
-//
-//				@Override
-//				protected Void doInBackground(Void... arg0) {
-//					FriendManager.getInstance().loadFriend();
-//					return null;
-//				}
-//
-//				@Override
-//				protected void onPostExecute(Void result) {
-//					updateUI();
-//					loadFriendsPosition();
-//					FriendManager.getInstance().isReady = true;
-//					frWaitLayout.setVisibility(View.GONE);
-//					Toast.makeText(getActivity(), "loaded!", Toast.LENGTH_SHORT)
-//							.show();
-//				}
-//
-//			}).execute();
-//
-//		}
-
 		afterViewCreate(view);
 
 		return view;
@@ -207,7 +169,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
 	}
 
 	@Override
@@ -217,7 +178,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ on resume");
 
 		// update setup map
-//		getmMap().setMapType(SettingManager.getInstance().getMapType());
+		getmMap().setMapType(SettingManager.getInstance().getMapType());
 
 		// check recording
 		gpsPosition.setUploadMyPosition(SettingManager.getInstance()
@@ -240,18 +201,28 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		context = activity.getApplicationContext();
 		myContext = (FragmentActivity) activity;
 
-		Log.i("context 1", activity.getApplication().toString());
+		if (!isRegister) {
+			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
+					com.sgu.findyourfriend.mgr.Config.UPDATE_UI));
+			isRegister = true;
+		}
+	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if (isRegister)
+			getActivity().unregisterReceiver(mHandleMessageReceiver);
 	}
 
 	// ----------------- init variable and setup methods ----------- //
+	@SuppressLint("UseSparseArrays")
 	private void afterViewCreate(View view) {
 		// set actionbar
 		View bar = getActivity().getActionBar().getCustomView();
 		bar.findViewById(R.id.grpItemControl).setVisibility(View.VISIBLE);
 		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
-
-		// ((Button) view.findViewById(R.id.btnMessage)).setAlpha(0.5f);
 
 		// get button show
 		btnShow = (ImageButton) view.findViewById(R.id.btnShow);
@@ -280,7 +251,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		}
 
 		// initialize
-		markerPoints = new ArrayList<LatLng>();
+		// markerPoints = new ArrayList<LatLng>();
 		markerManager = new HashMap<Integer, Marker>();
 
 		// setup control item hashmap
@@ -293,29 +264,26 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		setupFriendList();
 
 		// setup map
-//		setupMap();
+		setupMap();
 
 		// init + setup mapController
-		// mapController = new MapController(this.getParentFragment()
-		// .getActivity(), this, mMap, pbOnMap);
-
 		mapController = new MapController(mThis);
 
 		setupControlView();
 
 		// setup send location to server
-//		gpsPosition.startRecording();
+		gpsPosition.startRecording();
 
 		// load friends position after 1 mins
-//		loadFriendsPosition();
-//		updateFriendsInfo();
+		loadFriendsPosition();
+		updateFriendsInfo();
 
 		// check require from sliding friend event
 		if (ControlOptions.getInstance().isRequire()) {
 			Log.i("REQUIRE", "####################################");
 			int fId = ControlOptions.getInstance().getHashMap("friendId");
 			mapController
-					.zoomToPosition(friendManager.getInstance().hmMemberFriends
+					.zoomToPosition(FriendManager.getInstance().hmMemberFriends
 							.get(fId).getLastLocation());
 			ControlOptions.getInstance().finish();
 		}
@@ -337,8 +305,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 					public void run() {
 
 						hideControl();
-						hideMarker(friendManager.getInstance().getMine(),
-								friendManager.getInstance().hmMemberFriends
+						hideMarker(FriendManager.getInstance().getMine(),
+								FriendManager.getInstance().hmMemberFriends
 										.get(fIDCurrent));
 						mapController.routeTask(fIDCurrent);
 					}
@@ -377,32 +345,35 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		hideControl();
 	}
 
-	private void updateUI() {
-		FriendManager.getInstance().setupAfterLoading();
+	// update ui --------------------------------------------
+	// private void updateUI() {
+	// FriendManager.getInstance().setupAfterLoading();
+	//
+	// updateAdapter();
+	// }
 
-		updateAdapter();
-	}
+	// public void updateAdapter() {
+	// swipeAdapter.notifyDataSetChanged();
+	// ((MainActivity) myContext).notifyDataChange();
+	// updateAllPosition();
+	// }
 
-	public void updateAdapter() {
-		swipeAdapter.notifyDataSetChanged();
-		((MainActivity) myContext).notifyDataChange();
-		updateAllPosition();
-	}
-	
-	public void updateAfterAcceptRequest(int friendID) {
-		swipeAdapter.notifyDataSetChanged();
-		((MainActivity) myContext).notifyDataChange();
-		// updateAllPosition();
-		createMakerOnMap(FriendManager.getInstance().hmMemberFriends.get(friendID));
-		changeVisibilityView();
-	}
+	// public void updateAfterAcceptRequest(int friendID) {
+	// swipeAdapter.notifyDataSetChanged();
+	// ((MainActivity) myContext).notifyDataChange();
+	// // updateAllPosition();
+	// createMakerOnMap(FriendManager.getInstance().hmMemberFriends
+	// .get(friendID));
+	// changeVisibilityView();
+	// }
+
+	// ----------------------------------------------------
 
 	public void tickVibrator() {
 		vibrator.vibrate(100);
 	}
 
 	// ---------------- setup map ----------------------- //
-	@SuppressWarnings("deprecation")
 	private void setupMap() {
 		FragmentManager myFM = myContext.getSupportFragmentManager();
 		SupportMapFragment mySpFrg = (SupportMapFragment) myFM
@@ -417,15 +388,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		getmMap().getUiSettings().setZoomControlsEnabled(false);
 		// hide control my center
 		// mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-		// demo overlay
-		// final LatLng NEWARK = new LatLng(40.714086, -74.228697);
-		//
-		// BitmapDescriptor image = BitmapDescriptorFactory
-		// .fromResource(R.drawable.ic_launcher);
-		// GroundOverlayOptions groundOverlay = new GroundOverlayOptions()
-		// .image(image).position(NEWARK, 500f).transparency(0.5f);
-		// mMap.addGroundOverlay(groundOverlay);
 
 		// setup info window event
 		getmMap().setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
@@ -541,7 +503,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 		swipeAdapter = new FriendSwipeAdapter(context,
 				R.layout.item_friend_accepted,
-				friendManager.getInstance().memberFriends);
+				FriendManager.getInstance().memberFriends);
 		avatarListView.setAdapter(swipeAdapter);
 
 		avatarListView.setOnItemClickListener(new OnItemClickListener() {
@@ -565,9 +527,14 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				swipeAdapter.hightLightItem(position);
 				showControl();
 
-//				if (swipeAdapter.getItem(position).getAcceptState() == Friend.SHARE_RELATIONSHIP)
-//					mapController.zoomToPosition(swipeAdapter.getItem(position)
-//							.getLastLocation());
+				if (swipeAdapter.getItem(position).getAcceptState() == Friend.SHARE_RELATIONSHIP
+						&& null != swipeAdapter.getItem(position)
+								.getLastLocation())
+					mapController.zoomToPosition(swipeAdapter.getItem(position)
+							.getLastLocation());
+				else {
+					Utility.showMessage(context, "Vị trí hiện tại không có sẵn");
+				}
 			}
 		});
 	}
@@ -620,11 +587,16 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 			@Override
 			public void onClick(View v) {
-				if (maskEn[2] == 1) {
+				if (maskEn[2] == 1
+						&& null != FriendManager.getInstance().hmMemberFriends
+								.get(fIDCurrent).getLastLocation()) {
 					tickVibrator();
 					hideControl();
 					hideMarker();
 					mapController.drawHistoryTask(fIDCurrent);
+				} else {
+					
+					Utility.showMessage(context, "Vị trí  hiện tại không có sẵn");
 				}
 			}
 		});
@@ -646,13 +618,17 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 			@Override
 			public void onClick(View v) {
-				if (maskEn[4] == 1) {
+				if (maskEn[4] == 1
+						&& null != FriendManager.getInstance().hmMemberFriends
+						.get(fIDCurrent).getLastLocation()) {
 					tickVibrator();
 					hideControl();
-					hideMarker(friendManager.getInstance().getMine(),
-							friendManager.getInstance().hmMemberFriends
+					hideMarker(FriendManager.getInstance().getMine(),
+							FriendManager.getInstance().hmMemberFriends
 									.get(fIDCurrent));
 					mapController.routeTask(fIDCurrent);
+				} else {
+					Utility.showMessage(context, "Vị trí  hiện tại không có sẵn");
 				}
 			}
 		});
@@ -665,14 +641,14 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 					tickVibrator();
 					hideControl();
 					showMarker();
-					Friend f = FriendManager.getInstance().hmMemberFriends.get(fIDCurrent);
-					
-					if (f.getAcceptState()  == Friend.REQUESTED_SHARE)
+					Friend f = FriendManager.getInstance().hmMemberFriends
+							.get(fIDCurrent);
+
+					if (f.getAcceptState() == Friend.REQUESTED_SHARE)
 						mapController.acceptTask(fIDCurrent);
-					else 
+					else
 						mapController.requestTask(fIDCurrent);
-					
-					
+
 					// update ui
 				}
 			}
@@ -708,6 +684,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	// ------------------ hide/show view on control console ---------- //
 
+	@SuppressLint("UseSparseArrays")
 	private void setupForSelectionControl() {
 		// allways enable
 		// maskEn[2] = maskEn[3] = 1;
@@ -748,14 +725,17 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	}
 
 	private void changeVisibilityView() {
+		if (fIDCurrent < 0)
+			return;
+
 		View rView = getView();
 		// check view visiable
 		// my self
-		
-		
-		((TextView)((LinearLayout) ((ViewGroup) rView.findViewById(R.id.btnRequest).getParent()))
-				.getChildAt(1)).setText("yêu cầu");
-		
+
+		((TextView) ((LinearLayout) ((ViewGroup) rView.findViewById(
+				R.id.btnRequest).getParent())).getChildAt(1))
+				.setText("yêu cầu");
+
 		if (fIDCurrent == MyProfileManager.getInstance().mine.getId()) {
 			disableView(rView, R.id.btnMessage);
 			maskEn[0] = 0;
@@ -799,9 +779,9 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				disableView(rView, R.id.btnRequest);
 				maskEn[5] = 0;
 
-			} else if (f.getAcceptState() == Friend.REQUEST_SHARE){
+			} else if (f.getAcceptState() == Friend.REQUEST_SHARE) {
 				// wait accept
-				
+
 				enableView(rView, R.id.btnMessage);
 				maskEn[0] = 1;
 
@@ -819,10 +799,10 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 				disableView(rView, R.id.btnRequest);
 				maskEn[5] = 0;
-				
+
 			} else if (f.getAcceptState() == Friend.REQUESTED_SHARE) {
 				// accept text
-				
+
 				enableView(rView, R.id.btnMessage);
 				maskEn[0] = 1;
 
@@ -838,14 +818,13 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				disableView(rView, R.id.btnRoute);
 				maskEn[4] = 0;
 
-				
 				// change text here
 				enableView(rView, R.id.btnRequest);
-				((TextView)((LinearLayout) ((ViewGroup) rView.findViewById(R.id.btnRequest).getParent()))
-				.getChildAt(1)).setText("c.nhận");
+				((TextView) ((LinearLayout) ((ViewGroup) rView.findViewById(
+						R.id.btnRequest).getParent())).getChildAt(1))
+						.setText("c.nhận");
 				maskEn[5] = 1;
-				
-				
+
 			} else {
 				// friend
 				enableView(rView, R.id.btnMessage);
@@ -872,7 +851,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	// --------------------- changle color marker --------------------- //
 	private void changleSelectMarker(int idFriendCur, boolean isSelected) {
 		Marker m = markerManager.get(idFriendCur);
-		Friend f = friendManager.hmMemberFriends.get(idFriendCur);
+		Friend f = FriendManager.getInstance().hmMemberFriends.get(idFriendCur);
 
 		if (m != null) {
 			if (isSelected)
@@ -909,11 +888,9 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 		// update for friend
 		for (Friend f : swipeAdapter.getData()) {
-			if (f.getAcceptState() != Friend.SHARE_RELATIONSHIP
-					|| f.getLastLocation() == null)
-				continue;
-
-			createMakerOnMap(f);
+			if (f.getAcceptState() == Friend.SHARE_RELATIONSHIP
+					&& null != f.getLastLocation())
+				createMakerOnMap(f);
 		}
 	}
 
@@ -953,7 +930,18 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 					@Override
 					protected void onPostExecute(Void result) {
 						FriendManager.getInstance().setupAfterLoading();
-						updateUI();
+						// updateUI();
+
+						Intent intentUpdate = new Intent(
+								com.sgu.findyourfriend.mgr.Config.UPDATE_UI);
+						intentUpdate.putExtra(
+								com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE,
+								Utility.FRIEND);
+						intentUpdate
+								.putExtra(
+										com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION,
+										Utility.RESPONSE_NO);
+						context.sendBroadcast(intentUpdate);
 
 						Toast.makeText(getActivity(), "updateUI!",
 								Toast.LENGTH_SHORT).show();
@@ -967,7 +955,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		mUpdateHandler.postDelayed(mUpdateRunnable, intervalUpdateFriend);
 
 		// for (int key : markerManager.keySet()) {
-		// // PostData.updateLastLoation(friendManager.hmFriends.get(key),
+		// //
+		// PostData.updateLastLoation(FriendManager.getInstance().hmFriends.get(key),
 		// // markerManager.get(key));
 		// }
 
@@ -1042,6 +1031,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	// ----------------------- create map's marker ----------------- //
 	private void createMakerOnMap(Friend f) {
+		Log.i(TAG, "create on map");
+
 		MarkerOptions options = new MarkerOptions();
 		options.position(f.getLastLocation());
 		// options.title(mapController.getAddress(f.getLastLocation()));
@@ -1051,16 +1042,17 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				+ " trước - sai lệch " + f.getAccurency() + "m.");
 
 		options.icon(combileLocationIcon(f, false));
-		Marker m = getmMap().addMarker(options);
 
+		Marker m = getmMap().addMarker(options);
 		markerManager.put(f.getUserInfo().getId(), m);
 	}
 
 	@Override
 	public void onMyLocationChanged(Location location) {
-
+		if (null == location)
+			return;
 		Log.i(TAG, "update! " + markerManager.size());
-		Friend f = friendManager.getMine();
+		Friend f = FriendManager.getInstance().getMine();
 		LatLng latlng = new LatLng(location.getLatitude(),
 				location.getLongitude());
 		MyProfileManager.getInstance().myLocation = latlng;
@@ -1090,5 +1082,72 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	public void setPbOnMap(ProgressBar pbOnMap) {
 		this.pbOnMap = pbOnMap;
 	}
+
+	// handle message
+	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context ctx, Intent intent) {
+			if (intent.getStringExtra(
+					(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE)).equals(
+					Utility.SHARE)) {
+
+				if (intent.getStringExtra(
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+						.equals(Utility.REQUEST)) {
+					swipeAdapter.notifyDataSetChanged();
+					changeVisibilityView();
+				} else if (intent.getStringExtra(
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+						.equals(Utility.RESPONSE_YES)) {
+					swipeAdapter.notifyDataSetChanged();
+					((MainActivity) myContext).notifyDataChange();
+					changeVisibilityView();
+				} else {
+					// response no
+					swipeAdapter.notifyDataSetChanged();
+					((MainActivity) myContext).notifyDataChange();
+					changeVisibilityView();
+				}
+
+			} else if (intent.getStringExtra(
+					(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE)).equals(
+					Utility.FRIEND)) {
+				if (intent.getStringExtra(
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+						.equals(Utility.REQUEST)) {
+					// update friend
+
+				} else if (intent.getStringExtra(
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+						.equals(Utility.RESPONSE_YES)) {
+					
+					Log.i(TAG, "friend response yes");
+					// add new friend to map
+					for (int id : FriendManager.getInstance().hmMemberFriends
+							.keySet()) {
+						Friend fr = FriendManager.getInstance().hmMemberFriends
+								.get(id);
+						
+						if (null != fr.getLastLocation() && fr.getAcceptState() == Friend.SHARE_RELATIONSHIP
+								&& !markerManager.containsKey(id)) {
+							Log.i(TAG, "ok");
+							createMakerOnMap(fr);
+						}
+					}
+
+				} else {
+					// response no
+
+				}
+
+				swipeAdapter.notifyDataSetChanged();
+				((MainActivity) myContext).notifyDataChange();
+				changeVisibilityView();
+			}
+
+		}
+
+	};
 
 }

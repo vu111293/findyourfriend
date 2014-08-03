@@ -1,22 +1,30 @@
 package com.sgu.findyourfriend.screen;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,8 +41,11 @@ import com.sgu.findyourfriend.utils.Utility;
 
 public class CreateAccountProfileFragment extends BaseFragment {
 
+	private static final int TAKE_PHOTO = 0;
 	private static final int SELECT_PICTURE = 1;
+	public static int count = 0;
 
+	private ProgressDialogCustom progress;
 	private ImageView imgProfile;
 	private EditText phone, name, address, email, password;
 	private Button BtnCreateAccount;
@@ -44,6 +55,8 @@ public class CreateAccountProfileFragment extends BaseFragment {
 	private String selectedImageName;
 
 	private Controller mController;
+
+	protected Dialog alertDialog;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,13 +76,6 @@ public class CreateAccountProfileFragment extends BaseFragment {
 		email = (EditText) rootView.findViewById(R.id.editEmail);
 		BtnCreateAccount = (Button) rootView.findViewById(R.id.btnSignin);
 		Male = (RadioButton) rootView.findViewById(R.id.radioMale);
-
-		// TelephonyManager telemamanger = (TelephonyManager) ctx
-		// .getSystemService(Activity.TELEPHONY_SERVICE);
-		// String getSimNumber = telemamanger.getLine1Number();
-		// if (getSimNumber != null && getSimNumber != "") {
-		// phone.setText(getSimNumber);
-		// }
 
 		imgProfile.setOnClickListener(new OnClickListener() {
 
@@ -98,7 +104,9 @@ public class CreateAccountProfileFragment extends BaseFragment {
 						private boolean success = false;
 
 						protected void onPreExecute() {
-
+							progress = new ProgressDialogCustom(ctx);
+							progress.show();
+							
 							phoneNumber = phone.getText().toString().trim();
 							passwd = password.getText().toString().trim();
 
@@ -122,22 +130,24 @@ public class CreateAccountProfileFragment extends BaseFragment {
 										.toString().trim(), passwd, gcmId);
 							}
 
-							PostData.uploadFile(selectedImagePath);
+							String renameFile = "temp_"
+									+ System.currentTimeMillis() + ".png";
+							PostData.uploadFile(ctx, selectedImagePath,
+									renameFile);
 
 							int id = PostData.userCreate(ctx, name.getText()
 									.toString().trim(), Male.isChecked() ? 1
 									: 2, address.getText().toString().trim(),
 									email.getText().toString().trim(),
-									PostData.IMAGE_HOST + selectedImageName,
-									gcmId);
+									PostData.IMAGE_HOST + renameFile, gcmId);
 
 							Log.i("ACCOUT", id + "");
-							
+
 							// wait to receive response
 							if (id >= 0) {
 								success = PostData.accountCreate(ctx, id,
 										phoneNumber);
-								
+
 								Log.i("ACCOUT", success + "");
 								success &= PostData.userChangePassword(ctx, id,
 										"123456", passwd);
@@ -154,7 +164,8 @@ public class CreateAccountProfileFragment extends BaseFragment {
 
 						@Override
 						protected void onPostExecute(Boolean isOk) {
-
+							progress.dismiss();
+							
 							if (isOk) {
 								// save info
 								SettingManager.getInstance()
@@ -184,6 +195,8 @@ public class CreateAccountProfileFragment extends BaseFragment {
 			}
 		});
 
+		(new ProgressDialogCustom(ctx)).show();
+		
 		return rootView;
 	}
 
@@ -206,44 +219,43 @@ public class CreateAccountProfileFragment extends BaseFragment {
 		}
 	}
 
-	private void showTakeImage() {
-		AlertDialog.Builder builderSingle = new AlertDialog.Builder(ctx);
+	public void showTakeImage() {
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		View dialoglayout = inflater.inflate(
+				R.layout.options_take_image_layout, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx, R.style.progess_dialog_custom);
 
-		final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ctx,
-				android.R.layout.select_dialog_item);
-		arrayAdapter.add("Chụp từ camera");
-		arrayAdapter.add("Chọn tron bộ sưu tập");
-		builderSingle.setNegativeButton("cancel",
-				new DialogInterface.OnClickListener() {
+		builder.setView(dialoglayout);
+
+		((Button) dialoglayout.findViewById(R.id.btnGallery))
+				.setOnClickListener(new OnClickListener() {
 
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
+					public void onClick(View arg0) {
+						Intent intent = new Intent();
+						intent.setType("image/*");
+						intent.setAction(Intent.ACTION_GET_CONTENT);
+						startActivityForResult(
+								Intent.createChooser(intent, "Select Picture"),
+								SELECT_PICTURE);
+						alertDialog.dismiss();
 					}
 				});
 
-		builderSingle.setAdapter(arrayAdapter,
-				new DialogInterface.OnClickListener() {
+		((Button) dialoglayout.findViewById(R.id.btnTakePhoto))
+				.setOnClickListener(new OnClickListener() {
 
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (which == 0) {
-							Utility.showMessage(ctx, "Tính năng chưa sẵn sàng.");
-						} else {
-							// in onCreate or any event where your want the user
-							// to
-							// select a file
-							Intent intent = new Intent();
-							intent.setType("image/*");
-							intent.setAction(Intent.ACTION_GET_CONTENT);
-							startActivityForResult(Intent.createChooser(intent,
-									"Select Picture"), SELECT_PICTURE);
-						}
-
+					public void onClick(View arg0) {
+						Intent cameraIntent = new Intent(
+								android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+						startActivityForResult(cameraIntent, TAKE_PHOTO);
+						alertDialog.dismiss();
 					}
 				});
-		builderSingle.show();
 
+		alertDialog = builder.create();
+		alertDialog.show();
 	}
 
 	@Override
@@ -252,14 +264,58 @@ public class CreateAccountProfileFragment extends BaseFragment {
 			if (requestCode == SELECT_PICTURE) {
 				Uri selectedImageUri = data.getData();
 
-				selectedImagePath = getPath(selectedImageUri);
+				selectedImagePath = savebitmap(
+						Utility.dropRectBitmap(BitmapFactory
+								.decodeFile(getPath(selectedImageUri))))
+						.getPath();
+				//
+				// selectedImagePath = getPath(selectedImageUri);
 				selectedImageName = selectedImagePath.split("/")[(selectedImagePath
 						.split("/").length) - 1];
 				Utility.showMessage(ctx, "path: " + selectedImagePath);
-				
-				imgProfile.setImageDrawable(Drawable.createFromPath(selectedImagePath));
+
+				imgProfile.setImageDrawable(Drawable
+						.createFromPath(selectedImagePath));
+			} else if (requestCode == TAKE_PHOTO) {
+				Bitmap photo = (Bitmap) data.getExtras().get("data");
+				selectedImagePath = savebitmap(
+						Utility.dropRectBitmap(Utility.rotateBitmap(photo, 270)))
+						.getPath();
+
+				// wrong
+				// selectedImagePath = data.getStringExtra("path");
+				selectedImageName = selectedImagePath.split("/")[(selectedImagePath
+						.split("/").length) - 1];
+				Utility.showMessage(ctx, "path: " + selectedImagePath);
+				imgProfile.setImageDrawable(Drawable
+						.createFromPath(selectedImagePath));
 			}
 		}
+	}
+
+	private File savebitmap(Bitmap bmp) {
+		String extStorageDirectory = Environment.getExternalStorageDirectory()
+				.toString();
+		OutputStream outStream = null;
+		// String temp = null;
+		File file = new File(extStorageDirectory, "temp_2014.png");
+		if (file.exists()) {
+			file.delete();
+			file = new File(extStorageDirectory, "temp_2014.png");
+
+		}
+
+		try {
+			outStream = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+			outStream.flush();
+			outStream.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return file;
 	}
 
 	public String getPath(Uri uri) {

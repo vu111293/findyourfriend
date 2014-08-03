@@ -3,6 +3,8 @@ package com.sgu.findyourfriend.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.widget.Toast;
 
 /**
@@ -14,9 +16,17 @@ import android.widget.Toast;
 
 public class Utility {
 
-	public static enum TYPE {
-		SHARE, FRIEND
-	};
+	// public static enum TYPE {
+	// SHARE, FRIEND, MESSAGE, REQUEST, RESPONSE_YES, RESPONSE_NO
+	// };
+	//
+
+	public static String SHARE = "com.sgu.findyourfriend.share";
+	public static String FRIEND = "com.sgu.findyourfriend.friend";
+	public static String MESSAGE = "com.sgu.findyourfriend.message";
+	public static String REQUEST = "com.sgu.findyourfriend.request";
+	public static String RESPONSE_YES = "com.sgu.findyourfriend.resposeyes";
+	public static String RESPONSE_NO = "com.sgu.findyourfriend.responseno";
 
 	public static final String[] sender = new String[] { "Lalit", "RobinHood",
 			"Captain", "HotVerySpicy", "Dharmendra", "PareshMayani", "Abhi",
@@ -26,6 +36,8 @@ public class Utility {
 			"Lets see what the Rock is cooking..!!", "Yeah! thats great.",
 			"Awesome Awesome!", "@RobinHood.", "Lalit ka Dillllll...!!!",
 			"I'm fine, thanks, what about you?" };
+
+	public static final String INVITE_MESSAGE = "Bạn có muốn sử dụng app.";
 
 	// example: 30' 10s
 	public static String convertMicTimeToString(Long mics) {
@@ -60,7 +72,8 @@ public class Utility {
 
 	// verify request
 	public static boolean verifyRequest(String msg) {
-		if (null == msg) return false;
+		if (null == msg)
+			return false;
 		String res[] = msg.split(":");
 		if (res.length != 3)
 			return false;
@@ -71,9 +84,10 @@ public class Utility {
 
 	// verify response
 	public static boolean verifyResponse(String msg) {
-		if (null == msg) return false;
+		if (null == msg)
+			return false;
 		String res[] = msg.split(":");
-		if (res.length != 3)
+		if (res.length != 4)
 			return false;
 
 		return res[0].endsWith("RESPONSE");
@@ -83,10 +97,23 @@ public class Utility {
 
 		String res[] = msg.split(":");
 
+		if (res.length != 3)
+			return null;
+
+		String type = res[0].startsWith("FRIEND") ? FRIEND : SHARE;
+
+		return (new Utility()).new RReply(type, Integer.parseInt(res[1]),
+				Integer.parseInt(res[2]), true);
+	}
+
+	public static RReply getResponse(String msg) {
+
+		String res[] = msg.split(":");
+
 		if (res.length != 4)
 			return null;
 
-		TYPE type = res[0].startsWith("FRIEND") ? TYPE.FRIEND : TYPE.SHARE;
+		String type = res[0].startsWith("FRIEND") ? FRIEND : SHARE;
 
 		return (new Utility()).new RReply(type, Integer.parseInt(res[1]),
 				Integer.parseInt(res[2]), res[3].equals("YES"));
@@ -118,13 +145,13 @@ public class Utility {
 		alertDialog.show();
 	}
 
-	class RReply {
-		private TYPE type;
+	public class RReply {
+		private String type;
 		private int fromId;
 		private int toId;
 		private boolean res;
 
-		public RReply(TYPE type, int fromId, int toId, boolean res) {
+		public RReply(String type, int fromId, int toId, boolean res) {
 			this.setType(type);
 			this.setFromId(fromId);
 			this.setToId(toId);
@@ -155,13 +182,30 @@ public class Utility {
 			this.res = res;
 		}
 
-		public TYPE getType() {
+		public String getType() {
 			return type;
 		}
 
-		public void setType(TYPE type) {
+		public void setType(String type) {
 			this.type = type;
 		}
+	}
+
+	// --------------------- utility image -----------------------------
+	
+	
+	public static Bitmap dropRectBitmap(Bitmap source) {
+		int w = source.getWidth();
+		int h = source.getHeight();
+		int r = Math.min(w, h);
+		return Bitmap.createBitmap(source, (w - r) / 2, (h - r) / 2, r, r);
+	}
+	
+	public static Bitmap rotateBitmap(Bitmap source, float angle) {
+		Matrix matrix = new Matrix();
+		matrix.postRotate(angle);
+		return Bitmap.createBitmap(source, 0, 0, source.getWidth(),
+				source.getHeight(), matrix, true);
 	}
 
 }

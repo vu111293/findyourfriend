@@ -32,26 +32,6 @@ public class FriendManager {
 
 	public boolean isReady = false;
 
-	// private LatLng[] randLocations = {
-	// new LatLng(10.973881272186989, 106.5906023606658),
-	// new LatLng(10.973487272186989, 108.5906023606658),
-	// new LatLng(10.973007272186989, 105.5906023606658),
-	// new LatLng(11.973887272186989, 107.5906023606658),
-	// new LatLng(12.073887272186989, 106.5946023606658),
-	// new LatLng(10.900087272186989, 106.5996023606658),
-	// new LatLng(10.173887272186989, 106.5106023606658),
-	// new LatLng(10.673887272186989, 106.5906023606658),
-	// new LatLng(10.373887272186989, 106.5901023606658),
-	// new LatLng(13.073887272186989, 106.1006023606658)
-	// };
-
-	// private String[] drawDemo = {
-	// "drawable://" + R.drawable.img1,
-	// "drawable://" + R.drawable.img2,
-	// "drawable://" + R.drawable.img3,
-	// "drawable://" + R.drawable.img4
-	// };
-
 	public void init(Context context) {
 		this.context = context;
 		friends = new ArrayList<Friend>();
@@ -116,38 +96,14 @@ public class FriendManager {
 
 	@SuppressLint("UseSparseArrays")
 	public void setup() {
-		// add mine
-		// friends.add(0, new Friend(MyProfileManager.getInstance().mine,
-		// MyProfileManager.getInstance().numberLogin,
-		// true, true, true, MyProfileManager.getInstance().myLocation, null));
 
 		friends.add(0, MyProfileManager.getInstance().mineF);
-
-		// for (Friend fr : friends) {
-		// Log.i(TAG, "user info");
-		// Log.i(TAG, fr.getUserInfo().getId() + " # ");
-		// Log.i(TAG, fr.getNumberLogin() + " # " + fr.isShare());
-		// Log.i(TAG, fr.getUserInfo().getName() + " # "
-		// + fr.getUserInfo().getAvatar() + " # "
-		// + fr.getUserInfo().getEmail() + " # time: "
-		// + fr.getUserInfo().getLastestlogin().toLocaleString());
-		// }
 
 		hmFriends = new HashMap<Integer, Friend>();
 
 		for (Friend f : friends) {
 			hmFriends.put(f.getUserInfo().getId(), f);
 		}
-
-		// for (Friend fr : friends) {
-		// Log.i(TAG, "user info");
-		// Log.i(TAG, fr.getUserInfo().getId() + " # ");
-		// Log.i(TAG, fr.getNumberLogin() + " # " + fr.isShare());
-		// Log.i(TAG, fr.getUserInfo().getName() + " # "
-		// + fr.getUserInfo().getAvatar() + " # "
-		// + fr.getUserInfo().getEmail() + " # time: "
-		// + fr.getUserInfo().getLastestlogin().toLocaleString());
-		// }
 
 		// setup drawable icon
 		hmImageP = new HashMap<Integer, Drawable>();
@@ -224,11 +180,52 @@ public class FriendManager {
 
 	}
 
+	
+	public void updateChangeRequestToMember(Friend fr) {
+		int key = fr.getUserInfo().getId();
+		requestFriends.remove(fr);
+		hmRequestFriends.remove(key);
+		
+		memberFriends.add(fr);
+		hmMemberFriends.put(key, fr);
+	}
+	
+	
 	public void removeFriendRequest(Friend fr) {
 		requestFriends.remove(fr);
 		hmRequestFriends.remove(fr.getUserInfo().getId());
 	}
 
+	public void addFriendRequest(Friend fr) {
+		requestFriends.add(fr);
+		hmRequestFriends.put(fr.getUserInfo().getId(), fr);
+		
+		hmImageP.put(fr.getUserInfo().getId(),
+				Drawable.createFromPath(fr.getUserInfo().getAvatar()));
+	}
+
+	public void addFriendMember(Friend fr) {
+		memberFriends.add(fr);
+		hmMemberFriends.put(fr.getUserInfo().getId(), fr);
+		
+		hmImageP.put(fr.getUserInfo().getId(),
+				Drawable.createFromPath(fr.getUserInfo().getAvatar()));
+	}
+
+	public void updateChangeMemberFriend(Friend fr) {
+		int key = fr.getUserInfo().getId();
+		
+		for (Friend f : memberFriends) {
+			if (f.getUserInfo().getId() == key) {
+				f = fr;
+				break;
+			}
+		}
+		
+		hmMemberFriends.remove(key);
+		hmMemberFriends.put(key, fr);
+	}
+	
 	// public void updateFriendsState() {
 	// friends.clear();
 	// friends = PostData.friendGetFriendList(context, 7);

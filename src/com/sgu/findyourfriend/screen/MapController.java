@@ -38,12 +38,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.History;
 import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.utils.GpsDirection;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class MapController {
 
@@ -59,7 +61,9 @@ public class MapController {
 
 	private boolean isRouting;
 
-	private ProgressBar pbOnMap;
+	private ProgressDialogCustom progress;
+
+	// private ProgressBar pbOnMap;
 
 	// public MapController(Context context, Fragment f, GoogleMap map,
 	// ProgressBar pbOnMap) {
@@ -68,8 +72,9 @@ public class MapController {
 		this.mapFragment = parentFragment;
 		this.context = parentFragment.getParentFragment().getActivity();
 		this.mMap = parentFragment.getmMap();
-		this.pbOnMap = parentFragment.getPbOnMap();
+		// this.pbOnMap = parentFragment.getPbOnMap();
 
+		progress = new ProgressDialogCustom(context);
 		isRouting = false;
 
 		// get Gps direction after map is setup
@@ -138,7 +143,8 @@ public class MapController {
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
-				pbOnMap.setVisibility(View.VISIBLE);
+				// pbOnMap.setVisibility(View.VISIBLE);
+				progress.show();
 			}
 
 			@Override
@@ -146,21 +152,21 @@ public class MapController {
 				// locationsHis = aController.getLocationHistory(context);
 
 				// get list latlng from server
-				historyList.add(new History(new Timestamp(System
-						.currentTimeMillis() - 10000), new LatLng(
-						13.073887272186989, 106.1006023606658)));
-				historyList.add(new History(new Timestamp(System
-						.currentTimeMillis() - 8000), new LatLng(
-						13.973887272186989, 106.9006023606658)));
-				historyList.add(new History(new Timestamp(System
-						.currentTimeMillis() - 6000), new LatLng(
-						14.573887272186989, 106.8006023606658)));
-				historyList.add(new History(new Timestamp(System
-						.currentTimeMillis() - 4000), new LatLng(
-						13.273887272186989, 106.5006023606658)));
-				historyList.add(new History(new Timestamp(System
-						.currentTimeMillis() - 1000), new LatLng(
-						13.173887272186989, 107.1006023606658)));
+				// historyList.add(new History(new Timestamp(System
+				// .currentTimeMillis() - 10000), new LatLng(
+				// 13.073887272186989, 106.1006023606658)));
+				// historyList.add(new History(new Timestamp(System
+				// .currentTimeMillis() - 8000), new LatLng(
+				// 13.973887272186989, 106.9006023606658)));
+				// historyList.add(new History(new Timestamp(System
+				// .currentTimeMillis() - 6000), new LatLng(
+				// 14.573887272186989, 106.8006023606658)));
+				// historyList.add(new History(new Timestamp(System
+				// .currentTimeMillis() - 4000), new LatLng(
+				// 13.273887272186989, 106.5006023606658)));
+				// historyList.add(new History(new Timestamp(System
+				// .currentTimeMillis() - 1000), new LatLng(
+				// 13.173887272186989, 107.1006023606658)));
 
 				f = FriendManager.getInstance().hmMemberFriends.get(friendId);
 				if (null == f.getSteps())
@@ -190,7 +196,8 @@ public class MapController {
 				}
 
 				// hide progress bar
-				pbOnMap.setVisibility(View.GONE);
+				// pbOnMap.setVisibility(View.GONE);
+				progress.dismiss();
 
 				// set bound zoom
 				zoomBoundPosition(latlngs);
@@ -226,14 +233,24 @@ public class MapController {
 
 			@Override
 			protected void onPostExecute(Void result) {
-				FriendManager.getInstance().updateFriend(friend);
+				FriendManager.getInstance().updateChangeMemberFriend(friend);
 
 				// update adapter
-				mapFragment.updateAdapter();
-				zoomToPosition(friend.getLastLocation());
+				// mapFragment.updateAdapter();
 
-				Log.i("NewPosition", friend.getLastLocation().latitude + " # "
-						+ friend.getLastLocation().longitude);
+				Intent intentUpdate = new Intent(Config.UPDATE_UI);
+				intentUpdate.putExtra(Config.UPDATE_TYPE, Utility.FRIEND);
+				intentUpdate.putExtra(Config.UPDATE_ACTION,
+						Utility.RESPONSE_YES);
+				context.sendBroadcast(intentUpdate);
+
+				if (null != friend.getLastLocation()) {
+					zoomToPosition(friend.getLastLocation());
+					Log.i("NewPosition", friend.getLastLocation().latitude
+							+ " # " + friend.getLastLocation().longitude);
+				} else {
+					Utility.showMessage(context, "Vị trí hiện tại không có sẵn");
+				}
 
 				Toast.makeText(context, "updated!", Toast.LENGTH_SHORT).show();
 			}
@@ -274,10 +291,17 @@ public class MapController {
 			@Override
 			protected void onPostExecute(Void result) {
 				Toast.makeText(context, "sent!", Toast.LENGTH_SHORT).show();
-				Friend friend = FriendManager.getInstance().hmMemberFriends.get(friendId);
+				Friend friend = FriendManager.getInstance().hmMemberFriends
+						.get(friendId);
 				friend.setAcceptState(Friend.REQUEST_SHARE);
-				FriendManager.getInstance().updateFriend(friend);
-				mapFragment.updateAfterAcceptRequest(friendId);
+				FriendManager.getInstance().updateChangeMemberFriend(friend);
+				// mapFragment.updateAfterAcceptRequest(friendId);
+
+				Intent intentUpdate = new Intent(Config.UPDATE_UI);
+				intentUpdate.putExtra(Config.UPDATE_TYPE, Utility.SHARE);
+				intentUpdate.putExtra(Config.UPDATE_ACTION, Utility.REQUEST);
+				context.sendBroadcast(intentUpdate);
+
 			}
 
 		}).execute();
@@ -290,42 +314,47 @@ public class MapController {
 			@Override
 			protected void onPreExecute() {
 
-			
 			}
-			
+
 			@Override
 			protected Void doInBackground(Void... params) {
 				mapFragment.getActivity().runOnUiThread(new Runnable() {
-					  public void run() {
-					    Toast.makeText(mapFragment.getActivity(), "Hello", Toast.LENGTH_SHORT).show();
-					  }
-					});
-				
-				// Toast.makeText(context, "sending accept", Toast.LENGTH_SHORT).show();
+					public void run() {
+						Toast.makeText(mapFragment.getActivity(), "Hello",
+								Toast.LENGTH_SHORT).show();
+					}
+				});
+
+				// Toast.makeText(context, "sending accept",
+				// Toast.LENGTH_SHORT).show();
 				PostData.sendShareAccept(context,
 						MyProfileManager.getInstance().mine.getId(), fIDCurrent);
-				
-				
+
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				
-				Friend friend = FriendManager.getInstance().hmMemberFriends.get(fIDCurrent);
+
+				Friend friend = FriendManager.getInstance().hmMemberFriends
+						.get(fIDCurrent);
 				friend.setAcceptState(Friend.SHARE_RELATIONSHIP);
-				FriendManager.getInstance().updateFriend(friend);
-				mapFragment.updateAfterAcceptRequest(fIDCurrent);
-				
-				
-				// sound 
+				FriendManager.getInstance().updateChangeMemberFriend(friend);
+				// mapFragment.updateAfterAcceptRequest(fIDCurrent);
+
+				Intent intentUpdate = new Intent(Config.UPDATE_UI);
+				intentUpdate.putExtra(Config.UPDATE_TYPE, Utility.SHARE);
+				intentUpdate.putExtra(Config.UPDATE_ACTION,
+						Utility.RESPONSE_YES);
+				context.sendBroadcast(intentUpdate);
+
+				// sound
 			}
 
 		}).execute();
 	}
 
 	// --------------- utilities methods -------------------- //
-
 	private void createHistoryPoint(History hisP, int prio) {
 		MarkerOptions opt = new MarkerOptions();
 		opt.position(hisP.getLocation());

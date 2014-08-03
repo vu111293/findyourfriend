@@ -100,17 +100,27 @@ public class MessageAdapter extends BaseAdapter {
 
 		holder.message.setText(message.getMessage());
 
-		holder.txtSenderName
-				.setText(FriendManager.getInstance().hmMemberFriends
-						.get(message.getIdSender()).getUserInfo().getName());
+		if(message.isMine()) {
+			holder.txtSenderName
+			.setText(FriendManager.getInstance().hmMemberFriends
+					.get(message.getIdReceiver()).getUserInfo().getName());
+		} else {
+			holder.txtSenderName
+			.setText(FriendManager.getInstance().hmMemberFriends
+					.get(message.getIdSender()).getUserInfo().getName());
+		}
 		
-		
-		String receiverName = FriendManager.getInstance().hmMemberFriends
-				.get(message.getIdReceiver()).getUserInfo().getName().trim();
-		
-		holder.txtReceiverName
-		.setText(" gửi đến " + receiverName.substring(
-				receiverName.lastIndexOf(' ') == -1 ? 0 : receiverName.lastIndexOf(' ')));
+//		holder.txtSenderName
+//				.setText(FriendManager.getInstance().hmMemberFriends
+//						.get(message.getIdSender()).getUserInfo().getName());
+//		
+//		
+//		String receiverName = FriendManager.getInstance().hmMemberFriends
+//				.get(message.getIdReceiver()).getUserInfo().getName().trim();
+//		
+//		holder.txtReceiverName
+//		.setText(" gửi đến " + receiverName.substring(
+//				receiverName.lastIndexOf(' ') == -1 ? 0 : receiverName.lastIndexOf(' ')));
 		
 		holder.imgSender.setImageDrawable(FriendManager.getInstance().hmImageP
 				.get(message.getIdSender()));

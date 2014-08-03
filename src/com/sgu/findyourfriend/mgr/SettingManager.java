@@ -18,6 +18,8 @@ public class SettingManager {
 	public static String MESSAGE_COUNTER_KEY = "newMessage";
 	public static String REQUEST_COUNTER_KEY = "newRequest";
 
+	public static long TIME_UPDATE_DEFAULT = 90000;
+	
 	private SharedPreferences prefs;
 
 	public void init(Context context) {
@@ -138,4 +140,10 @@ public class SettingManager {
 	public void savePasswordAutoLogin(String password) {
 		prefs.edit().putString(PreferenceKeys.PASSWORD_AUTO_LOGIN, password).commit();
 	}
+	
+	
+	public long  getTimeUpdateOnlineStatus() {
+		return prefs.getLong(PreferenceKeys.timeUpdateOnlineStatus, TIME_UPDATE_DEFAULT);
+	}
+	
 }

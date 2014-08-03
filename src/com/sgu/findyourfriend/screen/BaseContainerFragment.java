@@ -10,6 +10,7 @@ public class BaseContainerFragment extends Fragment {
 	public void replaceFragment(Fragment fragment, boolean addToBackStack) {
 		FragmentTransaction transaction = getChildFragmentManager()
 				.beginTransaction();
+		transaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 		if (addToBackStack) {
 			transaction.addToBackStack(null);
 		}

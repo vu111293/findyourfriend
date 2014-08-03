@@ -64,4 +64,6 @@
     <color name="name_sender_right">#387326</color>
     <color name="sent_time">#707070</color>
     
+    <color name="blue_text_message">#2560b3</color>
+    
 </resources>

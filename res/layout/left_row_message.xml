@@ -20,13 +20,15 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="5dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/speech_bubble_silver"
+        
         android:orientation="vertical" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal" >
 
             <TextView
@@ -52,7 +54,7 @@
                 android:layout_marginRight="5dp"
                 android:gravity="right"
                 android:paddingRight="1dp"
-                android:textColor="@color/black"
+                android:textColor="@color/sent_time"
                 android:textSize="12sp"
                 android:textStyle="italic|bold" />
         </LinearLayout>
@@ -61,10 +63,14 @@
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="5dp"
             android:shadowColor="@color/textShadow"
             android:shadowDx="1"
             android:shadowDy="1"
+            android:background="@drawable/bubble_silver"
             android:textColor="@color/black"
             android:textSize="16sp" />
     </LinearLayout>

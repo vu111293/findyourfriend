@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.Message;
+import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.utils.Controller;
 import com.sgu.findyourfriend.utils.MessagesDataSource;
@@ -19,6 +21,7 @@ import com.sgu.findyourfriend.utils.Utility;
 
 public class MessageManager {
 
+	public static String TAG = "MessageManager";
 	private static MessageManager instance;
 
 	public static int numNewShareMessage = 0;
@@ -79,18 +82,6 @@ public class MessageManager {
 		}
 	}
 
-	// public Message sendMessage(String msg, List<Friend> friendsId, int k) {
-	// Message sms = new Message(msg, true,
-	// MyProfileManager.getInstance().mine.getId(),
-	// MyProfileManager.getInstance().mine.getGcmId(),
-	// MyProfileManager.getInstance().mine.getGcmId(), new Date(
-	// System.currentTimeMillis()));
-	// sms = dataSource.createMessage(sms);
-	// iMessage.addNewMessage(sms);
-	// new SendMessage().execute(msg);
-	// return sms;
-	// }
-
 	private class SendMessage extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(String... params) {
@@ -131,7 +122,7 @@ public class MessageManager {
 	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(final Context context, Intent intent) {
 			String newMessage = intent.getExtras().getString(
 					Config.EXTRA_MESSAGE);
 
@@ -139,13 +130,147 @@ public class MessageManager {
 			// update num msg for widget
 			SettingManager.getInstance().init(context);
 
+			// send broadcast notify
+			final Utility.RReply reply;
+			final Intent intentUpdate;
+
 			if (Utility.verifyRequest(newMessage)) {
-				SettingManager.getInstance().setNoNewRequest(
-						SettingManager.getInstance().getNoNewRequest() + 1);
-				mainActivity.newRequestNotify(true);
+
+				reply = Utility.getRequest(newMessage);
+				intentUpdate = new Intent(Config.UPDATE_UI);
+
+				(new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+						if (reply.getType().equals(Utility.FRIEND)) {
+							// send broadcast update ui vs msg
+							intentUpdate.putExtra(Config.UPDATE_TYPE,
+									Utility.FRIEND);
+
+							intentUpdate.putExtra(Config.UPDATE_ACTION,
+									Utility.REQUEST);
+							
+							Friend fr = PostData.friendGetFriend(context,
+									reply.getFromId());
+							FriendManager.getInstance().addFriendRequest(fr);
+
+						} else if (reply.getType().equals(Utility.SHARE)) {
+							// send broadcast update ui vs msg
+							intentUpdate.putExtra(Config.UPDATE_TYPE,
+									Utility.SHARE);
+
+							intentUpdate.putExtra(Config.UPDATE_ACTION,
+									Utility.REQUEST);
+
+							Friend fr = FriendManager.getInstance().hmMemberFriends
+									.get(reply.getFromId());
+							fr.setAcceptState(Friend.REQUESTED_SHARE);
+ 
+							FriendManager.getInstance().updateChangeMemberFriend(fr);
+						}
+
+						return null;
+					}
+
+					protected void onPostExecute(Void result) {
+						context.sendBroadcast(intentUpdate);
+
+						SettingManager.getInstance()
+								.setNoNewRequest(
+										SettingManager.getInstance()
+												.getNoNewRequest() + 1);
+					};
+
+				}).execute();
+
+				// mainActivity.newRequestNotify(true);
 			} else if (Utility.verifyResponse(newMessage)) {
-				
- 			} else {
+				Log.i(TAG, "response");
+// response ---------------------------------------------------------------
+				reply = Utility.getResponse(newMessage);
+				intentUpdate = new Intent(Config.UPDATE_UI);
+
+				(new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+						if (reply.getType().equals(Utility.FRIEND)) {
+							Log.i(TAG, "response friend");
+							// send broadcast update ui vs msg
+							intentUpdate.putExtra(Config.UPDATE_TYPE,
+									Utility.FRIEND);
+							
+							if (reply.isRes()) {
+								Log.i(TAG, "response friend yes");
+								// response yes
+								intentUpdate.putExtra(Config.UPDATE_ACTION,
+										Utility.RESPONSE_YES);
+								Friend fr = PostData.friendGetFriend(context,
+										reply.getFromId());
+								FriendManager.getInstance().addFriendMember(fr);
+							} else {
+								Log.i(TAG, "response friend no");
+								// response no
+								intentUpdate.putExtra(Config.UPDATE_ACTION,
+										Utility.RESPONSE_NO);
+							}
+
+						} else if (reply.getType().equals(Utility.SHARE)) {
+							
+							intentUpdate.putExtra(Config.UPDATE_TYPE,
+									Utility.SHARE);
+							Friend fr = FriendManager.getInstance().hmMemberFriends
+									.get(reply.getFromId());
+							
+							if (reply.isRes()) {
+								// response yes
+								intentUpdate.putExtra(Config.UPDATE_ACTION,
+										Utility.RESPONSE_YES);
+								fr.setAcceptState(Friend.SHARE_RELATIONSHIP);
+							} else {
+								// response no
+								intentUpdate.putExtra(Config.UPDATE_ACTION,
+										Utility.RESPONSE_NO);
+								fr.setAcceptState(Friend.FRIEND_RELATIONSHIP);
+							}
+							FriendManager.getInstance().updateChangeMemberFriend(fr);
+						}
+
+						return null;
+					}
+
+					protected void onPostExecute(Void result) {
+						context.sendBroadcast(intentUpdate);
+
+						SettingManager.getInstance()
+								.setNoNewRequest(
+										SettingManager.getInstance()
+												.getNoNewRequest() + 1);
+					};
+
+				}).execute();
+
+			} else {
+				// update msg ui
+				intentUpdate = new Intent(Config.UPDATE_UI);
+				intentUpdate.putExtra(Config.UPDATE_TYPE, Utility.MESSAGE);
+
+				// ************************************************************************
+				// message normal > from
+				Message sms = new Message(newMessage, false, 2,
+						MyProfileManager.getInstance().mine.getId(), new Date(
+								System.currentTimeMillis()));
+
+				// save to database
+				sms = dataSource.createMessage(sms);
+
+				// Display message on the screen
+				if (iMessage != null)
+					iMessage.addNewMessage(sms);
+
+				context.sendBroadcast(intentUpdate);
+
 				SettingManager.getInstance().setNoNewMessage(
 						SettingManager.getInstance().getNoNewMesssage() + 1);
 				mainActivity.newMessageNotify(true);
@@ -158,19 +283,6 @@ public class MessageManager {
 
 			// Waking up mobile if it is sleeping
 			aController.acquireWakeLock(context);
-
-			int idSender = 2; // get from message content
-
-			Message sms = new Message(newMessage, false, idSender,
-					MyProfileManager.getInstance().mine.getId(), new Date(
-							System.currentTimeMillis()));
-
-			// save to database
-			sms = dataSource.createMessage(sms);
-
-			// Display message on the screen
-			if (iMessage != null)
-				iMessage.addNewMessage(sms);
 
 			Toast.makeText(context, "Got Message: " + newMessage,
 					Toast.LENGTH_LONG).show();

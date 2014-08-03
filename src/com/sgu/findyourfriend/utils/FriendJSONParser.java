@@ -49,10 +49,8 @@ public class FriendJSONParser {
 	}
 
 	// Parsing the Country JSON object
-	private static Friend getFriend(JSONObject jFriend) {
-
+	public static Friend getFriend(JSONObject jFriend) {
 		Friend f = null;
-
 		try {
 			User u = null;
 			ArrayList<String> numberLogin = new ArrayList<String>();

@@ -8,20 +8,18 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -36,7 +34,7 @@ import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.mgr.SoundManager;
-import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.utils.Utility;
 
 public class MainActivity extends FragmentActivity {
@@ -64,6 +62,9 @@ public class MainActivity extends FragmentActivity {
 	private ProgressBar pbLoader;
 
 	private int backButtonCount;
+
+	private AlertDialog alertDialog = null;
+	private Handler handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,20 @@ public class MainActivity extends FragmentActivity {
 
 		}).execute();
 
+		// setup update online status
+		handler = new Handler();
+		final long timeUpdate = SettingManager.getInstance()
+				.getTimeUpdateOnlineStatus();
+
+		final Runnable r = new Runnable() {
+			public void run() {
+				(new StatusUpdate()).execute();
+				handler.postDelayed(this, timeUpdate);
+			}
+		};
+
+		handler.postDelayed(r, timeUpdate);
+
 	}
 
 	@Override
@@ -163,7 +178,7 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onTabChanged(String tabId) {
-				
+
 				backButtonCount = 1;
 
 				if (!mTabHost.getCurrentTabTag().equals(MESSAGE_TAG)) {
@@ -188,7 +203,8 @@ public class MainActivity extends FragmentActivity {
 
 		mActionBar.setDisplayShowHomeEnabled(true);
 		mActionBar.setDisplayShowTitleEnabled(false);
-		mActionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.bar_color)));
+		mActionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+				.getColor(R.color.bar_color)));
 		LayoutInflater mInflater = LayoutInflater.from(this);
 
 		View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
@@ -286,14 +302,13 @@ public class MainActivity extends FragmentActivity {
 						dialog.show();
 					}
 				});
-		
+
 		mCustomView.findViewById(R.id.imgContacts).setOnClickListener(
 				new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						ContactsDialog dialog = new ContactsDialog(mMain);
-						dialog.show();
+						showOptionsContacts();
 					}
 				});
 	}
@@ -301,28 +316,6 @@ public class MainActivity extends FragmentActivity {
 	public void notifyDataChange() {
 		adapter.notifyDataSetChanged();
 	}
-
-	// public Animation inFromRightAnimation() {
-	// Animation inFromRight = new TranslateAnimation(
-	// Animation.RELATIVE_TO_PARENT, +1.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f);
-	// inFromRight.setDuration(240);
-	// inFromRight.setInterpolator(new AccelerateInterpolator());
-	// return inFromRight;
-	// }
-	//
-	// public Animation outToRightAnimation() {
-	// Animation outtoLeft = new TranslateAnimation(
-	// Animation.RELATIVE_TO_PARENT, -1.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f,
-	// Animation.RELATIVE_TO_PARENT, 0.0f);
-	// outtoLeft.setDuration(240);
-	// outtoLeft.setInterpolator(new AccelerateInterpolator());
-	// return outtoLeft;
-	// }
 
 	@Override
 	public void onBackPressed() {
@@ -391,28 +384,58 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.menu, menu);
-//		return true;
-//	}
-//
-//	@Override
-//	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-//
-//		if (item.getItemId() == R.id.action_settings) {
-//			Intent intent = new Intent(this, SettingActivity.class);
-//			startActivity(intent);
-//			return true;
-//		}
-//
-//		return false;
-//	}
-
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		MessageManager.getInstance().destroy();
 	}
+
+	public void showOptionsContacts() {
+		LayoutInflater inflater = getLayoutInflater();
+		View dialoglayout = inflater.inflate(R.layout.options_invite_layout,
+				null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.progess_dialog_custom);
+
+		builder.setView(dialoglayout);
+
+		((Button) dialoglayout.findViewById(R.id.btnInvite))
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						InviteFromContactsDialog contactsdialog = new InviteFromContactsDialog(
+								mMain);
+						contactsdialog.show();
+						alertDialog.dismiss();
+					}
+				});
+
+		((Button) dialoglayout.findViewById(R.id.btnSearch))
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						SearchFromServerDialog searchdialog = new SearchFromServerDialog(
+								mMain);
+						searchdialog.show();
+						alertDialog.dismiss();
+					}
+				});
+
+		alertDialog = builder.create();
+		alertDialog.show();
+	}
+
+	class StatusUpdate extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			PostData.login(getApplicationContext(),
+					MyProfileManager.getInstance().numberLogins.get(0),
+					MyProfileManager.getInstance().password);
+			return null;
+		}
+
+	}
+
 }
