@@ -4,7 +4,7 @@ Find Your Friend
 
 ## Ứng dụng tham dự cuộc thi "Mùa hè sáng tạo 2014"
 
-[![solarized dualmode](https://github.com/altercation/solarized/raw/master/img/solarized-yinyang.png)](#features)
+[![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/logo.png)](#features)
 
 Bạn hay có những chuyến đi chơi xa cùng bạn bè? Bạn đang cần biết vị trí điểm hẹn mà
 người bạn của bạn đã đến trước? Bạn bị lạc và muồn cầu cứu mà không biết gọi ai? Ứng dụng
