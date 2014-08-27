@@ -38,37 +38,37 @@ gần nhất (độ chính xác không cao).
 Ảnh chụp ứng dụng
 -----------
 
-### widget ứng dụng truy cập nhanh tính năng cầu cứu
+### giao diện đăng nhập
 
-[![mutt dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-07-28-17-42-55.png)](https://github.com/altercation/solarized/raw/master/img/screen-mutt-dark.png)
+[![mutt dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-05-23.png)](https://github.com/altercation/solarized/raw/master/img/screen-mutt-dark.png)
 
 ### Vị trí bạn bè thể hiện trên bản đồ và thanh taskbar giúp truy cập nhanh
 
-[![c light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-16-59-11.png)](https://github.com/altercation/solarized/raw/master/img/screen-c-light.png)
+[![c light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-17-59-31.png)](https://github.com/altercation/solarized/raw/master/img/screen-c-light.png)
 
 ### Tìm đường
 
-[![haskell light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-16-59-58.png)](https://github.com/altercation/solarized/raw/master/img/screen-haskell-light.png)
+[![haskell light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-17-59-51.png)](https://github.com/altercation/solarized/raw/master/img/screen-haskell-light.png)
 
 ### Xem lịch sử vị trí
 
-[![html light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-17-00-14.png)](https://github.com/altercation/solarized/raw/master/img/screen-html-light.png)
+[![html light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-00-15.png)](https://github.com/altercation/solarized/raw/master/img/screen-html-light.png)
 
 ### Trạng thái bạn bè
 
-[![java dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-16-59-29.png)](https://github.com/altercation/solarized/raw/master/img/screen-java-dark.png)
+[![java dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-29.png)](https://github.com/altercation/solarized/raw/master/img/screen-java-dark.png)
 
 ### Tin nhắn trao đổi hoặc nhờ trợ giúp
 
-[![javascript dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-16-59-20.png)](https://github.com/altercation/solarized/raw/master/img/screen-javascript-dark.png)
+[![javascript dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-00.png)](https://github.com/altercation/solarized/raw/master/img/screen-javascript-dark.png)
 
 ### Cảnh báo gửi cầu cứu
 
-[![pandoc dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-17-00-20.png)](https://github.com/altercation/solarized/raw/master/img/screen-pandoc-dark.png)
+[![pandoc dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-36.png)](https://github.com/altercation/solarized/raw/master/img/screen-pandoc-dark.png)
 
 ### Mời bạn bè từ danh bạ
 
-[![perl dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-03-17-01-00.png)](https://github.com/altercation/solarized/raw/master/img/screen-perl-dark.png)
+[![perl dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-00-46.png)](https://github.com/altercation/solarized/raw/master/img/screen-perl-dark.png)
 
 
 
