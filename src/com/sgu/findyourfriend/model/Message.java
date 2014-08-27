@@ -9,9 +9,10 @@ public class Message {
 	private long id;
 	private String message;
 	private int idSender;
+	private String senderName;
 	private int idReceiver;
-	// private String gcmIdSender;
-	// private String gcmIdReceiver;
+	private String receiverName;
+	
 	private Date smsTime;
 	private boolean isMine;
 
@@ -22,53 +23,29 @@ public class Message {
 	 */
 	boolean isStatusMessage;
 
-	// public Message(String message, boolean isMine) {
-	// super();
-	// this.message = message;
-	// this.isMine = isMine;
-	// this.isStatusMessage = false;
-	// }
 
-	public Message(String message, boolean isMine, int idSender,
-			int idReceiver, Date smsTime) {
+	public Message(String message, boolean isMine, int idSender, String senderName,
+			int idReceiver, String receiverName, Date smsTime) {
 		this.setMessage(message);
 		this.setMine(isMine);
 		this.setIdSender(idSender);
 		this.setIdReceiver(idReceiver);
-		// this.setGcmIdSender(gcmIdSender);
-		// this.setGcmIdReceiver(gcmIdReceiver);
+		this.setSenderName(senderName);
+		this.setReceiverName(receiverName);
 		this.setSmsTime(smsTime);
 	}
 
-	public Message(long id, String message, boolean isMine, int idSender,
-			int idReceiver, Date smsTime) {
+	public Message(long id, String message, boolean isMine, int idSender, String senderName,
+			int idReceiver, String receiverName, Date smsTime) {
 		this.setId(id);
 		this.setMessage(message);
 		this.setMine(isMine);
 		this.setIdSender(idSender);
 		this.setIdReceiver(idReceiver);
-		// this.setGcmIdSender(gcmIdSender);
-		// this.setGcmIdReceiver(gcmIdReceiver);
+		this.setSenderName(senderName);
+		this.setReceiverName(receiverName);
 		this.setSmsTime(smsTime);
 	}
-
-	/**
-	 * Constructor to make a status Message object consider the parameters are
-	 * swaped from default Message constructor, not a good approach but have to
-	 * go with it.
-	 */
-//	public Message(boolean status, String message) {
-//		super();
-//		this.message = message;
-//		this.isMine = false;
-//		this.isStatusMessage = status;
-//	}
-//
-//	public Message(String message, boolean isMine, boolean isStatusMessage) {
-//		this.message = message;
-//		this.isMine = isMine;
-//		this.isStatusMessage = isStatusMessage;
-//	}
 
 	public String getMessage() {
 		return message;
@@ -94,22 +71,6 @@ public class Message {
 		this.isStatusMessage = isStatusMessage;
 	}
 
-	// public String getGcmIdSender() {
-	// return gcmIdSender;
-	// }
-	//
-	// public void setGcmIdSender(String gcmIdSender) {
-	// this.gcmIdSender = gcmIdSender;
-	// }
-	//
-	// public String getGcmIdReceiver() {
-	// return gcmIdReceiver;
-	// }
-	//
-	// public void setGcmIdReceiver(String gcmIdReceiver) {
-	// this.gcmIdReceiver = gcmIdReceiver;
-	// }
-
 	public Date getSmsTime() {
 		return smsTime;
 	}
@@ -126,14 +87,6 @@ public class Message {
 		this.id = id;
 	}
 
-	// public boolean isReaded() {
-	// return isReaded;
-	// }
-	//
-	// public void setReaded(boolean isReaded) {
-	// this.isReaded = isReaded;
-	// }
-
 	public int getIdSender() {
 		return idSender;
 	}
@@ -148,6 +101,22 @@ public class Message {
 
 	public void setIdReceiver(int idReceiver) {
 		this.idReceiver = idReceiver;
+	}
+
+	public String getSenderName() {
+		return senderName;
+	}
+
+	public void setSenderName(String senderName) {
+		this.senderName = senderName;
+	}
+
+	public String getReceiverName() {
+		return receiverName;
+	}
+
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
 	}
 
 }

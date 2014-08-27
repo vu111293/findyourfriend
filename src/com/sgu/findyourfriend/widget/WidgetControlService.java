@@ -21,16 +21,13 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.sgu.findyourfriend.R;
-import com.sgu.findyourfriend.mgr.Config;
-import com.sgu.findyourfriend.utils.Controller;
-import com.sgu.findyourfriend.utils.GpsPosition;
+import com.sgu.findyourfriend.mgr.SettingManager;
+import com.sgu.findyourfriend.net.PostData;
+import com.sgu.findyourfriend.utils.PreferenceKeys;
 
 public class WidgetControlService extends Service {
 
-	public static final String EXTRA_EMERGENCY = "com.sgu.findyourfriend.widget.emergency";
-
-	public static final String ACTION_START_EMERGENCY = "com.sgu.findyourfriend.widget.startemergency";
-	public static final String ACTION_START_UPDATE = "com.sgu.findyourfriend.widget.startupdate";
+	
 
 	private static final String APP_TAG = WidgetControlService.class.toString();
 
@@ -39,20 +36,14 @@ public class WidgetControlService extends Service {
 
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void onProviderDisabled(String provider) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -84,9 +75,9 @@ public class WidgetControlService extends Service {
 				.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 		if (widgetIds.length > 0) {
 			for (int widgetId : widgetIds) {
-				if (intent.hasExtra(EXTRA_EMERGENCY)) {
+				if (intent.hasExtra(PreferenceKeys.EXTRA_EMERGENCY)) {
 					Log.d(APP_TAG, "intent has extra enableLock");
-					if (intent.getBooleanExtra(EXTRA_EMERGENCY, true)) {
+					if (intent.getBooleanExtra(PreferenceKeys.EXTRA_EMERGENCY, true)) {
 						onEmergency(getApplicationContext());
 					}
 				} else {
@@ -203,15 +194,6 @@ public class WidgetControlService extends Service {
 		manager.updateAppWidget(thisWidget, views);
 	}
 
-	// private void onUpdate(Context context, RemoteViews remoteViews,
-	// String mAddress) {
-	// String address = (new GpsPosition(context).getMyAddressNow());
-	// // String address = (new GpsWidget().getNow());
-	// remoteViews.setTextViewText(R.id.txtMyAddress, address);
-	// Toast.makeText(context, "Update me " + mAddress, Toast.LENGTH_SHORT)
-	// .show();
-	// }
-
 	private void onEmergency(final Context context) {
 
 		(new AsyncTask<Void, Void, Void>() {
@@ -220,12 +202,16 @@ public class WidgetControlService extends Service {
 			protected void onPreExecute() {
 				Toast.makeText(context, "Emergency! sending",
 						Toast.LENGTH_SHORT).show();
+
+				SettingManager.getInstance().init(getApplicationContext());
 			}
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				(new Controller()).sendMessage(context, Config.GCM_ID,
-						Config.GCM_ID, "emergency");
+				
+				// to ...
+				PostData.sendMessage(context, SettingManager.getInstance()
+						.getLastAccountIdLogin(), 7, "emergency");
 				return null;
 			}
 

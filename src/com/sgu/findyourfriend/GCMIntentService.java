@@ -1,11 +1,8 @@
 package com.sgu.findyourfriend;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -14,13 +11,12 @@ import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.screen.MainActivity;
-import com.sgu.findyourfriend.utils.Controller;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
 	private static final String TAG = "GCMIntentService";
 
-	private Controller aController = null;
 	private static MainActivity mainActivity = null;
 
 	public GCMIntentService() {
@@ -37,33 +33,40 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * Method called on device registered
 	 **/
 	@Override
-	protected void onRegistered(Context context, String registrationId) {
-
-		// Get Global Controller Class object (see application tag in
-		// AndroidManifest.xml)
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
+	protected void onRegistered(Context context, final String registrationId) {
 
 		Log.i(TAG, "Device registered: regId = " + registrationId);
-		aController.displayMessageOnScreen(context,
+		Utility.displayMessageOnScreen(context,
 				"Your device registred with GCM");
-//		Log.d("NAME", MyProfileManager.getInstance().mine.getName());
 
-		
-//		aController.register(context,
-//				MyProfileManager.getInstance().numberLogins.get(0),
-//				MyProfileManager.getInstance().mine.getEmail(), registrationId);
-//
-//		MyProfileManager.getInstance().mine.setGcmid(registrationId);
-//		
-//		PostData.userEdit(context,
-//				MyProfileManager.getInstance().mine.getId(), 
-//				MyProfileManager.getInstance().mine.getName(),
-//				MyProfileManager.getInstance().mine.getGender(),
-//				MyProfileManager.getInstance().mine.getProvince(), 
-//				MyProfileManager.getInstance().mine.getEmail(),
-//				MyProfileManager.getInstance().mine.getAvatar(),
-//				MyProfileManager.getInstance().mine.getGcmId());
+		// if (MyProfileManager.getInstance().isLoaded()) {
+		Log.i(TAG, "myrpfile update!");
+
+		(new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				MyProfileManager.getInstance().init(getApplicationContext(),
+						SettingManager.getInstance().getLastAccountIdLogin(),
+						false);
+
+				PostData.updateGcmId(getApplicationContext(), SettingManager
+						.getInstance().getLastAccountIdLogin(), registrationId);
+
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+				Log.i(TAG, "update gcmid on onregister");
+				MyProfileManager.getInstance().setMyGCMID(registrationId);
+				// Utility.showMessage(getApplicationContext(),
+				// "Chức năng nhắn tin đã sẵn sàng");
+			}
+
+		}).execute();
 	}
 
 	/**
@@ -71,12 +74,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * */
 	@Override
 	protected void onUnregistered(Context context, String registrationId) {
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
 		Log.i(TAG, "Device unregistered");
-		aController.displayMessageOnScreen(context,
+		Utility.displayMessageOnScreen(context,
 				getString(R.string.gcm_unregistered));
-		aController.unregister(context, registrationId);
 	}
 
 	/**
@@ -84,21 +84,12 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * */
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
-
 		Log.i(TAG, "Received message");
 		String message = intent.getExtras().getString("price");
-
-		aController.displayMessageOnScreen(context, message);
-
-		// change ui
-		// if (null != mainActivity)
-		// mainActivity.newMessageNotify();
+		Utility.displayMessageOnScreen(context, message);
 
 		// notifies user
-		generateNotification(context, message);
+		// generateNotification(context, message);
 	}
 
 	/**
@@ -106,15 +97,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * */
 	@Override
 	protected void onDeletedMessages(Context context, int total) {
-
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
-
 		Log.i(TAG, "Received deleted messages notification");
 		String message = getString(R.string.gcm_deleted, total);
-		aController.displayMessageOnScreen(context, message);
+		Utility.displayMessageOnScreen(context, message);
 		// notifies user
-		generateNotification(context, message);
+		// generateNotification(context, message);
 	}
 
 	/**
@@ -122,73 +109,18 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * */
 	@Override
 	public void onError(Context context, String errorId) {
-
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
-
 		Log.i(TAG, "Received error: " + errorId);
-		aController.displayMessageOnScreen(context,
+		Utility.displayMessageOnScreen(context,
 				getString(R.string.gcm_error, errorId));
 	}
 
 	@Override
 	protected boolean onRecoverableError(Context context, String errorId) {
-
-		if (aController == null)
-			aController = (Controller) getApplicationContext();
-
 		// log message
 		Log.i(TAG, "Received recoverable error: " + errorId);
-		aController.displayMessageOnScreen(context,
+		Utility.displayMessageOnScreen(context,
 				getString(R.string.gcm_recoverable_error, errorId));
 		return super.onRecoverableError(context, errorId);
-	}
-
-	/**
-	 * Create a notification to inform the user that server has sent a message.
-	 */
-	@SuppressWarnings("deprecation")
-	private static void generateNotification(Context context, String message) {
-		int icon = R.drawable.ic_launcher;
-		long when = System.currentTimeMillis();
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(icon, message, when);
-
-		String title = context.getString(R.string.app_name);
-
-		Intent notificationIntent = new Intent(context, MainActivity.class);
-		// set intent so it does not start a new activity
-		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent intent = PendingIntent.getActivity(context, 0,
-				notificationIntent, 0);
-		notification.setLatestEventInfo(context, title, message, intent);
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-		// Play default notification sound
-		// notification.defaults |= Notification.DEFAULT_SOUND;
-
-		SettingManager.getInstance().init(context);
-		if (SettingManager.getInstance().isMessageRingtone()) {
-			String uriRingtone = SettingManager.getInstance().getRingtoneUri();
-
-			if (!uriRingtone.equals("")) {
-				notification.sound = Uri.parse(uriRingtone);
-			} else {
-				notification.defaults |= Notification.DEFAULT_SOUND;
-			}
-			Log.i("NOTIFY", uriRingtone);
-		}
-
-		// notification.sound = Uri.parse("android.resource://" +
-		// context.getPackageName() + "your_sound_file_name.mp3");
-
-		// Vibrate if vibrate is enabled
-		if (SettingManager.getInstance().isVibrate())
-			notification.defaults |= Notification.DEFAULT_VIBRATE;
-		notificationManager.notify(0, notification);
-
 	}
 
 }

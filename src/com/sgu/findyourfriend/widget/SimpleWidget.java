@@ -9,11 +9,12 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.google.android.gms.drive.internal.RemoveEventListenerRequest;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.mgr.Config;
+import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
-import com.sgu.findyourfriend.screen.RegisterActivity;
+import com.sgu.findyourfriend.screen.MainLoginActivity;
+import com.sgu.findyourfriend.utils.PreferenceKeys;
 import com.sgu.findyourfriend.utils.Utility;
 
 public class SimpleWidget extends AppWidgetProvider {
@@ -42,11 +43,26 @@ public class SimpleWidget extends AppWidgetProvider {
 					// get instance prefs
 					SettingManager.getInstance().init(context);
 
-					if (Utility.verifyRequest(message)) {
-						// new request
+					if (Utility.verifyRequest(message)
+							&& (Utility.getRequest(message).getType()
+									.equals(Utility.FRIEND))) {
+						// new friend request
+						SettingManager.getInstance()
+						.setNoNewRequest(
+								SettingManager.getInstance()
+										.getNoNewRequest() + 1);
+						
 						updateNewRequest(remoteViews);
 					} else {
 						// new message
+						SettingManager.getInstance()
+								.setNoNewMessage(
+										SettingManager.getInstance()
+												.getNoNewMesssage() + 1);
+
+						// save message
+						MessageManager.getInstance().quickSaveTempMessage(context, message);
+						
 						updateNewMessage(remoteViews);
 					}
 					appWidgetManager.updateAppWidget(widgetId, remoteViews);
@@ -86,26 +102,26 @@ public class SimpleWidget extends AppWidgetProvider {
 
 		// get instance prefs
 		SettingManager.getInstance().init(context);
-		
+
 		updateNewMessage(remoteViews);
 		updateNewRequest(remoteViews);
-		
+
 		// emergency intent
 		final Intent emerIntent = createIntent(context, appWidgetIds);
-		emerIntent.putExtra(WidgetControlService.EXTRA_EMERGENCY, true);
-		emerIntent.setAction(WidgetControlService.ACTION_START_EMERGENCY);
+		emerIntent.putExtra(PreferenceKeys.EXTRA_EMERGENCY, true);
+		emerIntent.setAction(PreferenceKeys.ACTION_START_EMERGENCY);
 		final PendingIntent pendingEmergencyIntent = createPendingIntent(
 				context, emerIntent);
 
 		// update intent
 		final Intent updateIntent = createIntent(context, appWidgetIds);
-		updateIntent.putExtra(WidgetControlService.EXTRA_EMERGENCY, false);
-		updateIntent.setAction(WidgetControlService.ACTION_START_UPDATE);
+		updateIntent.putExtra(PreferenceKeys.EXTRA_EMERGENCY, false);
+		updateIntent.setAction(PreferenceKeys.ACTION_START_UPDATE);
 		final PendingIntent pendingUpdateIntent = createPendingIntent(context,
 				updateIntent);
 
 		// open main app
-		Intent intentOpenApp = new Intent(context, RegisterActivity.class);
+		Intent intentOpenApp = new Intent(context, MainLoginActivity.class);
 		PendingIntent pendingOpenAppIntent = PendingIntent.getActivity(context,
 				0, intentOpenApp, 0);
 
@@ -127,30 +143,6 @@ public class SimpleWidget extends AppWidgetProvider {
 		context.startService(updateIntent);
 	}
 
-	@Override
-	public void onEnabled(Context context) {
-		// AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-		//
-		// Intent i = new Intent();
-		// i.setClassName("com.sgu.findyourfriend.screen",
-		// "com.sgu.findyourfriend.screen.RegisterActivity");
-		// PendingIntent myPI = PendingIntent.getService(context, 0, i, 0);
-		//
-		// RemoteViews views = new RemoteViews(context.getPackageName(),
-		// R.layout.main_widget_ui);
-		//
-		// // attach the click listener for the service start command intent
-		// views.setOnClickPendingIntent(R.id.txtMyAddress, myPI);
-		// // views.setOnClickPendingIntent(R.id.imgNewRequest, myPI);
-		//
-		//
-		// // define the componenet for self
-		// ComponentName comp = new ComponentName(context.getPackageName(),
-		// SimpleWidget.class.getName());
-		//
-		// mgr.updateAppWidget(comp, views);
-	}
-
 	private Intent createIntent(Context context, int[] appWidgetIds) {
 		Intent updateIntent = new Intent(context.getApplicationContext(),
 				WidgetControlService.class);
@@ -165,10 +157,6 @@ public class SimpleWidget extends AppWidgetProvider {
 				context.getApplicationContext(), 0, updateIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
-	}
-
-	private void uiMessageStatusUpdate(Context context) {
-
 	}
 
 	private void updateNewMessage(RemoteViews remoteViews) {

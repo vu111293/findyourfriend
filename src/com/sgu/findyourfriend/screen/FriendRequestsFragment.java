@@ -1,5 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,22 +19,24 @@ import android.widget.ProgressBar;
 
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.CustomAdapterFriendRequests;
+import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
+import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.utils.Utility;
 
 public class FriendRequestsFragment extends Fragment {
 
-	private static boolean isRegister = false;
+	private static boolean isRegister;
 	private CustomAdapterFriendRequests adapter = null;
 	private ListView lv = null;
 	private Context ctx;
 	private View rootView;
-	private ProgressBar pbLoader;
+	private Context context;
 
 	public FriendRequestsFragment() {
-
+		isRegister = false;
 	}
 
 	@Override
@@ -42,26 +46,28 @@ public class FriendRequestsFragment extends Fragment {
 		// check and notify
 		if (SettingManager.getInstance().getNoNewRequest() > 0) {
 			SettingManager.getInstance().setNoNewRequest(0);
-			MessageManager.getInstance().sendUpdateRequestWidget();
+
+			// send broadcast intent update widget
+			Intent intent = new Intent(Config.UPDATE_MESSAGE_WIDGET_ACTION);
+			context.sendBroadcast(intent);
+
+			// intent hide nofify
+			// send broadcast hide notify
+			Intent intent2 = new Intent(Config.NOTIFY_UI);
+			intent2.putExtra(Config.FRIEND_REQUEST_NOTIFY, Config.HIDE);
+			context.sendBroadcast(intent2);
+
 		}
 
 		rootView = inflater.inflate(R.layout.fragment_friendrequests,
 				container, false);
 
-		// set actionbar
-		View bar = getActivity().getActionBar().getCustomView();
-		bar.findViewById(R.id.imgFriendList).setVisibility(View.VISIBLE);
-		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
-
 		ctx = rootView.getContext();
-
-		pbLoader = (ProgressBar) rootView.findViewById(R.id.pbLoader);
-		pbLoader.setVisibility(View.VISIBLE);
 
 		lv = (ListView) rootView.findViewById(R.id.listView_FriendRequests);
 		adapter = new CustomAdapterFriendRequests(ctx,
-				R.layout.custom_friendrequests,
-				FriendManager.getInstance().requestFriends);
+				R.layout.custom_friendrequests, new ArrayList<Friend>(
+						FriendManager.getInstance().hmRequestFriends.values()));
 		lv.setAdapter(adapter);
 
 		// load friend request list from server
@@ -75,7 +81,6 @@ public class FriendRequestsFragment extends Fragment {
 
 			@Override
 			protected void onPostExecute(Void result) {
-				pbLoader.setVisibility(View.GONE);
 				adapter.notifyDataSetChanged();
 			}
 
@@ -88,6 +93,8 @@ public class FriendRequestsFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
+		this.context = activity;
+		
 		if (!isRegister) {
 			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
 					com.sgu.findyourfriend.mgr.Config.UPDATE_UI));

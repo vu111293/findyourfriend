@@ -1,7 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.sgu.findyourfriend.R;
@@ -10,6 +10,7 @@ public class BaseFragment extends Fragment {
 	public void replaceFragment(Fragment fragment, boolean addToBackStack) {
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
+		transaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 		if (addToBackStack) {
 			transaction.addToBackStack(null);
 		}

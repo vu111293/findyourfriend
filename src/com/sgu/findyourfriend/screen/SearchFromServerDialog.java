@@ -1,6 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -29,9 +30,8 @@ public class SearchFromServerDialog extends Dialog {
 	private ListView lv;
 	private Context ctx;
 	private ProgressBar pbLoader;
-	private ImageButton searchBtn;
-	private ImageButton deleteBtn;
-	private Button closeBtn;
+	private ImageButton imgClose;
+	private Button btnSearch;
 	private EditText editSearch;
 	private ArrayList<User> temptData;
 
@@ -50,9 +50,8 @@ public class SearchFromServerDialog extends Dialog {
 				LayoutParams.MATCH_PARENT);
 
 		pbLoader = (ProgressBar) findViewById(R.id.pbLoader);
-		searchBtn = (ImageButton) findViewById(R.id.bntSearch);
-		deleteBtn = (ImageButton) findViewById(R.id.bntDelete);
-		closeBtn = (Button) findViewById(R.id.closeBtn);
+		imgClose = (ImageButton) findViewById(R.id.imgClose);
+		btnSearch = (Button) findViewById(R.id.btnSearch);
 		editSearch = (EditText) findViewById(R.id.editSearch);
 
 		lv = (ListView) findViewById(R.id.lvFriendSuggest);
@@ -60,7 +59,7 @@ public class SearchFromServerDialog extends Dialog {
 				R.layout.custom_friend_search, temptData);
 		lv.setAdapter(adapter);
 
-		searchBtn.setOnClickListener(new View.OnClickListener() {
+		btnSearch.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -76,15 +75,7 @@ public class SearchFromServerDialog extends Dialog {
 			}
 		});
 
-		deleteBtn.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				editSearch.setText("");
-			}
-		});
-
-		closeBtn.setOnClickListener(new View.OnClickListener() {
+		imgClose.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -105,9 +96,8 @@ public class SearchFromServerDialog extends Dialog {
 
 		@Override
 		protected Void doInBackground(String... params) {
-			temptData = PostData.userGetUsersByNameWithoutFriend(getContext(),
-					MyProfileManager.getInstance().mine.getId(), params[0]);
-
+			temptData = PostData.userGetUsersByEveryThingWithoutFriend(getContext(), MyProfileManager
+							.getInstance().getMyID(), params[0]);
 			return null;
 		}
 
@@ -118,6 +108,12 @@ public class SearchFromServerDialog extends Dialog {
 			adapter = new CustomAdapterFriendSearch(ctx,
 					R.layout.custom_friend_search, temptData);
 			lv.setAdapter(adapter);
+
+			if (temptData.size() == 0) {
+				Utility.showAlertDialog(ctx, "", "Không có kết quả", true);
+
+			}
+
 		}
 
 	}

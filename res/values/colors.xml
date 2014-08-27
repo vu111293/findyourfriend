@@ -6,7 +6,14 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 	<color name="gray">#EEEEEE</color>
+	<color name="orange">#F8931D</color>
+	<color name="blue">#0F75BD</color>
+	<color name="pupors">#662E91</color>
+    <color name="opc_blue">#76c0de</color>
+    <color name="mdu_blue">#25AAE3</color>
+    <color name="silver">#808080</color>
     
+    <color name="while_opt20">#32FFFFFF</color>
     
     <color name="alertBkg">#DDC92020</color>
 	<color name="divider">#E6E6E6</color>
@@ -40,10 +47,10 @@
     
     
     <!-- bar -->
-    <color name="bar_color">#3B5999</color>
+    <color name="bar_color">#0F75BD</color>
     <color name="selector_bar_color">#2F497A</color>
     <color name="bottom_bar_color">#E6E9F0</color>
-    <color name="selector_color">#2D4979</color>
+    <color name="selector_color">#0F75BD</color>
     <color name="bkg_bar">#2F497A</color>
     <color name="bkg_bar_selected">#003182</color>
     

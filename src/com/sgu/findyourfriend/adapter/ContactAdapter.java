@@ -48,9 +48,14 @@ public class ContactAdapter extends ArrayAdapter<ContactBean> {
 			data.get(i).setCheck(true);
 		}
 		notifyDataSetChanged();
-		
 	}
 	
+	public void unCheckAll() {
+		for (int i = 0; i < data.size(); ++i) {
+			data.get(i).setCheck(false);
+		}
+		notifyDataSetChanged();
+	}
 	
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {

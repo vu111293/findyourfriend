@@ -1,19 +1,18 @@
 package com.sgu.findyourfriend.screen;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.test.UiThreadTest;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,22 +20,24 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.google.android.gms.drive.internal.ac;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.MessageAdapter;
-import com.sgu.findyourfriend.ctr.ControlOptions;
+import com.sgu.findyourfriend.mgr.Config;
+import com.sgu.findyourfriend.mgr.IMessage;
 import com.sgu.findyourfriend.mgr.MessageManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.model.Message;
 import com.sgu.findyourfriend.utils.Utility;
 
-public class MessageFragment extends Fragment {
+public class MessageFragment extends Fragment implements IMessage {
 
 	private static String TAG = "MESSAGE FRAGMENT";
-	private static boolean isRegister = false;
+	private static boolean isRegister; // = false;
 	private List<Message> messages;
 	private MessageAdapter adapter;
 	private EditText text;
@@ -49,7 +50,7 @@ public class MessageFragment extends Fragment {
 	private MessageFragment mThis = this;
 
 	public MessageFragment() {
-
+		isRegister = false;
 	}
 
 	@Override
@@ -58,17 +59,25 @@ public class MessageFragment extends Fragment {
 
 		// check and notify
 		if (SettingManager.getInstance().getNoNewMesssage() > 0) {
+
+			// broadcast update widget
 			SettingManager.getInstance().setNoNewMessage(0);
-			MessageManager.getInstance().sendUpdateMessageWidget();
+
+			Intent intent = new Intent(Config.UPDATE_MESSAGE_WIDGET_ACTION);
+			// Send Broadcast to Broadcast receiver with message
+			context.sendBroadcast(intent);
+
+			// send broadcast hide notify
+			Intent intent2 = new Intent(Config.NOTIFY_UI);
+			intent2.putExtra(Config.MESSAGE_NOTIFY, Config.HIDE);
+			context.sendBroadcast(intent2);
+
 		}
 
 		View rootView = inflater.inflate(R.layout.fragment_message, container,
 				false);
 
-		// set actionbar
-		View bar = getActivity().getActionBar().getCustomView();
-		bar.findViewById(R.id.grpItemControl).setVisibility(View.VISIBLE);
-		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
+		MessageManager.getInstance().setMessageListener(this);
 
 		return rootView;
 	}
@@ -81,6 +90,8 @@ public class MessageFragment extends Fragment {
 		if (!isRegister) {
 			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
 					com.sgu.findyourfriend.mgr.Config.UPDATE_UI));
+			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
+					com.sgu.findyourfriend.mgr.Config.MAIN_ACTION));
 			isRegister = true;
 		}
 	}
@@ -102,58 +113,78 @@ public class MessageFragment extends Fragment {
 
 		messages = MessageManager.getInstance().getAllMessage();
 		Log.i("MESSAGE", "numbwe sms db: " + messages.size());
-
-		// List<Message> ls = new ArrayList<Message>();
-		// ls.add(new Message("message", true));
-		// ls.add(new Message("message", false));
-		// ls.add(new Message("message", true));
-		// ls.add(new Message("message", false));
-
 		adapter = new MessageAdapter(context, messages);
 
 		// setup listview
 		smsListView = (ListView) view.findViewById(R.id.listview);
 		smsListView.setAdapter(adapter);
+
+		smsListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+		});
+
 		smsListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int position, long id) {
-				Log.i("CLICK", position + "");
+				AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+						activity);
+				String[] items = { "Gửi mới", "Xóa" };
+				builderSingle.setItems(items,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (which == 0) {
+									// reply
+									int id;
+									if (adapter.getItem(position).isMine()) {
+										id = adapter.getItem(position)
+												.getIdReceiver();
+									} else {
+										id = adapter.getItem(position)
+												.getIdSender();
+									}
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-				builder.setTitle("Warning!");
-				builder.setMessage("Do you want to delete this message?");
-				builder.setPositiveButton("Ok", new OnClickListener() {
+									if (id == 0) {
+										Utility.showMessage(activity,
+												"Không thể gửi cho admin");
+									} else {
+										openEditMessageScene(id);
+									}
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						MessageManager.getInstance().deleteMessage(
-								messages.get(position));
-						messages.remove(messages.get(position));
-						adapter.notifyDataSetChanged();
-						smsListView.setSelection(messages.size() - 1);
-					}
-				});
-				builder.setNegativeButton("Cancel", new OnClickListener() {
+								} else if (which == 1) {
+									// delete message
+									MessageManager.getInstance().deleteMessage(
+											messages.get(position));
+									messages.remove(messages.get(position));
+									adapter.notifyDataSetChanged();
+									smsListView.setSelection(messages.size() - 1);
+								}
+							}
+						});
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+				builderSingle.setNegativeButton("Hủy",
+						new DialogInterface.OnClickListener() {
 
-					}
-				});
-				builder.show();
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+							}
+						});
+
+				builderSingle.show();
 			}
 		});
 		smsListView.setSelection(messages.size() - 1);
-
-		// check require from sliding friend event
-		if (ControlOptions.getInstance().isRequire()) {
-			Log.i("REQUIRE", "####################################");
-			int fId = ControlOptions.getInstance().getHashMap("friendId");
-			openEditMessageScene(fId);
-			ControlOptions.getInstance().finish();
-		}
 	}
 
 	@Override
@@ -181,7 +212,7 @@ public class MessageFragment extends Fragment {
 	}
 
 	private void openEditMessageScene(int friendId) {
-		SendMessageFragment fragment = new SendMessageFragment(mThis);
+		MessageSendFragment fragment = new MessageSendFragment(mThis);
 
 		Bundle bundle = new Bundle();
 		bundle.putInt("friendId", friendId);
@@ -197,13 +228,30 @@ public class MessageFragment extends Fragment {
 
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
-			if (intent.getStringExtra(
-					(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE)).equals(
-					Utility.MESSAGE)) {
+			String action = intent.getAction();
 
-				adapter.notifyDataSetChanged();
-				smsListView.setSelection(messages.size() - 1);
+			if (action.equals(Config.MAIN_ACTION)) {
+				if (intent.hasExtra(Config.EDIT_MESSAGE_ACTION)) {
+					int fID = intent
+							.getIntExtra(Config.EDIT_MESSAGE_ACTION, -1);
+					Log.i("MESSAGE", fID + "");
+					if (fID >= 0) {
+
+						openEditMessageScene(fID);
+					}
+				}
+
+			} else if (action.equals(Config.UPDATE_UI)) {
+				if (intent.getStringExtra(
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE))
+						.equals(Utility.MESSAGE)) {
+
+					adapter.notifyDataSetChanged();
+					smsListView.setSelection(messages.size() - 1);
+				}
+
 			}
+
 		}
 	};
 

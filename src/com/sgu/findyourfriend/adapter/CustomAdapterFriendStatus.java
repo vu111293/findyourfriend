@@ -24,7 +24,6 @@ public class CustomAdapterFriendStatus extends ArrayAdapter<Friend> {
 	public CustomAdapterFriendStatus(Context context, int resource,
 			List<Friend> objects) {
 		super(context, resource, objects);
-		// TODO Auto-generated constructor stub
 		ctx = context;
 		LayoutResID = resource;
 		DataList = objects;

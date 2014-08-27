@@ -31,8 +31,8 @@ public class MessageAdapter extends BaseAdapter {
 	private Context mContext;
 	private List<Message> mMessages;
 	private LayoutInflater mInflater;
-	
-    private SimpleDateFormat sdfDate; 
+
+	private SimpleDateFormat sdfDate;
 
 	public MessageAdapter(Context context, List<Message> messages) {
 		super();
@@ -40,7 +40,7 @@ public class MessageAdapter extends BaseAdapter {
 		this.mMessages = messages;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		 sdfDate = new SimpleDateFormat("hh:mm dd/MM");
+		sdfDate = new SimpleDateFormat("hh:mm dd/MM");
 	}
 
 	@Override
@@ -82,10 +82,8 @@ public class MessageAdapter extends BaseAdapter {
 			holder.message = (TextView) view.findViewById(R.id.message_text);
 			holder.imgSender = (ImageView) view
 					.findViewById(R.id.imgIconMessage);
-			holder.txtSenderName = (TextView) view
-					.findViewById(R.id.txtSenderName);
-			holder.txtReceiverName = (TextView) view
-					.findViewById(R.id.txtReceiverName);
+			holder.txtName = (TextView) view
+					.findViewById(R.id.txtName);
 			holder.txtTime = (TextView) view
 					.findViewById(R.id.txtTime);
 			
@@ -101,48 +99,23 @@ public class MessageAdapter extends BaseAdapter {
 		holder.message.setText(message.getMessage());
 
 		if(message.isMine()) {
-			holder.txtSenderName
-			.setText(FriendManager.getInstance().hmMemberFriends
-					.get(message.getIdReceiver()).getUserInfo().getName());
+			holder.txtName
+			.setText(message.getReceiverName());
 		} else {
-			holder.txtSenderName
-			.setText(FriendManager.getInstance().hmMemberFriends
-					.get(message.getIdSender()).getUserInfo().getName());
+			holder.txtName
+			.setText(message.getSenderName());
 		}
 		
-//		holder.txtSenderName
-//				.setText(FriendManager.getInstance().hmMemberFriends
-//						.get(message.getIdSender()).getUserInfo().getName());
-//		
-//		
-//		String receiverName = FriendManager.getInstance().hmMemberFriends
-//				.get(message.getIdReceiver()).getUserInfo().getName().trim();
-//		
-//		holder.txtReceiverName
-//		.setText(" gửi đến " + receiverName.substring(
-//				receiverName.lastIndexOf(' ') == -1 ? 0 : receiverName.lastIndexOf(' ')));
 		
-		holder.imgSender.setImageDrawable(FriendManager.getInstance().hmImageP
+		if (null != FriendManager.getInstance().hmImageP
+				.get(message.getIdSender()))
+			holder.imgSender.setImageDrawable(FriendManager.getInstance().hmImageP
 				.get(message.getIdSender()));
+		else 
+			holder.imgSender.setImageResource(R.drawable.ic_no_imgprofile);
 
 		holder.txtTime.setText(sdfDate.format(message.getSmsTime()));
 		
-//		if (getItemViewType(position) == MINE_TYPE) {
-//			holder.txtSenderName.setText(MyProfileManager.getInstance().mine
-//					.getName());
-//			holder.imgSender
-//					.setImageDrawable(FriendManager.getInstance().hmImageP
-//							.get(7));
-//
-//		} else {
-//			holder.txtSenderName
-//					.setText(FriendManager.getInstance().hmMemberFriends.get(2)
-//							.getUserInfo().getName());
-//			holder.imgSender
-//					.setImageDrawable(FriendManager.getInstance().hmImageP
-//							.get(2));
-//		}
-
 		// set image view
 
 		return view;
@@ -150,8 +123,7 @@ public class MessageAdapter extends BaseAdapter {
 
 	private static class ViewHolder {
 		TextView message;
-		TextView txtSenderName;
-		TextView txtReceiverName;
+		TextView txtName;
 		ImageView imgSender;
 		TextView txtTime;
 	}

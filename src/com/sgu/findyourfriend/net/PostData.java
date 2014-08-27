@@ -4,12 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +26,11 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.sgu.findyourfriend.model.Friend;
 import com.sgu.findyourfriend.model.History;
+import com.sgu.findyourfriend.model.SimpleUserAndLocation;
 import com.sgu.findyourfriend.model.User;
 import com.sgu.findyourfriend.utils.FriendJSONParser;
 import com.sgu.findyourfriend.utils.HistoryJSONParser;
+import com.sgu.findyourfriend.utils.SimpleUserAndLocationParser;
 import com.sgu.findyourfriend.utils.UserJSONParser;
 
 public class PostData {
@@ -40,7 +41,7 @@ public class PostData {
 	public static final String appCode = "AHC99-97JA8-AK009-AIJD1";
 
 	// **Links
-	public static final String host = "http://sgudev2014.comuv.com/";
+	public static final String host = "http://sgulab.letsgeekaround.com/";
 	public static final String IMAGE_HOST = host + "uploads/images/";
 	public static final String userManagerLink = host + "usermanager.php";
 	public static final String accountManagerLink = host + "accountmanager.php";
@@ -52,6 +53,7 @@ public class PostData {
 
 	// **Define Types
 	public static final String userCreateType = "CREATE";
+	public static final String userCreatePassLoginType = "CREATE_LOGIN";
 	public static final String userEditType = "EDIT";
 	public static final String userDeleteType = "DELETE";
 	public static final String userGetUserListType = "GET_USER_LIST";
@@ -60,8 +62,10 @@ public class PostData {
 	public static final String userChangePasswordType = "CHANGE_PASSWORD";
 	public static final String userChangeAvatarType = "CHANGE_AVATAR";
 	public static final String userGetUsersWithoutFriendType = "GET_NEW_USERLIST";
-	public static final String userGetUsersByNameWithoutFriendType = "GET_USER_LIST_BY_NAME";
 	public static final String userUpdateGcmIdType = "UPDATE_GCMID";
+	public static final String userSetPublicType = "SET_PUBLIC";
+	public static final String userForgetPasswordTy­pe = "FORGET_PASSWORD";
+	public static final String userGetProfileType = "GET_PROFILE";
 
 	public static final String accountCreateType = "CREATE";
 	public static final String accountDeleteOneType = "DELETE_ONE";
@@ -86,6 +90,13 @@ public class PostData {
 	public static final String sendShareRequest = "SEND_SHARE_REQUEST";
 	public static final String sendShareNotAccept = "SEND_SHARE_NOT_ACCEPT";
 	public static final String sendShareAccept = "SEND_SHARE_ACCEPT";
+	public static final String accountCheckExistNumberType = "CHECK_EXIST_NUMBER";
+
+	public static final String findInDistance = "FIND_IN_DISTANCE";
+	public static final String findInCurAddress = "FIND_IN_CURRENT_ADDRESS";
+	public static final String findInAddress = "FIND_IN_ADDRESS";
+
+	public static final String userGetUsersBySthgWithoutFriendType = "GET_USER_LIST_BY_STHG";
 
 	public static final String shareRequest = "SHARE_REQUEST";
 	public static final String friendRequest = "FRIEND_REQUEST";
@@ -93,57 +104,115 @@ public class PostData {
 	public static final String shareRespone = "SHARE_RESPONSE";
 	public static final String friendRespone = "FRIEND_RESPONSE";
 
-	public static int userCreate(Context ctx, String name, int gender,
-			String province, String email, String avatar, String gcmid) {
+	// ---------------------------- add new
+	public static boolean userForgetPasswork(Context ctx, int id, String email) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userForgetPasswordTy­pe);
+		params.put("id", id + "");
+		params.put("email", email);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
+
+	}
+
+	public static int userCreate(Context ctx, String name, String avatar,
+			String gcmid, int gender, String address, String birthday,
+			String school, String workplace, String email, String fblink,
+			String password, boolean isPublic) {
 		String serverUrl = userManagerLink;
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("appcode", appCode);
 		params.put("type", userCreateType);
 		params.put("name", name);
-		params.put("gender", gender + "");
-		params.put("province", province);
-		params.put("email", email);
 		params.put("avatar", avatar);
 		params.put("gcmid", gcmid);
+		params.put("gender", gender + "");
+		params.put("address", address);
+		params.put("birthday", birthday);
+		params.put("school", school);
+		params.put("workplace", workplace);
+		params.put("email", email);
+		params.put("fblink", fblink);
+		params.put("password", password);
+		params.put("ispublic", isPublic ? "1" : "0");
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse);
+		Log.i(TAG, jsonResponse);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse);
+	}
+
+	public static int userCreatePasswordLogin(Context ctx, int id,
+			String password) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userCreatePassLoginType);
+		params.put("id", id + "");
+		params.put("password", password);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		Log.i(TAG, jsonResponse);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse);
+	}
+
+	public static int userSetPublic(Context ctx, int id, int isPublic) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userSetPublicType);
+		params.put("id", id + "");
+		params.put("ispublic", isPublic + "");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		Log.i(TAG, jsonResponse);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse);
 	}
 
 	public static boolean userEdit(Context ctx, int id, String name,
-			int gender, String province, String email, String avatar,
-			String gcmid) {
+			String avatar, String gcmid, int gender, String address,
+			String birthday, String school, String workplace, String email,
+			String fblink, boolean isPublic) {
 		String serverUrl = userManagerLink;
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("appcode", appCode);
 		params.put("type", userEditType);
 		params.put("id", id + "");
 		params.put("name", name);
-		params.put("gender", gender + "");
-		params.put("province", province);
-		params.put("email", email);
 		params.put("avatar", avatar);
+		params.put("gcmid", gcmid);
+		params.put("gender", gender + "");
+		params.put("address", address);
+		params.put("birthday", birthday);
+		params.put("school", school);
+		params.put("workplace", workplace);
+		params.put("email", email);
+		params.put("fblink", fblink);
+		params.put("ispublic", isPublic ? "1" : "0");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
+	}
+
+	public static boolean updateGcmId(Context ctx, int id, String gcmid) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userUpdateGcmIdType);
+		params.put("id", id + "");
 		params.put("gcmid", gcmid);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static boolean userDelete(Context ctx, int id) {
@@ -154,15 +223,8 @@ public class PostData {
 		params.put("id", id + "");
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static ArrayList<User> userGetUserList(Context ctx) {
@@ -174,41 +236,6 @@ public class PostData {
 				params);
 		ArrayList<User> list = new ArrayList<User>();
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				list = (ArrayList<User>) UserJSONParser.parse(json);
-				Log.i(TAG, "Parse complete " + list.size());
-			} catch (Exception e) {
-				Log.d(TAG, "Parse JSON error!");
-			}
-
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		return list;
-	}
-
-	public static ArrayList<User> userGetUsersByNameWithoutFriend(Context ctx,
-			int myid, String name) {
-		String serverUrl = userManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", userGetUsersByNameWithoutFriendType);
-		params.put("id", myid + "");
-		params.put("name", name);
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		ArrayList<User> list = new ArrayList<User>();
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
 				list = (ArrayList<User>) UserJSONParser.parse(json);
@@ -242,10 +269,6 @@ public class PostData {
 				params);
 		HashMap<String, Integer> numbersWithId = new HashMap<String, Integer>();
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONArray json = new JSONArray(jsonResponse);
 				for (int i = 0; i < json.length(); i++) {
@@ -273,13 +296,9 @@ public class PostData {
 				params);
 		User user = null;
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
-				user = UserJSONParser.getUser(json);
+				user = UserJSONParser.getUser(json, false);
 			} catch (Exception e) {
 				Log.d(TAG, "Parse JSON error!");
 			}
@@ -301,10 +320,7 @@ public class PostData {
 				params);
 		int state = 0;
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
+			jsonResponse = jsonResponse.replaceAll("\n", "");
 			try {
 				state = Integer.parseInt(jsonResponse);
 			} catch (Exception e) {
@@ -329,15 +345,8 @@ public class PostData {
 		params.put("newpass", newPass);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static boolean userChangeAvatar(Context ctx, int id,
@@ -350,15 +359,8 @@ public class PostData {
 		params.put("avatar", avatarlink);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static boolean accountCreate(Context ctx, int id, String number) {
@@ -370,16 +372,8 @@ public class PostData {
 		params.put("number", number);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static User accountGetUserByNumber(Context ctx, String number) {
@@ -392,13 +386,9 @@ public class PostData {
 				params);
 		User user = null;
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
-				user = UserJSONParser.getUser(json);
+				user = UserJSONParser.getUser(json,false);
 			} catch (Exception e) {
 				Log.d(TAG, "Parse JSON error!");
 			}
@@ -420,10 +410,6 @@ public class PostData {
 				params);
 		ArrayList<String> numbers = new ArrayList<String>();
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONArray json = new JSONArray(jsonResponse);
 				for (int i = 0; i < json.length(); i++) {
@@ -450,15 +436,8 @@ public class PostData {
 		params.put("number", number);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static boolean accountDeleteAllAccount(Context ctx, int id) {
@@ -469,15 +448,8 @@ public class PostData {
 		params.put("id", id + "");
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static boolean accountCheckExist(Context ctx, int id, String number) {
@@ -489,15 +461,8 @@ public class PostData {
 		params.put("number", number);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static ArrayList<History> historyGetUserHistory(Context ctx, int id) {
@@ -510,10 +475,6 @@ public class PostData {
 				params);
 		ArrayList<History> list = new ArrayList<History>();
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
 				list = (ArrayList<History>) HistoryJSONParser.parse(json);
@@ -539,10 +500,6 @@ public class PostData {
 				params);
 		History hi = null;
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
 				hi = HistoryJSONParser.getHistory(json);
@@ -567,15 +524,8 @@ public class PostData {
 		params.put("longtitude", latlong.longitude + "");
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
 	}
 
 	public static ArrayList<Friend> friendGetFriendList(Context ctx, int id) {
@@ -588,10 +538,6 @@ public class PostData {
 				params);
 		ArrayList<Friend> list = new ArrayList<Friend>();
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
 				list = FriendJSONParser.parse(json);
@@ -607,359 +553,6 @@ public class PostData {
 		return list;
 	}
 
-	public static boolean friendRemove(Context ctx, int myid, int friendid) {
-		String serverUrl = friendManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", friendRemoveType);
-		params.put("uid", myid + "");
-		params.put("fid", friendid + "");
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
-	}
-
-	// public static boolean friendSetShare(Context ctx, int uid, int fid,
-	// int share) {
-	// String serverUrl = friendManagerLink;
-	// Map<String, String> params = new HashMap<String, String>();
-	// params.put("appcode", appCode);
-	// params.put("type", friendSetShareType);
-	// params.put("uid", uid + "");
-	// params.put("fid", fid + "");
-	// params.put("share", share + "");
-	// String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-	// params);
-	// if (!jsonResponse.equals("")) {
-	// // Remove ads from free host
-	// String[] jssplit = jsonResponse
-	// .split("\n<!-- Hosting24 Analytics Code -->");
-	// jsonResponse = jssplit[0];
-	// } else {
-	// Log.i(TAG, "No result!");
-	// }
-	// return Integer.parseInt(jsonResponse)>0;
-	// }
-
-	// public static int friendGetShare(Context ctx, int uid, int fid) {
-	// String serverUrl = friendManagerLink;
-	// Map<String, String> params = new HashMap<String, String>();
-	// params.put("appcode", appCode);
-	// params.put("type", friendGetShareType);
-	// params.put("uid", uid + "");
-	// params.put("fid", fid + "");
-	// String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-	// params);
-	// int share = -1;
-	// if (!jsonResponse.equals("")) {
-	// // Remove ads from free host
-	// String[] jssplit = jsonResponse
-	// .split("\n<!-- Hosting24 Analytics Code -->");
-	// jsonResponse = jssplit[0];
-	// jsonResponse = jsonResponse.substring(0, 1);
-	// try {
-	// share = Integer.parseInt(jsonResponse);
-	// } catch (Exception e) {
-	// Log.i(TAG, "Parse error");
-	// }
-	//
-	// } else {
-	// Log.i(TAG, "No result!");
-	// }
-	// return share;
-	// }
-
-	public static HashMap<String, Integer> sendMessage(Context ctx, int from,
-			int to, String msg) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", chatsSendMsgType);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", msg);
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		HashMap<String, Integer> report = new HashMap<String, Integer>();
-
-		if (!jsonResponse.equals("")) {
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				Log.i(TAG, jsonResponse);
-				report.put("success", json.getInt("success"));
-				report.put("failure", json.getInt("failure"));
-			} catch (JSONException e) {
-				// e.printStackTrace();
-			}
-		}
-		return report;
-	}
-
-	public static HashMap<String, Integer> sendFriendRequest(Context ctx,
-			int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendFriendRequest);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", friendRequest + ":" + from + ":" + to);
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		HashMap<String, Integer> report = new HashMap<String, Integer>();
-
-		if (!jsonResponse.equals("")) {
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				Log.i(TAG, jsonResponse);
-				report.put("success", json.getInt("success"));
-				report.put("failure", json.getInt("failure"));
-			} catch (JSONException e) {
-				// e.printStackTrace();
-			}
-		}
-		return report;
-	}
-
-	public static HashMap<String, Integer> sendShareRequest(Context ctx,
-			int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendShareRequest);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", shareRequest + ":" + from + ":" + to);
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		HashMap<String, Integer> report = new HashMap<String, Integer>();
-
-		if (!jsonResponse.equals("")) {
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				Log.i(TAG, jsonResponse);
-				report.put("success", json.getInt("success"));
-				report.put("failure", json.getInt("failure"));
-			} catch (JSONException e) {
-				// e.printStackTrace();
-			}
-		}
-		return report;
-	}
-
-	public static boolean sendFriendAccept(Context ctx, int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendFriendAccept);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", friendRespone + ":" + from + ":" + to + ":YES");
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		// HashMap<String, Integer> report = new HashMap<String, Integer>();
-		//
-		// if (!jsonResponse.equals("")) {
-		// try {
-		// JSONObject json = new JSONObject(jsonResponse);
-		// Log.i(TAG, jsonResponse);
-		// report.put("success", json.getInt("success"));
-		// report.put("failure", json.getInt("failure"));
-		// } catch (JSONException e) {
-		// // e.printStackTrace();
-		// }
-		// }
-		try {
-			return (new JSONObject(jsonResponse)).getInt("success") > 0;
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
-	public static boolean sendFriendNotAccept(Context ctx, int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendFriendNotAccept);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", friendRespone + ":" + from + ":" + to + ":NO");
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		// HashMap<String, Integer> report = new HashMap<String, Integer>();
-		//
-		// if (!jsonResponse.equals("")) {
-		// try {
-		// JSONObject json = new JSONObject(jsonResponse);
-		// Log.i(TAG, jsonResponse);
-		// report.put("success", json.getInt("success"));
-		// report.put("failure", json.getInt("failure"));
-		// } catch (JSONException e) {
-		// // e.printStackTrace();
-		// }
-		// }
-		try {
-			return (new JSONObject(jsonResponse)).getInt("success") > 0;
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
-	public static HashMap<String, Integer> sendShareAccept(Context ctx,
-			int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendShareAccept);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", shareRespone + ":" + from + ":" + to + ":YES");
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		HashMap<String, Integer> report = new HashMap<String, Integer>();
-
-		if (!jsonResponse.equals("")) {
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				Log.i(TAG, jsonResponse);
-				report.put("success", json.getInt("success"));
-				report.put("failure", json.getInt("failure"));
-			} catch (JSONException e) {
-				// e.printStackTrace();
-			}
-		}
-		return report;
-	}
-
-	public static HashMap<String, Integer> sendShareNotAccept(Context ctx,
-			int from, int to) {
-		String serverUrl = chatsManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", sendShareNotAccept);
-		params.put("senderid", from + "");
-		params.put("recipientid", to + "");
-		params.put("msg", shareRespone + ":" + from + ":" + to + ":NO");
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-			// Log.i(TAG, jsonResponse);
-		} else {
-			Log.i(TAG, "No result!");
-		}
-
-		HashMap<String, Integer> report = new HashMap<String, Integer>();
-
-		if (!jsonResponse.equals("")) {
-			try {
-				JSONObject json = new JSONObject(jsonResponse);
-				Log.i(TAG, jsonResponse);
-				report.put("success", json.getInt("success"));
-				report.put("failure", json.getInt("failure"));
-			} catch (JSONException e) {
-				// e.printStackTrace();
-			}
-		}
-		return report;
-	}
-
-	public static boolean updateGcmId(Context ctx, int id, String gcmid) {
-		String serverUrl = userManagerLink;
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("appcode", appCode);
-		params.put("type", userUpdateGcmIdType);
-		params.put("id", id + "");
-		params.put("gcmid", gcmid);
-		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
-				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
-
-		} else {
-			Log.i(TAG, "No result!");
-		}
-		return Integer.parseInt(jsonResponse) > 0;
-	}
-
 	public static Friend friendGetFriend(Context ctx, int fid) {
 		String serverUrl = friendManagerLink;
 		Map<String, String> params = new HashMap<String, String>();
@@ -970,10 +563,6 @@ public class PostData {
 				params);
 		Friend f = null;
 		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0];
 			try {
 				JSONObject json = new JSONObject(jsonResponse);
 				f = FriendJSONParser.getFriend(json);
@@ -988,6 +577,227 @@ public class PostData {
 		return f;
 	}
 
+	public static boolean friendRemove(Context ctx, int myid, int friendid) {
+		String serverUrl = friendManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", friendRemoveType);
+		params.put("uid", myid + "");
+		params.put("fid", friendid + "");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
+	}
+
+	public static boolean sendMessage(Context ctx, int from, int to, String msg) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", chatsSendMsgType);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", msg);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+				return json.getInt("success") > 0;
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public static boolean sendFriendRequest(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendFriendRequest);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", friendRequest + ":" + from + ":" + to);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+				return json.getInt("success") > 0;
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public static boolean sendShareRequest(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendShareRequest);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", shareRequest + ":" + from + ":" + to);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+				return json.getInt("success") > 0;
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public static boolean sendFriendAccept(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendFriendAccept);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", friendRespone + ":" + from + ":" + to + ":YES");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		// HashMap<String, Integer> report = new HashMap<String, Integer>();
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+
+				return json.getInt("success") > 0;
+				// report.put("success", json.getInt("success"));
+				// report.put("failure", json.getInt("failure"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public static boolean sendFriendNotAccept(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendFriendNotAccept);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", friendRespone + ":" + from + ":" + to + ":NO");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+
+				return json.getInt("success") > 0;
+				// report.put("success", json.getInt("success"));
+				// report.put("failure", json.getInt("failure"));
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public static boolean sendShareAccept(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendShareAccept);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", shareRespone + ":" + from + ":" + to + ":YES");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		HashMap<String, Integer> report = new HashMap<String, Integer>();
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+				return json.getInt("success") > 0;
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	public boolean sendShareNotAccept(Context ctx, int from, int to) {
+		String serverUrl = chatsManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", sendShareNotAccept);
+		params.put("senderid", from + "");
+		params.put("recipientid", to + "");
+		params.put("msg", shareRespone + ":" + from + ":" + to + ":NO");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			// Log.i(TAG, jsonResponse);
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		HashMap<String, Integer> report = new HashMap<String, Integer>();
+
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				Log.i(TAG, jsonResponse);
+				return json.getInt("success") > 0;
+			} catch (JSONException e) {
+				// e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
 	public static int login(Context ctx, String number, String password) {
 		String serverUrl = loginLink;
 		Map<String, String> params = new HashMap<String, String>();
@@ -996,21 +806,16 @@ public class PostData {
 		params.put("password", password);
 		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
 				params);
-		if (!jsonResponse.equals("")) {
-			// Remove ads from free host
-			String[] jssplit = jsonResponse
-					.split("\n<!-- Hosting24 Analytics Code -->");
-			jsonResponse = jssplit[0].replaceAll("\"", "");
-		} else {
-			Log.i(TAG, "No result!");
-		}
 		Log.i(TAG, "User login: " + jsonResponse);
 		if (jsonResponse.equals("")) {
 			return -1;
 		} else {
-			return Integer.parseInt(jsonResponse);
+			jsonResponse = jsonResponse.replaceAll("\n", "");
+			return mParseInt(jsonResponse);
 		}
 	}
+
+	// -----------end add new
 
 	public static int uploadFile(Context ctx, String fullPath, String rename) {
 		int serverResponseCode = 0;
@@ -1037,10 +842,10 @@ public class PostData {
 
 		// Convert bitmap to byte array
 		Bitmap bitmap = BitmapFactory.decodeFile(fullPath, options);
-		
+
 		// resize bitmap
 		bitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
-		
+
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		bitmap.compress(CompressFormat.PNG, 0, bos);
 		byte[] bitmapdata = bos.toByteArray();
@@ -1053,7 +858,7 @@ public class PostData {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		
+
 		fullPath = f.getPath();
 
 		if (!sourceFile.isFile()) {
@@ -1116,63 +921,176 @@ public class PostData {
 						+ serverResponseMessage + ": " + serverResponseCode);
 
 				if (serverResponseCode == 200) {
-
-					// runOnUiThread(new Runnable() {
-					// public void run() {
-					//
 					String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
 							+ " http://www.androidexample.com/media/uploads/"
 							+ fullPath;
 
 					Log.i(TAG, msg);
-					// messageText.setText(msg);
-					// Toast.makeText(UploadToServer.this,
-					// "File Upload Complete.",
-					// Toast.LENGTH_SHORT).show();
-					// }
-					// });
 				}
 
-				// close the streams //
+				// close the streams
 				fileInputStream.close();
 				dos.flush();
 				dos.close();
 
 			} catch (MalformedURLException ex) {
-
-				// dialog.dismiss();
 				ex.printStackTrace();
-
-				// runOnUiThread(new Runnable() {
-				// public void run() {
-				// messageText
-				// .setText("MalformedURLException Exception : check script url.");
-				// Toast.makeText(UploadToServer.this,
-				// "MalformedURLException", Toast.LENGTH_SHORT)
-				// .show();
-				// }
-				// });
-
 				Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
 			} catch (Exception e) {
-
-				// dialog.dismiss();
 				e.printStackTrace();
-
-				// runOnUiThread(new Runnable() {
-				// public void run() {
-				// messageText.setText("Got Exception : see logcat ");
-				// Toast.makeText(UploadToServer.this,
-				// "Got Exception : see logcat ",
-				// Toast.LENGTH_SHORT).show();
-				// }
-				// });
 				Log.e("Upload file to server Exception",
 						"Exception : " + e.getMessage(), e);
 			}
-			// dialog.dismiss();
 			return serverResponseCode;
 
 		} // End else block
 	}
+
+	private static int mParseInt(String s) {
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public static boolean isPhoneRegisted(Context ctx, String number) {
+		String serverUrl = accountManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", accountCheckExistNumberType);
+		params.put("number", number);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
+	}
+
+	public static User userGetMyProfile(Context ctx, int id) {
+
+		// Warning: Only for myself id!
+
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userGetProfileType);
+		params.put("id", id + "");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		User user = null;
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				user = UserJSONParser.getUser(json, true);
+			} catch (Exception e) {
+				Log.d(TAG, "Parse JSON error!");
+			}
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		return user;
+	}
+
+	public static boolean userForgetPassword(Context ctx, String number,
+			String email) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userForgetPasswordTy­pe);
+		params.put("number", number);
+		params.put("email", email);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		jsonResponse = jsonResponse.replaceAll("\n", "");
+		return mParseInt(jsonResponse) > 0;
+	}
+
+	public static ArrayList<SimpleUserAndLocation> findInDistance(Context ctx,
+			Double yourlat, Double yourlng, Double distance) {
+
+		Log.i(TAG, "find in distance " + distance);
+
+		// Note: distance unit is meter (m)
+
+		ArrayList<SimpleUserAndLocation> list = new ArrayList<SimpleUserAndLocation>();
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", findInDistance);
+		params.put("lat", yourlat + "");
+		params.put("lng", yourlng + "");
+		params.put("d", distance + "");
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+
+		Log.i(TAG, "find in distance result: " + jsonResponse);
+		if (!jsonResponse.equals("")) {
+			try {
+				Log.e(TAG, jsonResponse);
+				JSONArray json = new JSONArray(jsonResponse);
+				list = SimpleUserAndLocationParser.parse(json);
+			} catch (Exception e) {
+				Log.d(TAG, "Parse JSON error!");
+			}
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+		return list;
+	}
+
+	public static ArrayList<SimpleUserAndLocation> findInCurrentAddress(
+			Context ctx, String address) {
+		ArrayList<SimpleUserAndLocation> list = new ArrayList<SimpleUserAndLocation>();
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", findInCurAddress);
+		params.put("addr", address);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		if (!jsonResponse.equals("")) {
+			try {
+				Log.e(TAG, jsonResponse);
+				JSONArray json = new JSONArray(jsonResponse);
+				list = SimpleUserAndLocationParser.parse(json);
+			} catch (Exception e) {
+				Log.d(TAG, "Parse JSON error!");
+			}
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+		return list;
+	}
+
+	public static ArrayList<User> userGetUsersByEveryThingWithoutFriend(
+			Context ctx, int myid, String sthg) {
+		String serverUrl = userManagerLink;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("appcode", appCode);
+		params.put("type", userGetUsersBySthgWithoutFriendType);
+		params.put("id", myid + "");
+		params.put("sthg", sthg);
+		String jsonResponse = PostManager.tryPostWithJsonResult(ctx, serverUrl,
+				params);
+		ArrayList<User> list = new ArrayList<User>();
+		if (!jsonResponse.equals("")) {
+			try {
+				JSONObject json = new JSONObject(jsonResponse);
+				list = (ArrayList<User>) UserJSONParser.parse(json);
+				Log.i(TAG, "Parse complete " + list.size());
+			} catch (Exception e) {
+				Log.d(TAG, "Parse JSON error!");
+			}
+
+		} else {
+			Log.i(TAG, "No result!");
+		}
+
+		return list;
+	}
+
 }

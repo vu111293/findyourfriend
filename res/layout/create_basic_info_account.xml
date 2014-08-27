@@ -1,0 +1,219 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="@color/blue">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context=".CreateAccountActivity"
+         >
+
+        <LinearLayout
+            android:id="@+id/lbl_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Thông tin cá nhân"
+                android:textSize="8pt"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@drawable/divider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="buộc phải có"
+                android:textColor="@color/white"
+                android:textSize="7pt" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/grpProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lbl_info"
+            android:layout_marginTop="10dp" >
+
+            <FrameLayout
+                android:id="@+id/frameLayoutImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" >
+
+                <ImageView
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="@dimen/image_profile_info"
+                    android:layout_height="@dimen/image_profile_info"
+                    android:background="@drawable/triangle_full_black"
+                    android:contentDescription="@string/item_imgprofile_description"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_no_imgprofile" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/triangle_full_black"
+                    android:gravity="center_horizontal"
+                    android:paddingBottom="1dp"
+                    android:paddingTop="1dp"
+                    android:text="sửa"
+                    android:textColor="@color/white" />
+            </FrameLayout>
+
+            <EditText
+                android:id="@+id/editName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/frameLayoutImg"
+                android:background="@drawable/edit_text"
+                android:ems="10"
+                android:hint="Họ tên"
+                android:textColor="@color/silver"
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp"
+                 >
+            </EditText>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/grpProfile"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:text="Giới tính"
+                    android:textSize="8pt" 
+                    android:textColor="@color/white"/>
+
+                <RadioGroup
+                    android:id="@+id/radioSex"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/radioMale"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:checked="true"
+                        android:text="Nam"
+                        android:textColor="@color/white" />
+
+                    <RadioButton
+                        android:id="@+id/radioFemale"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Nữ" 
+                        android:textColor="@color/white"/>
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:text="Tỉnh thành"
+                    android:textSize="8pt"
+                    android:textColor="@color/white" />
+
+                <Spinner
+                    android:id="@+id/spr_country"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text"
+                    android:entries="@array/country_arrays"
+                    android:gravity="center_horizontal"
+                    android:textColor="@color/silver"
+                    android:prompt="@string/country_prompt" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editProvice"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edit_text"
+                android:ems="10"
+                android:textColor="@color/silver"
+                android:hint="Địa chỉ hiện tại"
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp" />
+
+            <EditText
+                android:id="@+id/editEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edit_text"
+                android:ems="10"
+                android:textColor="@color/silver"
+                android:hint="Địa chỉ email"
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal" >
+
+                <Button
+                    android:id="@+id/btnNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_green"
+                    android:paddingLeft="50dp"
+                    android:paddingRight="50dp"
+                    android:text="Kế tiếp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>

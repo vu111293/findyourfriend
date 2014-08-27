@@ -25,7 +25,6 @@ public class GpsPosition {
 	public static final String TAG = "GPS POSITION";
 	private Context context;
 	private Location lastLocation = null;
-	private Location lastLocationUpdate = null;
 
 	private Timer gpsTimer = new Timer();
 	private long lastprovidertimestamp = 0;
@@ -36,9 +35,9 @@ public class GpsPosition {
 
 	private int checkInterval;
 	private int minDistance;
-	
-	
-	public GpsPosition(Context conext, MyLocationChangeListener myLocationListener) {
+
+	public GpsPosition(Context conext,
+			MyLocationChangeListener myLocationListener) {
 		this.context = conext;
 		this.myLocationListener = myLocationListener;
 		lastprovidertimestamp = 0;
@@ -48,15 +47,24 @@ public class GpsPosition {
 	public void startRecording() {
 		gpsTimer.cancel();
 		gpsTimer = new Timer();
-		setCheckInterval(SettingManager.getInstance().getIntervalUpdatePosition()); // = getGPSCheckMillisFromPrefs();
-		setMinDistance(SettingManager.getInstance().getAccuracyUpdatePosition()); // = getMinDistanceFromPrefs();
+		setCheckInterval(SettingManager.getInstance()
+				.getIntervalUpdatePosition()); // =
+												// getGPSCheckMillisFromPrefs();
+		setMinDistance(SettingManager.getInstance().getAccuracyUpdatePosition()); // =
+																					// getMinDistanceFromPrefs();
 		// receive updates
 		LocationManager locationManager = (LocationManager) context
 				.getSystemService(Context.LOCATION_SERVICE);
-		
+
 		// get now
-		myLocationListener.onMyLocationChanged(getBestLocation());
-		
+
+		Location mLocation = getBestLocation();
+
+		if (null != mLocation) {
+			updateToServer(mLocation.getLatitude(), mLocation.getLongitude());
+			myLocationListener.onMyLocationChanged(mLocation);
+		}
+
 		for (String s : locationManager.getAllProviders()) {
 			locationManager.requestLocationUpdates(s, getCheckInterval(),
 					getMinDistance(), new LocationListener() {
@@ -83,7 +91,8 @@ public class GpsPosition {
 										Toast.LENGTH_SHORT).show();
 
 								doLocationUpdate(location, true);
-								myLocationListener.onMyLocationChanged(location);
+								myLocationListener
+										.onMyLocationChanged(location);
 							}
 						}
 					});
@@ -98,38 +107,12 @@ public class GpsPosition {
 				doLocationUpdate(location, false);
 			}
 		}, 0, getCheckInterval());
-		
-		
+
 	}
-	
+
 	public void setUploadMyPosition(boolean upload) {
 		isUploadMyPosition = upload;
 	}
-
-//	private long getGPSCheckMillisFromPrefs() {
-//		SharedPreferences prefs = PreferenceManager
-//				.getDefaultSharedPreferences(context);
-//		int checkminutes = 300000;
-//		try {
-//			checkminutes = Integer.parseInt(prefs.getString(
-//					"gps_check_interval", "300000"));
-//		} catch (NumberFormatException e) {
-//		}
-//		
-//		return checkminutes;
-//	}
-//
-//	private long getMinDistanceFromPrefs() {
-//		SharedPreferences prefs = PreferenceManager
-//				.getDefaultSharedPreferences(context);
-//		int minDist = 1000;
-//		try {
-//			minDist = Integer.parseInt(prefs.getString("gps_min_distance",
-//					"1000"));
-//		} catch (NumberFormatException e) {
-//		}
-//		return minDist;
-//	}
 
 	public void doLocationUpdate(Location l, boolean force) {
 		// long minDistance = getMinDistanceFromPrefs();
@@ -170,13 +153,19 @@ public class GpsPosition {
 			double lng = getLastLocation().getLongitude();
 
 			// ---------------- send to server ------------------
-			if (MyProfileManager.getInstance().myLocation.latitude != lat
-					&& MyProfileManager.getInstance().myLocation.latitude != lat) {
-				PostData.historyCreate(context,
-						MyProfileManager.getInstance().mine.getId(),
-						new LatLng(lat, lng));
-			}
+			// updateToServer(lat, lng);
 			// ------------------ end ---------------------------
+		}
+	}
+
+	private void updateToServer(double lat, double lng) {
+		Log.i("Gps", "call update to server");
+		if (null == MyProfileManager.getInstance().getMyPosition() ||
+				MyProfileManager.getInstance().getMyPosition().latitude != lat
+				|| MyProfileManager.getInstance().getMyPosition().latitude != lat) {
+			Log.i("Gps", "call update to server ok");
+			PostData.historyCreate(context, MyProfileManager.getInstance()
+					.getMyID(), new LatLng(lat, lng));
 		}
 	}
 
@@ -192,10 +181,11 @@ public class GpsPosition {
 			// Log.d(TAG, "No Network Location available");
 			return gpslocation;
 		}
-		// a location update is considered 'old' if its older than the configured
+		// a location update is considered 'old' if its older than the
+		// configured
 		// update interval. this means, we didn't get a
 		// update from this provider since the last check
-		long old = System.currentTimeMillis() - getCheckInterval(); //getGPSCheckMillisFromPrefs();
+		long old = System.currentTimeMillis() - getCheckInterval();
 		boolean gpsIsOld = (gpslocation.getTime() < old);
 		boolean networkIsOld = (networkLocation.getTime() < old);
 		// gps is current and available, gps is better than network
@@ -238,17 +228,8 @@ public class GpsPosition {
 	public boolean isProviderSupported(String in_Provider) {
 		LocationManager locationManager = getLocationManager();
 		int lv_N;
-		List lv_List;
+		List<String> lv_List;
 
-		// isProviderEnabled should throw a IllegalArgumentException if
-		// provider is not
-		// supported
-		// But in sdk 1.1 the exception is catched by isProviderEnabled itself.
-		// Therefore check out the list of providers instead (which indeed does
-		// not
-		// report a provider it does not exist in the device) Undocumented is
-		// that
-		// this call can throw a SecurityException
 		try {
 			lv_List = locationManager.getAllProviders();
 		} catch (Throwable e) {
@@ -296,38 +277,4 @@ public class GpsPosition {
 		this.minDistance = minDistance;
 	}
 
-	
-//	public String getMyAddressNow() {
-//		// Location bLocation = getBestLocation();
-//		return getAddress(new LatLng(12.073887272186989, 106.5946023606658));
-//	}
-//	
-//	private String getAddress(LatLng point) {
-//		try {
-//			Geocoder geocoder;
-//			List<Address> addresses;
-//			geocoder = new Geocoder(context);
-//			if (point.latitude != 0 || point.longitude != 0) {
-//				addresses = geocoder.getFromLocation(point.latitude,
-//						point.longitude, 1);
-//
-//				Address address = addresses.get(0);
-//
-//				String addressText = String.format(
-//						"%s, %s",
-//						address.getMaxAddressLineIndex() > 0 ? address
-//								.getAddressLine(0) : "", address
-//								.getCountryName());
-//
-//				return addressText;
-//			} else {
-//				Toast.makeText(context, "latitude and longitude are null",
-//						Toast.LENGTH_LONG).show();
-//				return "";
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
 }

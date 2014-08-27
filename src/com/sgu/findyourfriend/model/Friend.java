@@ -29,7 +29,14 @@ public class Friend {
 	private int accurency = 15; // not available
 	private LatLng lastLocation;
 	private ArrayList<History> steps;
+	
+	private boolean check;
 
+	public Friend(int id) {
+		
+		userInfo = new User(id);
+	}
+	
 	public Friend(User userInfo, ArrayList<String> numberLogin, boolean isAvailable,
 			int acceptState, LatLng lastLocation,
 			ArrayList<History> steps) {
@@ -41,6 +48,7 @@ public class Friend {
 //		this.isShare = isShare;
 		this.lastLocation = lastLocation;
 		this.steps = steps;
+		this.setCheck(false);
 	}
 
 	public User getUserInfo() {
@@ -105,5 +113,13 @@ public class Friend {
 	
 	public void setAccurency(int accurency) {
 		this.accurency = accurency;
+	}
+
+	public boolean isCheck() {
+		return check;
+	}
+
+	public void setCheck(boolean check) {
+		this.check = check;
 	}
 }

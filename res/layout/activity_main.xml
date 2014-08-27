@@ -36,8 +36,8 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/white"
-        android:divider="@color/divider" 
-        android:dividerHeight="1dp"/>
+        android:background="@drawable/bk_radiant"
+        android:divider="@drawable/divider"
+        android:dividerHeight="0.5dp" />
 
 </android.support.v4.widget.DrawerLayout>

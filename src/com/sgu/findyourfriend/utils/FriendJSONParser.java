@@ -57,7 +57,7 @@ public class FriendJSONParser {
 			History h = null;
 			int share = 0;
 			boolean state;
-			u = UserJSONParser.getUser(jFriend.getJSONObject("user"));
+			u = UserJSONParser.getUser(jFriend.getJSONObject("user"), false);
 			share = jFriend.getInt("share");
 			if (!jFriend.isNull("lastlocation"))
 				h = HistoryJSONParser.getHistory(jFriend

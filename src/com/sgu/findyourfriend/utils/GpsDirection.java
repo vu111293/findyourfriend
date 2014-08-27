@@ -13,12 +13,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +50,7 @@ public class GpsDirection {
 	// amazing for route detection
 	private boolean stopAmazing;
 	private int ir = 0;
-	
+
 	public enum MODE {
 		driving, walking
 	};
@@ -72,7 +70,6 @@ public class GpsDirection {
 		this.isBeforeRemove = isBeforeRemove;
 		if (isBeforeRemove && polylineCurrent != null)
 			clearRoute();
-			
 
 		isDraw = true;
 
@@ -81,7 +78,7 @@ public class GpsDirection {
 
 		// Start downloading json data from Google Directions API
 		downloadTask.execute(url);
-		
+
 		// start amazing
 		amazingRoute(dest);
 	}
@@ -89,7 +86,7 @@ public class GpsDirection {
 	public void clearRoute() {
 		if (null != polylineCurrent)
 			polylineCurrent.remove();
-		
+
 	}
 
 	public void loadViewDirectionInfo(TextView txtDistance, TextView txtWalk,
@@ -280,9 +277,8 @@ public class GpsDirection {
 					}
 				} else {
 					stopAmazing = true;
+					Toast.makeText(context, "Không tìm thấy đường đi", Toast.LENGTH_SHORT).show();
 				}
-
-				Toast.makeText(context, "No Points", Toast.LENGTH_SHORT).show();
 				return;
 			}
 
@@ -337,37 +333,38 @@ public class GpsDirection {
 					+ endAddress);
 
 			if (isDraw) {
-//				Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
-
+				// Log.i("DRAW", "NUM of: " + lineOptions.getPoints().size());
 				polylineCurrent = mMap.addPolyline(lineOptions);
 				stopAmazing = true;
 				return;
 			}
 
 			if (mode.equals(MODE.walking)) {
-				if (duration.equals("")) duration = "0";
-//				Log.i("WALKING duration: ", duration);
+				if (duration.equals(""))
+					duration = "0";
+				Log.i("WALKING duration: ", duration);
 				txtWalk.setText(Utility.convertSecTimeToString(Long
 						.parseLong(duration)));
 
 			} else if (mode.equals(MODE.driving)) {
-				if (duration.equals("")) duration = "0";
+				if (duration.equals(""))
+					duration = "0";
 				mdistance = distance;
 				txtDistance.setText(distance);
 				txtMoto.setText(Utility.convertSecTimeToString(Long
 						.parseLong(duration)));
 
 				polylineOptions = lineOptions;
-//				Log.i("DISTANCE: ", distance);
-//				Log.i("TRAVLING duration: ", duration);
+				// Log.i("DISTANCE: ", distance);
+				Log.i("TRAVLING duration: ", duration);
 			}
 		}
 	}
-	
+
 	private void amazingRoute(LatLng latlng) {
 		final long interval = 250;
-		final int[] radius = new int[] {1000, 5000, 10000, 20000, 50000};
-		
+		final int[] radius = new int[] { 1000, 5000, 10000, 20000, 50000 };
+
 		CircleOptions opt = new CircleOptions();
 		opt.center(latlng);
 		opt.fillColor(0x882176B9);
@@ -375,8 +372,7 @@ public class GpsDirection {
 		opt.radius(100);
 		final Circle c = mMap.addCircle(opt);
 		stopAmazing = false;
-		
-		
+
 		final Handler handler = new Handler();
 		final Runnable r = new Runnable() {
 			public void run() {

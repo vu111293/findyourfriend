@@ -1,36 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#E4E4E4" >
+    android:layout_height="fill_parent"
+    android:background="@color/blue"
+    android:orientation="vertical" >
 
-    <com.devsmart.android.ui.HorizontalListView
-        android:id="@+id/avatarListView"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/white" />
-    
-    <EditText
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:id="@+id/editMessage"
+    <LinearLayout
+        android:id="@+id/layoutEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/avatarListView"
-        android:background="@drawable/edit_round"
-        android:ems="10"
-        android:gravity="top"
-        android:inputType="textMultiLine"
-        android:lines="3"
-        android:overScrollMode="always"
-        android:padding="10dp"
-        android:scrollHorizontally="false"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="vertical" />
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="@dimen/message_box_margin"
+        android:background="@drawable/message_bar" >
+
+        <EditText
+            android:id="@+id/editMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/edit_round"
+            android:ems="10"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:lines="2"
+            android:hint="@string/enter_message_hint"
+            android:overScrollMode="always"
+            android:padding="10dp"
+            android:scrollHorizontally="false"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/button_yellow"
+            android:text="Gửi"
+            android:textColor="@color/white" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/buttonGrpLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/layoutEdit"
+        android:padding="10dp" >
+
+        <Button
+            android:id="@+id/btnSelectAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_green"
+            android:text="Chọn tất cả"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_yellow"
+            android:text="Quay lại"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+    
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/buttonGrpLayout"
+        android:layout_alignParentTop="true"
+        android:cacheColorHint="#00000000"
+        android:divider="@drawable/divider"
+        android:dividerHeight="0.5dp" >
+    </ListView>
 
 </RelativeLayout>

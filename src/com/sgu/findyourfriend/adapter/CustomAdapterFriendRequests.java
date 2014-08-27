@@ -39,6 +39,10 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 		this.Data = objects;
 	}
 
+	public int getItemCount() {
+		return Data.size();
+	}
+	
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
 
@@ -53,17 +57,10 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 		((TextView) convertView.findViewById(R.id.txtName)).setText(fr
 				.getUserInfo().getName());
 
-		// if (fr.isNotNow()) {
-		// ((ImageView) convertView.findViewById(R.id.imgNotNow))
-		// .setVisibility(View.VISIBLE);
-		// ((Button) convertView.findViewById(R.id.btnNotNow))
-		// .setVisibility(View.GONE);
-		// } else {
 		((ImageView) convertView.findViewById(R.id.imgNotNow))
 				.setVisibility(View.GONE);
 		((Button) convertView.findViewById(R.id.btnNotNow))
 				.setVisibility(View.VISIBLE);
-		// }
 
 		((Button) convertView.findViewById(R.id.btnConfirm))
 				.setOnClickListener(new OnClickListener() {
@@ -77,8 +74,7 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 							@Override
 							protected Boolean doInBackground(Void... params) {
 								return PostData.sendFriendAccept(context,
-										MyProfileManager.getInstance().mine
-												.getId(), fr.getUserInfo()
+										MyProfileManager.getInstance().getMyID(), fr.getUserInfo()
 												.getId());
 							}
 
@@ -119,14 +115,12 @@ public class CustomAdapterFriendRequests extends ArrayAdapter<Friend> {
 					@Override
 					public void onClick(View arg0) {
 						// request to server
-
 						(new AsyncTask<Void, Void, Boolean>() {
 
 							@Override
 							protected Boolean doInBackground(Void... params) {
 								return PostData.sendFriendNotAccept(context,
-										MyProfileManager.getInstance().mine
-												.getId(), fr.getUserInfo()
+										MyProfileManager.getInstance().getMyID(), fr.getUserInfo()
 												.getId());
 							}
 

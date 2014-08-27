@@ -1,5 +1,6 @@
 package com.sgu.findyourfriend.screen;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.InflateException;
@@ -30,6 +31,8 @@ public class CategoriesFragment extends Fragment {
 		} catch (InflateException e) {
 
 		}
+		
+		view.setBackgroundColor(Color.WHITE);
 		
 		return view;
 	}

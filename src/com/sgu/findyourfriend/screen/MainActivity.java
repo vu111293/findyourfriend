@@ -1,43 +1,54 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.CustomAdapterFriendStatus;
-import com.sgu.findyourfriend.ctr.ControlOptions;
+import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MessageManager;
-import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.mgr.SoundManager;
+import com.sgu.findyourfriend.model.TempMessage;
 import com.sgu.findyourfriend.net.PostData;
+import com.sgu.findyourfriend.service.ServiceUpdatePosition;
 import com.sgu.findyourfriend.utils.Utility;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends SherlockFragmentActivity {
 
 	public static String TAG = "MAIN ACTIVITY";
 	public static final String MAP_TAG = "map_fragment";
@@ -55,7 +66,7 @@ public class MainActivity extends FragmentActivity {
 
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
-	TextView TitleTextView;
+	private TextView TitleTextView;
 
 	private View mRootView;
 
@@ -66,12 +77,31 @@ public class MainActivity extends FragmentActivity {
 	private AlertDialog alertDialog = null;
 	private Handler handler;
 
+	private boolean isRegister;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		(new AsyncTask<Void, Void, Void>() {
+		Log.i(TAG, "onCreate main app");
 
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
+		ActionBar mAcionBar = getSupportActionBar();
+
+		mAcionBar.setDisplayShowHomeEnabled(false);
+		mAcionBar.setDisplayShowTitleEnabled(false);
+		mAcionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+				.getColor(R.color.bar_color)));
+
+		getApplicationContext().registerReceiver(mHandleMessageReceiver,
+				new IntentFilter(com.sgu.findyourfriend.mgr.Config.NOTIFY_UI));
+
+		(new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected void onPreExecute() {
 				setContentView(R.layout.loadingscreen);
@@ -116,9 +146,15 @@ public class MainActivity extends FragmentActivity {
 				initView();
 
 				// refs to context
-				// FriendManager.getInstance().context = mTabHost.getContext();
 				pbLoader.setVisibility(View.GONE);
 				setContentView(mRootView);
+
+				isRegister = true;
+
+				// precheck new notify
+				preCheckNewNotify();
+
+				checkStartUpdateService();
 			}
 
 		}).execute();
@@ -139,6 +175,47 @@ public class MainActivity extends FragmentActivity {
 
 	}
 
+	protected void checkStartUpdateService() {
+		if (SettingManager.getInstance().isUploadMyPosition()) {
+			Log.i(TAG, "start update---------------------------------");
+			Intent i = new Intent(this, ServiceUpdatePosition.class);
+			i.putExtra("isStop", false);
+			startService(i);
+		} else {
+			Log.i(TAG, "start stop");
+		}
+
+	}
+
+	private void preCheckNewNotify() {
+
+		if (SettingManager.getInstance().getNoNewMesssage() > 0) {
+			Intent intent = new Intent(Config.NOTIFY_UI);
+			intent.putExtra(Config.MESSAGE_NOTIFY, Config.SHOW);
+			getApplicationContext().sendBroadcast(intent);
+
+			List<TempMessage> tempMessages = MessageManager.getInstance()
+					.quickGetAllTempMessage(getApplicationContext());
+
+			// broad cast local message
+			for (TempMessage tmp : tempMessages) {
+
+				Log.i(TAG, "broadcast " + tmp.getMessage());
+				Intent intent3 = new Intent(Config.LOCAL_MESSAGE_ACTION);
+				intent3.putExtra(Config.EXTRA_MESSAGE, tmp.getMessage());
+				getApplicationContext().sendBroadcast(intent3);
+			}
+
+		}
+
+		if (SettingManager.getInstance().getNoNewRequest() > 0) {
+			Intent intent2 = new Intent(Config.NOTIFY_UI);
+			intent2.putExtra(Config.FRIEND_REQUEST_NOTIFY, Config.SHOW);
+			getApplicationContext().sendBroadcast(intent2);
+		}
+
+	}
+
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -150,10 +227,12 @@ public class MainActivity extends FragmentActivity {
 				.findViewById(android.R.id.tabhost);
 		mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
 
-		mTabHost.addTab(
-				mTabHost.newTabSpec(MAP_TAG).setIndicator("",
-						getResources().getDrawable(R.drawable.ic_location)),
-				MapContainerFragment.class, null);
+		if (GooglePlayServicesUtil
+				.isGooglePlayServicesAvailable(getApplicationContext()) == ConnectionResult.SUCCESS)
+			mTabHost.addTab(
+					mTabHost.newTabSpec(MAP_TAG).setIndicator("",
+							getResources().getDrawable(R.drawable.ic_location)),
+					MapContainerFragment.class, null);
 
 		mTabHost.addTab(
 				mTabHost.newTabSpec(MESSAGE_TAG).setIndicator("",
@@ -171,8 +250,6 @@ public class MainActivity extends FragmentActivity {
 						getResources().getDrawable(
 								R.drawable.ic_action_settings)),
 				CategoriesContainerFragment.class, null);
-
-		// currentTab = mTabHost.getCurrentTab();
 
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 
@@ -199,9 +276,10 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		// setup sliding bar
-		android.app.ActionBar mActionBar = mMain.getActionBar();
+		ActionBar mActionBar = getSupportActionBar();
 
-		mActionBar.setDisplayShowHomeEnabled(true);
+		// android.app.ActionBar mActionBar = mMain.getActionBar();
+		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setDisplayShowTitleEnabled(false);
 		mActionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.bar_color)));
@@ -216,7 +294,7 @@ public class MainActivity extends FragmentActivity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		adapter = new CustomAdapterFriendStatus(this,
 				R.layout.custom_friend_status,
-				FriendManager.getInstance().memberFriends);
+				FriendManager.getInstance().pureFriends);
 		mDrawerList.setAdapter(adapter);
 
 		mDrawerList.setOnItemClickListener(new OnItemClickListener() {
@@ -225,36 +303,56 @@ public class MainActivity extends FragmentActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int pos, long arg3) {
 
+				Log.i(TAG, "on item click");
+
 				String[] items = { "Xem trên bản đồ", "Gọi", "Nhắn tin", "Khác" };
 				AlertDialog.Builder builder = new AlertDialog.Builder(mMain);
-				builder.setTitle("Chọn chức năng:");
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 						case 0:
-							ControlOptions.getInstance().edit();
-							ControlOptions.getInstance().putHashMap("friendId",
-									adapter.getItem(pos).getUserInfo().getId());
-
-							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
+							// view position on map
 							mTabHost.setCurrentTabByTag(MAP_TAG);
+							Intent intent = new Intent(Config.MAIN_ACTION);
+							intent.putExtra(Config.ZOOM_POSITION_ACTION,
+									adapter.getItem(pos).getUserInfo().getId());
+							getApplicationContext().sendBroadcast(intent);
 							break;
 						case 1:
-							Intent callIntent = new Intent(Intent.ACTION_CALL);
-							callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							callIntent.setData(Uri.parse("tel:"
-									+ adapter.getItem(pos).getUserInfo()
-											.getPhoneNumber()));
-							mTabHost.getContext().startActivity(callIntent);
+							callTask(adapter.getItem(pos).getUserInfo().getId());
+//							
+//							
+//							
+//							
+//							Intent callIntent = new Intent(Intent.ACTION_CALL);
+//							callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//							callIntent.setData(Uri.parse("tel:"
+//									+ adapter.getItem(pos).getNumberLogin()
+//											.get(0)));
+//							mTabHost.getContext().startActivity(callIntent);
 							break;
 
 						case 2:
-							ControlOptions.getInstance().edit();
-							ControlOptions.getInstance().putHashMap("friendId",
-									adapter.getItem(pos).getUserInfo().getId());
-
-							mTabHost.setCurrentTabByTag(CATEGORIES_TAG);
 							mTabHost.setCurrentTabByTag(MESSAGE_TAG);
+
+							Handler handler = new Handler();
+
+							final Runnable r = new Runnable() {
+								public void run() {
+
+									Intent intent2 = new Intent(
+											Config.MAIN_ACTION);
+									intent2.putExtra(
+											Config.EDIT_MESSAGE_ACTION, adapter
+													.getItem(pos).getUserInfo()
+													.getId());
+									getApplicationContext().sendBroadcast(
+											intent2);
+								}
+							};
+
+							handler.postDelayed(r, 10);
+
 							break;
 
 						case 3:
@@ -273,8 +371,10 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		mMain.getActionBar().setCustomView(mCustomView);
+		getSupportActionBar().setCustomView(mCustomView);
 
+		// mMain.getActionBar().setCustomView(mCustomView);
+		//
 		mActionBar.setDisplayShowCustomEnabled(true);
 
 		// set listener for item control
@@ -283,7 +383,6 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
 						if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
 							mDrawerLayout.closeDrawer(mDrawerList);
 						} else {
@@ -303,20 +402,63 @@ public class MainActivity extends FragmentActivity {
 					}
 				});
 
-		mCustomView.findViewById(R.id.imgContacts).setOnClickListener(
-				new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						showOptionsContacts();
-					}
-				});
+//		mCustomView.findViewById(R.id.imgContacts).setOnClickListener(
+//				new OnClickListener() {
+//
+//					@Override
+//					public void onClick(View v) {
+//						// showOptionsContacts();
+//					}
+//				});
 	}
 
 	public void notifyDataChange() {
 		adapter.notifyDataSetChanged();
 	}
 
+	public void callTask(int friendId) {
+
+		ArrayList<String> phs = FriendManager.getInstance().hmMemberFriends
+				.get(friendId).getNumberLogin();
+
+		if (phs.size() == 0) {
+			Toast.makeText(mMain, "Không có số điện thoại", Toast.LENGTH_LONG)
+					.show();
+			return;
+		}
+
+		if (phs.size() == 1) {
+			Intent callIntent = new Intent(Intent.ACTION_CALL);
+			callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			callIntent.setData(Uri.parse("tel:" + phs.get(0)));
+			mTabHost.getContext().startActivity(callIntent);
+			return;
+		}
+		
+		final String[] phonenumbers = new String[phs.size()];
+
+		for (int i = 0; i < phs.size(); ++i) {
+			phonenumbers[i] = phs.get(i);
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(mMain);
+		builder.setTitle("Chọn số cần gọi");
+		builder.setItems(phonenumbers, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+				callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				callIntent.setData(Uri.parse("tel:" + phonenumbers[which]));
+				mTabHost.getContext().startActivity(callIntent);
+			}
+		}).setNegativeButton("Quay lại", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			}
+		});
+
+		builder.show();
+	}
+	
+	
 	@Override
 	public void onBackPressed() {
 		boolean isPopFragment = false;
@@ -356,86 +498,74 @@ public class MainActivity extends FragmentActivity {
 		mTabHost.setCurrentTabByTag(tabTag);
 	}
 
-	public void newMessageNotify(boolean isNew) {
-		if (isNew) {
-			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(1)
-					.findViewById(android.R.id.icon))
-					.setImageDrawable(getResources().getDrawable(
-							R.drawable.ic_grp_trigger));
-		} else {
-			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(1)
-					.findViewById(android.R.id.icon))
-					.setImageDrawable(getResources().getDrawable(
-							R.drawable.ic_grp));
-		}
-	}
-
-	public void newRequestNotify(boolean isNew) {
-		if (isNew) {
-			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(2)
-					.findViewById(android.R.id.icon))
-					.setImageDrawable(getResources().getDrawable(
-							R.drawable.ic_usercheck_trigger));
-		} else {
-			((ImageView) mTabHost.getTabWidget().getChildTabViewAt(2)
-					.findViewById(android.R.id.icon))
-					.setImageDrawable(getResources().getDrawable(
-							R.drawable.ic_usercheck));
-		}
-	}
-
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		MessageManager.getInstance().destroy();
+		if (isRegister)
+			getApplicationContext().unregisterReceiver(mHandleMessageReceiver);
 	}
 
-	public void showOptionsContacts() {
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.options_invite_layout,
-				null);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.progess_dialog_custom);
-
-		builder.setView(dialoglayout);
-
-		((Button) dialoglayout.findViewById(R.id.btnInvite))
-				.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View arg0) {
-						InviteFromContactsDialog contactsdialog = new InviteFromContactsDialog(
-								mMain);
-						contactsdialog.show();
-						alertDialog.dismiss();
-					}
-				});
-
-		((Button) dialoglayout.findViewById(R.id.btnSearch))
-				.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View arg0) {
-						SearchFromServerDialog searchdialog = new SearchFromServerDialog(
-								mMain);
-						searchdialog.show();
-						alertDialog.dismiss();
-					}
-				});
-
-		alertDialog = builder.create();
-		alertDialog.show();
-	}
 
 	class StatusUpdate extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			PostData.login(getApplicationContext(),
-					MyProfileManager.getInstance().numberLogins.get(0),
-					MyProfileManager.getInstance().password);
+			PostData.login(getApplicationContext(), SettingManager
+					.getInstance().getPhoneAutoLogin(), SettingManager
+					.getInstance().getPasswordAutoLogin());
 			return null;
 		}
 
 	}
+
+	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context ctx, Intent intent) {
+			String action = intent.getAction();
+
+			if (action.equals(Config.NOTIFY_UI)) {
+
+				if (intent.hasExtra(Config.MESSAGE_NOTIFY)) {
+					if (intent.getIntExtra(Config.MESSAGE_NOTIFY, -1) == Config.SHOW) {
+
+						if (!mTabHost.getCurrentTabTag().equals(MESSAGE_TAG))
+							((ImageView) mTabHost.getTabWidget()
+									.getChildTabViewAt(1)
+									.findViewById(android.R.id.icon))
+									.setImageDrawable(getResources()
+											.getDrawable(
+													R.drawable.ic_grp_trigger));
+					} else {
+						((ImageView) mTabHost.getTabWidget()
+								.getChildTabViewAt(1)
+								.findViewById(android.R.id.icon))
+								.setImageDrawable(getResources().getDrawable(
+										R.drawable.ic_grp));
+					}
+
+				} else if (intent.hasExtra(Config.FRIEND_REQUEST_NOTIFY)) {
+					if (intent.getIntExtra(Config.FRIEND_REQUEST_NOTIFY, -1) == Config.SHOW) {
+						if (!mTabHost.getCurrentTabTag().equals(REQUEST_TAG))
+							((ImageView) mTabHost.getTabWidget()
+									.getChildTabViewAt(2)
+									.findViewById(android.R.id.icon))
+									.setImageDrawable(getResources()
+											.getDrawable(
+													R.drawable.ic_usercheck_trigger));
+					} else {
+						((ImageView) mTabHost.getTabWidget()
+								.getChildTabViewAt(2)
+								.findViewById(android.R.id.icon))
+								.setImageDrawable(getResources().getDrawable(
+										R.drawable.ic_usercheck));
+					}
+				}
+
+			}
+
+		}
+	};
 
 }

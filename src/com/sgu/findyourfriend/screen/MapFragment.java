@@ -1,86 +1,109 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.devsmart.android.ui.HorizontalListView;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sgu.findyourfriend.R;
 import com.sgu.findyourfriend.adapter.FriendSwipeAdapter;
-import com.sgu.findyourfriend.ctr.ControlOptions;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MyLocationChangeListener;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.model.Friend;
-import com.sgu.findyourfriend.utils.Controller;
+import com.sgu.findyourfriend.model.SimpleUserAndLocation;
+import com.sgu.findyourfriend.net.PostData;
+import com.sgu.findyourfriend.screen.MapWrapperLayout.OnDragListener;
 import com.sgu.findyourfriend.utils.GpsPosition;
 import com.sgu.findyourfriend.utils.Utility;
 
-public class MapFragment extends Fragment implements MyLocationChangeListener {
+public class MapFragment extends BaseContainerFragment implements
+		MyLocationChangeListener {
+
+	// contants define
+	private static final int CALL = 0;
+	private static final int MESSAGE = 1;
+	private static final int HISTORIES = 2;
+	private static final int UPDATE = 3;
+	private static final int ROUTE = 4;
+	private static final int REQUEST = 5;
+	private static final int ACCEPT = 6;
+	private static final int UNFRIEND = 7;
+	private static final int REMOVE_HISTORIES = 8;
+	private static final int STOP_SHARE = 9;
+	private static final int NOT_POSITION = 10;
+
+	private static final int TASK_NUM = 11;
 
 	// point to itself
 	private MapFragment mThis = this;
 
-	private static boolean isRegister = false;
+	private static float startDegree = 0f;
+	private static float radius = 130f;
+
+	private static boolean isRegister;
 
 	private Context context;
 
 	// view replace
 	private static View view;
-	private View inc; // include layout for horizontal friend list
+	private FrameLayout inc; // include layout for horizontal friend list
 
 	// map for app
 	private GoogleMap mMap;
 
 	private HashMap<Integer, Marker> markerManager;
+
+	// marker Stranger and invited
+	private HashMap<Integer, Marker> markerSIn;
+
+	private HashMap<Integer, View> hmViewOnHoz;
 
 	private FragmentActivity myContext;
 
@@ -91,44 +114,47 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	// friend's id current
 	private int fIDCurrent = -1;
 
-	private Controller aController;
-
 	// GPS Controller
 	private GpsPosition gpsPosition;
 
 	private View viewSelected = null;
 
-	// control button
-	private Button btnMessage;
-	private Button btnCall;
-	private Button btnHistory;
-	private Button btnUpdate;
-	private Button btnRoute;
-	private Button btnRequest;
+	// // control button
+	private ImageButton[] imgButtons = new ImageButton[TASK_NUM];
+	private TextView textViewAddress;
 
 	private ImageButton btnShow;
+	private ImageButton btnZoomIn;
+	private ImageButton btnZoomOut;
+
+	private float zoomLevel; // min 2.0 max 21.0
+
+	private boolean toggleBtnValue = true;
 
 	private ProgressBar pbOnMap;
 
 	private boolean isMapStarted = false;
 
+	private boolean isSetupTasker = false;
+
 	// state marker hide/show
 	private boolean isShowMarker;
 
 	// masks check control
-	private int[] maskEn = new int[6];
+	private int[] maskEn = new int[TASK_NUM];
 
 	private MapController mapController;
 
 	// management
 	private Resources resource;
 
-	// bi map resource for control view icon
-	private HashMap<Integer, Integer> hmToCap20;
-	private HashMap<Integer, Integer> hmFromCap20;
-
 	// vibrator
 	private Vibrator vibrator;
+
+	private AlphaAnimation alphaIn;
+	private AlphaAnimation alphaOut;
+
+	private boolean isControllerShowed = true;
 
 	// update time
 	private long intervalUpdateFriend;
@@ -139,14 +165,12 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		// init
 		isMapStarted = false;
 		isShowMarker = true;
+		isRegister = false;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
-		Log.i(TAG,
-				"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ on create view");
 
 		if (view != null) {
 			ViewGroup parent = (ViewGroup) view.getParent();
@@ -169,14 +193,13 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+
+		Log.i(TAG, "onActivityCreated");
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.i(TAG,
-				"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ on resume");
-
 		// update setup map
 		getmMap().setMapType(SettingManager.getInstance().getMapType());
 
@@ -204,6 +227,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		if (!isRegister) {
 			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
 					com.sgu.findyourfriend.mgr.Config.UPDATE_UI));
+			activity.registerReceiver(mHandleMessageReceiver, new IntentFilter(
+					com.sgu.findyourfriend.mgr.Config.MAIN_ACTION));
 			isRegister = true;
 		}
 	}
@@ -219,13 +244,20 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	// ----------------- init variable and setup methods ----------- //
 	@SuppressLint("UseSparseArrays")
 	private void afterViewCreate(View view) {
-		// set actionbar
-		View bar = getActivity().getActionBar().getCustomView();
-		bar.findViewById(R.id.grpItemControl).setVisibility(View.VISIBLE);
-		bar.findViewById(R.id.imgSend).setVisibility(View.GONE);
+
+		// setup alpha animation
+		alphaIn = new AlphaAnimation(0F, 1F);
+		alphaIn.setDuration(500);
+		alphaIn.setFillAfter(true);
+
+		alphaOut = new AlphaAnimation(1F, 0F);
+		alphaOut.setDuration(500);
+		alphaOut.setFillAfter(true);
 
 		// get button show
 		btnShow = (ImageButton) view.findViewById(R.id.btnShow);
+		btnZoomIn = (ImageButton) view.findViewById(R.id.btnZoomIn);
+		btnZoomOut = (ImageButton) view.findViewById(R.id.btnZoomOut);
 
 		// get progress bar
 		setPbOnMap((ProgressBar) view.findViewById(R.id.pbOnMap));
@@ -237,28 +269,24 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		// get resources
 		resource = getActivity().getResources();
 
-		// get controller
-		aController = (Controller) context;
-
 		// Check if Internet present
-		if (!aController.isConnectingToInternet()) {
+		if (!Utility.isConnectingToInternet(getActivity())) {
 
 			// Internet Connection is not present
-			aController.showAlertDialog(context, "Internet Connection Error",
+			Utility.showAlertDialog(context, "Internet Connection Error",
 					"Please connect to Internet connection", false);
 			// stop executing code by return
 			return;
 		}
 
 		// initialize
-		// markerPoints = new ArrayList<LatLng>();
 		markerManager = new HashMap<Integer, Marker>();
+		markerSIn = new HashMap<Integer, Marker>();
 
-		// setup control item hashmap
-		setupForSelectionControl();
+		hmViewOnHoz = new HashMap<Integer, View>();
 
 		// setup control layout and avatar list view
-		inc = view.findViewById(R.id.inc_horixontal_container);
+		setupHalfCirle();
 
 		// setup friend list
 		setupFriendList();
@@ -278,64 +306,11 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		loadFriendsPosition();
 		updateFriendsInfo();
 
-		// check require from sliding friend event
-		if (ControlOptions.getInstance().isRequire()) {
-			Log.i("REQUIRE", "####################################");
-			int fId = ControlOptions.getInstance().getHashMap("friendId");
-			mapController
-					.zoomToPosition(FriendManager.getInstance().hmMemberFriends
-							.get(fId).getLastLocation());
-			ControlOptions.getInstance().finish();
-		}
+		// load strangers
+		// loadStrangers(2000000);
 
-		// check bundle from detail info fragment
-		Bundle bundle = getArguments();
-
-		Log.i(TAG,
-				"################################################################################# start");
-
-		if (null != bundle) {
-			fIDCurrent = bundle.getInt("friendId");
-			String task = bundle.getString("task", "");
-
-			if (task.equals("route")) {
-
-				final Handler mUpdateHandler = new Handler();
-				Runnable mUpdateRunnable = new Runnable() {
-					public void run() {
-
-						hideControl();
-						hideMarker(FriendManager.getInstance().getMine(),
-								FriendManager.getInstance().hmMemberFriends
-										.get(fIDCurrent));
-						mapController.routeTask(fIDCurrent);
-					}
-				};
-
-				mUpdateHandler.postDelayed(mUpdateRunnable, 50);
-
-			} else if (task.equals("history")) {
-				Log.i(TAG, "map history!!! " + markerManager.size());
-
-				final Handler mUpdateHandler = new Handler();
-				Runnable mUpdateRunnable = new Runnable() {
-					public void run() {
-
-						hideControl();
-						hideMarker();
-						mapController.drawHistoryTask(fIDCurrent);
-					}
-				};
-
-				mUpdateHandler.postDelayed(mUpdateRunnable, 50);
-
-			}
-
-			bundle.clear();
-		}
-
-		Log.i(TAG,
-				"################################################################################# end");
+		// load invited member
+		// loadInvitedMember();
 
 		// vibrator setup
 		vibrator = (Vibrator) context
@@ -343,31 +318,67 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 		// hide control console
 		hideControl();
+
+		// scrollForFriendList();
 	}
 
-	// update ui --------------------------------------------
-	// private void updateUI() {
-	// FriendManager.getInstance().setupAfterLoading();
-	//
-	// updateAdapter();
-	// }
+	private void loadInvitedMember() {
+		// load on map
+		for (int id : FriendManager.getInstance().hmInvited.keySet()) {
+			createInvitedMakerOnMap(id,
+					FriendManager.getInstance().hmInvited.get(id));
+		}
 
-	// public void updateAdapter() {
-	// swipeAdapter.notifyDataSetChanged();
-	// ((MainActivity) myContext).notifyDataChange();
-	// updateAllPosition();
-	// }
+	}
 
-	// public void updateAfterAcceptRequest(int friendID) {
-	// swipeAdapter.notifyDataSetChanged();
-	// ((MainActivity) myContext).notifyDataChange();
-	// // updateAllPosition();
-	// createMakerOnMap(FriendManager.getInstance().hmMemberFriends
-	// .get(friendID));
-	// changeVisibilityView();
-	// }
+	private void loadStrangers(final double radius) {
 
-	// ----------------------------------------------------
+		getmMap().addCircle(
+				(new CircleOptions())
+						.center(MyProfileManager.getInstance().getMyPosition())
+						.radius(radius).strokeWidth(2).strokeColor(0x55ff0000));
+
+		(new AsyncTask<Void, Void, ArrayList<SimpleUserAndLocation>>() {
+
+			@Override
+			protected ArrayList<SimpleUserAndLocation> doInBackground(
+					Void... params) {
+
+				if (FriendManager.getInstance().hmStrangers.size() == 0) {
+					// try get
+					return PostData
+							.findInDistance(context, MyProfileManager
+									.getInstance().getMyPosition().latitude,
+									MyProfileManager.getInstance()
+											.getMyPosition().longitude, radius);
+
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(ArrayList<SimpleUserAndLocation> result) {
+				if (null != result) {
+					FriendManager.getInstance().hmStrangers.clear();
+					for (SimpleUserAndLocation sp : result) {
+						FriendManager.getInstance().hmStrangers.put(sp.getId(),
+								new LatLng(sp.getLat(), sp.getLng()));
+
+					}
+
+				}
+
+				// load on map
+				for (int id : FriendManager.getInstance().hmStrangers.keySet()) {
+					createStrangerMakerOnMap(id,
+							FriendManager.getInstance().hmStrangers.get(id));
+				}
+
+			}
+
+		}).execute();
+
+	}
 
 	public void tickVibrator() {
 		vibrator.vibrate(100);
@@ -376,7 +387,7 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	// ---------------- setup map ----------------------- //
 	private void setupMap() {
 		FragmentManager myFM = myContext.getSupportFragmentManager();
-		SupportMapFragment mySpFrg = (SupportMapFragment) myFM
+		CustomMapFragment mySpFrg = (CustomMapFragment) myFM
 				.findFragmentById(R.id.mapFragment);
 
 		setmMap(mySpFrg.getMap());
@@ -386,6 +397,10 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		// mMap.setMapType(SettingManager.getInstance().getMapType());
 
 		getmMap().getUiSettings().setZoomControlsEnabled(false);
+
+		zoomLevel = 10.0f;
+		getmMap().animateCamera(CameraUpdateFactory.zoomTo(zoomLevel));
+
 		// hide control my center
 		// mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
@@ -394,6 +409,11 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 			@Override
 			public void onInfoWindowClick(final Marker marker) {
+
+				for (int k : markerSIn.keySet()) {
+					// if ok return;
+
+				}
 
 				// int friendId = 0;
 				for (int k : markerManager.keySet()) {
@@ -413,6 +433,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 				final Handler mUpdateHandler = new Handler();
 				Runnable mUpdateRunnable = new Runnable() {
 					public void run() {
+						// hide maker before display new screen
+						hideMarker();
 
 						PositionDetailFragment fragment = new PositionDetailFragment(
 								mThis);
@@ -421,12 +443,10 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 						bundle.putInt("friendId", fIDCurrent);
 						bundle.putString("address",
 								mapController.getAddress(marker.getPosition()));
-						bundle.putDouble(
-								"myLat",
-								MyProfileManager.getInstance().myLocation.latitude);
-						bundle.putDouble(
-								"myLng",
-								MyProfileManager.getInstance().myLocation.longitude);
+						bundle.putDouble("myLat", MyProfileManager
+								.getInstance().getMyPosition().latitude);
+						bundle.putDouble("myLng", MyProfileManager
+								.getInstance().getMyPosition().longitude);
 
 						fragment.setArguments(bundle);
 
@@ -448,24 +468,65 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 			public boolean onMarkerClick(final Marker marker) {
 				Log.i(TAG, "marker on click!");
 
+				// int disBefore, disAfter;
+
+				// check marker manager
 				for (int k : markerManager.keySet()) {
 					if (marker.equals(markerManager.get(k))) {
+						// disBefore =
+						// swipeAdapter.getDistaceToItem(fIDCurrent);
+						
 						if (fIDCurrent != k) {
 							changleSelectMarker(fIDCurrent, false);
 							fIDCurrent = k;
-							changleSelectMarker(fIDCurrent, true);
+							
 
 							// setup control
-							swipeAdapter.hightLightItem(swipeAdapter
-									.getPositionByFriendID(k));
-							changeVisibilityView();
-							showControl();
+//							swipeAdapter.hightLightItem(swipeAdapter
+//									.getPositionByFriendID(k));
+//							changeVisibilityView();
+//							showControl();
+
+							// disAfter =
+							// swipeAdapter.getDistaceToItem(fIDCurrent);
+
+							scrollForFriendList(fIDCurrent);
+
+							
+//							textViewAddress.setText(mapController.getAddress(FriendManager
+//									.getInstance().hmMemberFriends.get(k)
+//									.getLastLocation()));
+//							
+//							marker.setTitle(mapController.getAddress(FriendManager
+//									.getInstance().hmMemberFriends.get(k)
+//									.getLastLocation()));
 						}
 
-						marker.setTitle(mapController.getAddress(FriendManager
-								.getInstance().hmMemberFriends.get(k)
-								.getLastLocation()));
+						changleSelectMarker(fIDCurrent, true);
+						
+						// setup control
+						swipeAdapter.hightLightItem(swipeAdapter
+								.getPositionByFriendID(k));
+						changeVisibilityView();
+						showControl();
+						
+						break;
+					}
+				}
 
+				// check marker sin
+				for (int k : markerSIn.keySet()) {
+					if (marker.equals(markerSIn.get(k))) {
+						if (FriendManager.getInstance().hmStrangers
+								.containsKey(k)) {
+							marker.setTitle("Kết bạn");
+
+						} else if (FriendManager.getInstance().hmInvited
+								.containsKey(k)) {
+							marker.setTitle(mapController
+									.getAddress(FriendManager.getInstance().hmInvited
+											.get(k).getLastLocation()));
+						}
 						break;
 					}
 				}
@@ -479,31 +540,34 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 			@Override
 			public void onMapClick(LatLng point) {
 				Log.i("POS", point.latitude + " # " + point.longitude);
-
-				swipeAdapter.unHightLightItem();
+				// swipeAdapter.unHightLightItem();
+				swipeAdapter.hightLightItem(-1);
 				hideControl();
 				changleSelectMarker(fIDCurrent, false);
-				//
-				//
-				// if (viewSelected != null) {
-				// hideControl();
-				// changleSelectMarker(fIDCurrent, false);
-				// fIDCurrent = -1;
-				// }
-
 			}
 		});
 
+		
+		mySpFrg.setOnDragListener(new OnDragListener() {
+			
+			@Override
+			public void onDrag(MotionEvent motionEvent) {
+				// Log.d("ON_DRAG", "OK");
+				if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) 
+					hideControl();
+			}
+		});
+		
 	}
 
 	// ---------------- setup friend list ------------------ //
 	private void setupFriendList() {
 		avatarListView = (HorizontalListView) view
-				.findViewById(R.id.avatarListView);
+				.findViewById(R.id.avatarHListView);
 
 		swipeAdapter = new FriendSwipeAdapter(context,
-				R.layout.item_friend_accepted,
-				FriendManager.getInstance().memberFriends);
+				R.layout.item_friend_accepted, new ArrayList<Friend>(
+						FriendManager.getInstance().hmMemberFriends.values()));
 		avatarListView.setAdapter(swipeAdapter);
 
 		avatarListView.setOnItemClickListener(new OnItemClickListener() {
@@ -513,12 +577,27 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 					int position, long id) {
 				Log.i(TAG, "click at " + position);
 
-				if (fIDCurrent >= 0)
+				//  unmarke 
+				if (fIDCurrent >= 0) {
 					changleSelectMarker(fIDCurrent, false);
+					// swipeAdapter.unHightLightItem();
+				}
 
+				// change id selected
 				fIDCurrent = swipeAdapter.getItem(position).getUserInfo()
 						.getId();
 
+				
+				if (fIDCurrent == -1) {
+					// add friend
+					hideControl();
+					showOptionsContacts();
+					return;
+				}
+				
+				showMarker();
+				
+				// mark
 				changleSelectMarker(fIDCurrent, true);
 
 				// dis/en visible on control view
@@ -533,7 +612,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 					mapController.zoomToPosition(swipeAdapter.getItem(position)
 							.getLastLocation());
 				else {
-					Utility.showMessage(context, "Vị trí hiện tại không có sẵn");
+					// Utility.showMessageOnCenter(context,
+					// "Vị trí hiện tại không có sẵn");
 				}
 			}
 		});
@@ -545,114 +625,102 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		btnShow.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) {
-				showMarker();
-				mapController.clearnMarkerHistory();
-			}
-		});
+			public void onClick(View view) {
 
-		inc = view.findViewById(R.id.inc_horixontal_container);
-		btnMessage = (Button) inc.findViewById(R.id.btnMessage);
-		btnCall = (Button) inc.findViewById(R.id.btnCall);
-		btnHistory = (Button) inc.findViewById(R.id.btnHistory);
-		btnUpdate = (Button) inc.findViewById(R.id.btnUpdate);
-		btnRoute = (Button) inc.findViewById(R.id.btnRoute);
-		btnRequest = (Button) inc.findViewById(R.id.btnRequest);
+				toggleBtnValue = !toggleBtnValue;
 
-		btnMessage.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				if (maskEn[0] == 1) {
-					tickVibrator();
-					hideControl();
-					mapController.sendMessageTask(fIDCurrent);
-				}
-			}
-		});
-
-		btnCall.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (maskEn[1] == 1) {
-					tickVibrator();
-					hideControl();
-					mapController.callTask(fIDCurrent);
-				}
-			}
-		});
-
-		btnHistory.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (maskEn[2] == 1
-						&& null != FriendManager.getInstance().hmMemberFriends
-								.get(fIDCurrent).getLastLocation()) {
-					tickVibrator();
-					hideControl();
+				if (toggleBtnValue) {
+					showMarker();
+					btnShow.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_show));
+				} else {
 					hideMarker();
-					mapController.drawHistoryTask(fIDCurrent);
-				} else {
-					
-					Utility.showMessage(context, "Vị trí  hiện tại không có sẵn");
+					btnShow.setImageDrawable(getResources().getDrawable(
+							R.drawable.ic_hide));
 				}
 			}
+
 		});
 
-		btnUpdate.setOnClickListener(new OnClickListener() {
+		btnShow.setOnLongClickListener(new OnLongClickListener() {
 
 			@Override
-			public void onClick(View v) {
-				if (maskEn[3] == 1) {
-					tickVibrator();
-					hideControl();
-					showMarker();
-					mapController.updatePositionTask(fIDCurrent);
-				}
+			public boolean onLongClick(View arg0) {
+				mapController.clearnMarkerHistory();
+				return true;
 			}
 		});
 
-		btnRoute.setOnClickListener(new OnClickListener() {
+		btnZoomIn.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View v) {
-				if (maskEn[4] == 1
-						&& null != FriendManager.getInstance().hmMemberFriends
-						.get(fIDCurrent).getLastLocation()) {
-					tickVibrator();
-					hideControl();
-					hideMarker(FriendManager.getInstance().getMine(),
-							FriendManager.getInstance().hmMemberFriends
-									.get(fIDCurrent));
-					mapController.routeTask(fIDCurrent);
-				} else {
-					Utility.showMessage(context, "Vị trí  hiện tại không có sẵn");
-				}
+			public void onClick(View arg0) {
+				hideControl();
+				zoomLevel += 2.0f;
+				if (zoomLevel > 21.0f)
+					zoomLevel = 21.0f;
+				mMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel));
+
 			}
 		});
 
-		btnRequest.setOnClickListener(new OnClickListener() {
+		btnZoomOut.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View v) {
-				if (maskEn[5] == 1) {
-					tickVibrator();
-					hideControl();
-					showMarker();
-					Friend f = FriendManager.getInstance().hmMemberFriends
-							.get(fIDCurrent);
+			public void onClick(View arg0) {
+				hideControl();
+				zoomLevel -= 2.0f;
+				if (zoomLevel < 2.0f)
+					zoomLevel = 2.0f;
+				mMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel));
 
-					if (f.getAcceptState() == Friend.REQUESTED_SHARE)
-						mapController.acceptTask(fIDCurrent);
-					else
-						mapController.requestTask(fIDCurrent);
-
-					// update ui
-				}
 			}
 		});
+	}
+
+	private void setupHalfCirle() {
+		inc = (FrameLayout) view.findViewById(R.id.task_inc);
+
+		textViewAddress = (TextView) view.findViewById(R.id.txtToastAddress);
+		textViewAddress.setVisibility(View.GONE);
+		
+		imgButtons = new ImageButton[inc.getChildCount() - 1];
+		for (int i = 0; i < TASK_NUM; ++i) {
+			imgButtons[i] = (ImageButton) inc.getChildAt(i);
+			imgButtons[i].setVisibility(View.GONE);
+		}
+
+	}
+
+	private void scrollForFriendList(final int toId) {
+		avatarListView.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+
+				// View v1 = swipeAdapter.getViewByFriendId(formId);
+//				View v2 = swipeAdapter.getViewByFriendId(toId);
+//
+//				avatarListView.scrollTo(0);
+//
+//				int disBefore = (v2.getLeft() + v2.getRight()) / 2
+//						- (avatarListView.getWidth() / 2);
+//				int disAfter = disBefore;
+//				if (disBefore < 0
+//						&& swipeAdapter.getDistaceToItem(toId) < avatarListView
+//								.getWidth())
+//					disAfter += avatarListView.getWidth();
+//				else if (disBefore > 0
+//						&& swipeAdapter.getDistaceToItem(toId) > (swipeAdapter
+//								.getWidth() - avatarListView.getWidth()))
+//					disAfter -= avatarListView.getWidth();
+//
+//				avatarListView.scrollBy(
+//						disBefore * disAfter > 0 ? disAfter : 0, 0);
+//
+//				Log.i(TAG, "disbefore " + disBefore + "#disaftert " + disAfter);
+			}
+		}, 100);
 	}
 
 	// ---------- hide/show marker on map ----------------- //
@@ -684,168 +752,241 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 	// ------------------ hide/show view on control console ---------- //
 
-	@SuppressLint("UseSparseArrays")
-	private void setupForSelectionControl() {
-		// allways enable
-		// maskEn[2] = maskEn[3] = 1;
-
-		hmToCap20 = new HashMap<Integer, Integer>(6);
-		hmToCap20.put(R.id.btnMessage, R.drawable.ic_message_cap20);
-		hmToCap20.put(R.id.btnCall, R.drawable.ic_call_cap20);
-		hmToCap20.put(R.id.btnRequest, R.drawable.ic_request_cap20);
-		hmToCap20.put(R.id.btnRoute, R.drawable.ic_route_cap20);
-		hmToCap20.put(R.id.btnHistory, R.drawable.ic_history_cap20);
-		hmToCap20.put(R.id.btnUpdate, R.drawable.ic_update_cap20);
-
-		hmFromCap20 = new HashMap<Integer, Integer>(6);
-		hmFromCap20.put(R.id.btnMessage, R.drawable.ic_message);
-		hmFromCap20.put(R.id.btnCall, R.drawable.ic_call);
-		hmFromCap20.put(R.id.btnRequest, R.drawable.ic_request);
-		hmFromCap20.put(R.id.btnRoute, R.drawable.ic_route);
-		hmFromCap20.put(R.id.btnHistory, R.drawable.ic_history);
-		hmFromCap20.put(R.id.btnUpdate, R.drawable.ic_update);
-
-	}
-
-	public void disableView(View rView, int idRaw) {
-		((LinearLayout) ((ViewGroup) rView.findViewById(idRaw).getParent()))
-				.getChildAt(1).setAlpha(0.2f);
-
-		((Button) rView.findViewById(idRaw)).setBackgroundDrawable(resource
-				.getDrawable(hmToCap20.get(idRaw)));
-	}
-
-	public void enableView(View rView, int idRaw) {
-		((LinearLayout) ((ViewGroup) rView.findViewById(idRaw).getParent()))
-				.getChildAt(1).setAlpha(1f);
-
-		((Button) rView.findViewById(idRaw)).setBackgroundDrawable(resource
-				.getDrawable(hmFromCap20.get(idRaw)));
-
-	}
-
 	private void changeVisibilityView() {
-		if (fIDCurrent < 0)
+
+		if (fIDCurrent <= 0)
 			return;
 
 		View rView = getView();
-		// check view visiable
-		// my self
 
-		((TextView) ((LinearLayout) ((ViewGroup) rView.findViewById(
-				R.id.btnRequest).getParent())).getChildAt(1))
-				.setText("yêu cầu");
+		if (null == rView)
+			return;
 
-		if (fIDCurrent == MyProfileManager.getInstance().mine.getId()) {
-			disableView(rView, R.id.btnMessage);
-			maskEn[0] = 0;
+		
+		boolean isToastPosition = false; // is show address 
+		
+		
+		// accept = 6, unfriend = 7, remove = 8, stop share = 9, task nopos = 10
+		for (int i = 0; i < TASK_NUM; ++i)
+			maskEn[i] = 1;
 
-			disableView(rView, R.id.btnCall);
-			maskEn[1] = 0;
-
-			enableView(rView, R.id.btnHistory);
-			maskEn[2] = 1;
-
-			enableView(rView, R.id.btnUpdate);
-			maskEn[3] = 1;
-
-			disableView(rView, R.id.btnRoute);
-			maskEn[4] = 0;
-
-			disableView(rView, R.id.btnRequest);
-			maskEn[5] = 0;
-
+		if (fIDCurrent == MyProfileManager.getInstance().getMyID()) {
+			maskEn[CALL] = 0;
+			maskEn[MESSAGE] = 0;
+			maskEn[ROUTE] = 0;
+			maskEn[REQUEST] = 0;
+			maskEn[ACCEPT] = 0;
+			maskEn[UNFRIEND] = 0;
+			maskEn[NOT_POSITION] = 0;
+			isToastPosition = true;
 		} else {
 
 			Friend f = FriendManager.getInstance().hmMemberFriends
 					.get(fIDCurrent);
 			if (f.getAcceptState() == Friend.SHARE_RELATIONSHIP) {
-				// full options
-				enableView(rView, R.id.btnMessage);
-				maskEn[0] = 1;
+				maskEn[REQUEST] = 0;
+				maskEn[ACCEPT] = 0;
+				maskEn[REMOVE_HISTORIES] = 0;
 
-				enableView(rView, R.id.btnCall);
-				maskEn[1] = 1;
-
-				enableView(rView, R.id.btnHistory);
-				maskEn[2] = 1;
-
-				enableView(rView, R.id.btnUpdate);
-				maskEn[3] = 1;
-
-				enableView(rView, R.id.btnRoute);
-				maskEn[4] = 1;
-
-				disableView(rView, R.id.btnRequest);
-				maskEn[5] = 0;
-
+				if (null != f.getLastLocation()) {
+					maskEn[NOT_POSITION] = 0;
+					isToastPosition = true;
+				}
+				
 			} else if (f.getAcceptState() == Friend.REQUEST_SHARE) {
 				// wait accept
-
-				enableView(rView, R.id.btnMessage);
-				maskEn[0] = 1;
-
-				enableView(rView, R.id.btnCall);
-				maskEn[1] = 1;
-
-				disableView(rView, R.id.btnHistory);
-				maskEn[2] = 0;
-
-				enableView(rView, R.id.btnUpdate);
-				maskEn[3] = 1;
-
-				disableView(rView, R.id.btnRoute);
-				maskEn[4] = 0;
-
-				disableView(rView, R.id.btnRequest);
-				maskEn[5] = 0;
-
+				maskEn[HISTORIES] = 0;
+				maskEn[ROUTE] = 0;
+				maskEn[REQUEST] = 0;
+				maskEn[ACCEPT] = 0;
+				maskEn[REMOVE_HISTORIES] = 0;
+				maskEn[STOP_SHARE] = 0;
 			} else if (f.getAcceptState() == Friend.REQUESTED_SHARE) {
 				// accept text
-
-				enableView(rView, R.id.btnMessage);
-				maskEn[0] = 1;
-
-				enableView(rView, R.id.btnCall);
-				maskEn[1] = 1;
-
-				disableView(rView, R.id.btnHistory);
-				maskEn[2] = 0;
-
-				enableView(rView, R.id.btnUpdate);
-				maskEn[3] = 1;
-
-				disableView(rView, R.id.btnRoute);
-				maskEn[4] = 0;
-
-				// change text here
-				enableView(rView, R.id.btnRequest);
-				((TextView) ((LinearLayout) ((ViewGroup) rView.findViewById(
-						R.id.btnRequest).getParent())).getChildAt(1))
-						.setText("c.nhận");
-				maskEn[5] = 1;
-
+				maskEn[HISTORIES] = 0;
+				maskEn[ROUTE] = 0;
+				maskEn[REQUEST] = 0;
+				maskEn[REMOVE_HISTORIES] = 0;
+				maskEn[STOP_SHARE] = 0;
 			} else {
 				// friend
-				enableView(rView, R.id.btnMessage);
-				maskEn[0] = 1;
-
-				enableView(rView, R.id.btnCall);
-				maskEn[1] = 1;
-
-				disableView(rView, R.id.btnHistory);
-				maskEn[2] = 0;
-
-				enableView(rView, R.id.btnUpdate);
-				maskEn[3] = 1;
-
-				disableView(rView, R.id.btnRoute);
-				maskEn[4] = 0;
-
-				enableView(rView, R.id.btnRequest);
-				maskEn[5] = 1;
+				maskEn[HISTORIES] = 0;
+				maskEn[ROUTE] = 0;
+				maskEn[ACCEPT] = 0;
+				maskEn[REMOVE_HISTORIES] = 0;
+				maskEn[STOP_SHARE] = 0;
 			}
 		}
+
+		int numOfButton = 0; // inc.getChildCount();
+
+		if (maskEn[CALL] == 1) {
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_call));
+			imgButtons[numOfButton].setOnClickListener(new OnCallClick());
+			numOfButton++;
+		}
+
+		if (maskEn[MESSAGE] == 1) {
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_message));
+			imgButtons[numOfButton].setOnClickListener(new OnMessageClick());
+			numOfButton++;
+		} else {
+		}
+
+		if (maskEn[HISTORIES] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_history));
+			imgButtons[numOfButton].setOnClickListener(new OnHistoryClick());
+			numOfButton++;
+		}
+
+		if (maskEn[UPDATE] == 1) {
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_update));
+			imgButtons[numOfButton].setOnClickListener(new OnUpdateClick());
+			numOfButton++;
+		}
+
+		if (maskEn[ROUTE] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_route));
+			imgButtons[numOfButton].setOnClickListener(new OnRouteClick());
+			numOfButton++;
+		}
+
+		if (maskEn[REQUEST] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_request));
+			imgButtons[numOfButton].setOnClickListener(new OnRequestClick());
+			numOfButton++;
+		}
+
+		// accept request
+		if (maskEn[ACCEPT] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_accept));
+			imgButtons[numOfButton].setOnClickListener(new OnAcceptClick());
+			numOfButton++;
+		}
+
+		// unfriend
+		if (maskEn[UNFRIEND] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_unfriend));
+			imgButtons[numOfButton].setOnClickListener(new OnUnFriendClick());
+			numOfButton++;
+		}
+
+		// remove histories
+		if (maskEn[REMOVE_HISTORIES] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_remove_histories));
+			imgButtons[numOfButton]
+					.setOnClickListener(new OnRemoveHistoryClick());
+			numOfButton++;
+		}
+
+		// stop share
+		if (maskEn[STOP_SHARE] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_stop_share));
+			imgButtons[numOfButton].setOnClickListener(new OnStopShareClick());
+			numOfButton++;
+		}
+
+		// not position
+		if (maskEn[NOT_POSITION] == 1) {
+
+			imgButtons[numOfButton].setImageDrawable(getResources()
+					.getDrawable(R.drawable.ic_notposition));
+			imgButtons[numOfButton].setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Utility.showMessage(context, "Not available");
+				}
+			});
+			// not add
+		}
+
+		for (int i = 0; i < inc.getChildCount() - 1; ++i) {
+			if (i < numOfButton)
+				imgButtons[i].setVisibility(View.VISIBLE);
+			else
+				imgButtons[i].setVisibility(View.GONE);
+
+		}
+
+		float dimenTaksButton = getActivity().getResources().getDimension(
+				R.dimen.size_task_button);
+
+		int cor1[] = new int[2];
+		inc.getLocationOnScreen(cor1);
+		Log.i(TAG, "top" + cor1[0] + " # " + cor1[1]);
+
+		float xCenter = (inc.getWidth() - dimenTaksButton) / 2f + cor1[0];
+		float yCenter = (inc.getHeight() - dimenTaksButton) / 2f - 50f;
+
+		Log.i(TAG, xCenter + " # " + yCenter);
+
+		float alpha = 360f / (numOfButton);
+
+		for (int i = 0; i < numOfButton; ++i) {
+			imgButtons[i] = (ImageButton) inc.getChildAt(i);
+			imgButtons[i].setX((int) (xCenter + (radius * Math.cos(Math
+					.toRadians(alpha * i + startDegree)))));
+			imgButtons[i].setY((int) (yCenter - (radius * Math.sin(Math
+					.toRadians(alpha * i + startDegree)))));
+
+			Log.i(TAG, imgButtons[i].toString() + " # " + imgButtons[i].getX()
+					+ " @ " + imgButtons[i].getY());
+		}
+
+		// set position for button not position
+		if (maskEn[NOT_POSITION] == 1) {
+			imgButtons[numOfButton] = (ImageButton) inc.getChildAt(numOfButton);
+			imgButtons[numOfButton].setX(xCenter);
+			imgButtons[numOfButton].setY(yCenter);
+			imgButtons[numOfButton].setVisibility(View.VISIBLE);
+		}
+		
+		
+		// show Toast
+		if (isToastPosition) {
+			FrameLayout.LayoutParams layoutPrms = (FrameLayout.LayoutParams) textViewAddress.getLayoutParams();
+			
+			layoutPrms.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+			layoutPrms.bottomMargin = 100;
+			textViewAddress.setLayoutParams(layoutPrms);
+			textViewAddress.setText("đang tính...");
+			textViewAddress.setVisibility(View.VISIBLE);
+			
+			
+			String address = mapController.getAddress(FriendManager
+					.getInstance().hmMemberFriends.get(fIDCurrent)
+					.getLastLocation());
+			
+			if (null == address)
+				textViewAddress.setText("Vị trí không có sẵn");
+			else
+				textViewAddress.setText(address);
+			
+			
+			textViewAddress.setOnClickListener(new OnToastClick());
+			
+		} else {
+			textViewAddress.setVisibility(View.GONE);
+		}
+
 	}
 
 	// --------------------- changle color marker --------------------- //
@@ -855,31 +996,38 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 
 		if (m != null) {
 			if (isSelected)
-				m.setIcon(combileLocationIcon(f, true));
+				m.setIcon(Utility.combileLocationIcon(getActivity(), f, true));
 			else
-				m.setIcon(combileLocationIcon(f, false));
+				m.setIcon(Utility.combileLocationIcon(getActivity(), f, false));
 		}
 	}
 
 	// -------------- show/hide control console ---------------- //
 	private void showControl() {
-		inc.setAlpha(1.0f);
-		ValueAnimator anim = ObjectAnimator.ofFloat(inc, "translationY",
-				-inc.getHeight());
-		anim.setDuration(500);
-		anim.start();
+		inc.setVisibility(View.VISIBLE);
+		inc.startAnimation(alphaIn);
+		isControllerShowed = true;
 	}
 
 	private void hideControl() {
-		ValueAnimator anim = ObjectAnimator.ofFloat(inc, "translationY",
-				inc.getHeight());
-		anim.setDuration(500);
-		anim.start();
-
-		if (viewSelected != null) {
-			viewSelected.setBackgroundColor(0x00);
-			viewSelected = null;
+		if (isControllerShowed) {
+			inc.startAnimation(alphaOut);
+			isControllerShowed = false;
+			inc.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					inc.setVisibility(View.GONE);
+					
+					for (int i = 0; i < TASK_NUM; ++i) {
+						imgButtons[i].setX(-100);
+						imgButtons[i].setY(-100);
+					}
+					
+				}
+			}, 500);
 		}
+
 	}
 
 	// -------------------- should load with timer --------------- //
@@ -943,8 +1091,8 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 										Utility.RESPONSE_NO);
 						context.sendBroadcast(intentUpdate);
 
-						Toast.makeText(getActivity(), "updateUI!",
-								Toast.LENGTH_SHORT).show();
+						// Toast.makeText(getActivity(), "updateUI!",
+						// Toast.LENGTH_SHORT).show();
 					}
 
 				}).execute();
@@ -953,12 +1101,6 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 			}
 		};
 		mUpdateHandler.postDelayed(mUpdateRunnable, intervalUpdateFriend);
-
-		// for (int key : markerManager.keySet()) {
-		// //
-		// PostData.updateLastLoation(FriendManager.getInstance().hmFriends.get(key),
-		// // markerManager.get(key));
-		// }
 
 	}
 
@@ -970,78 +1112,50 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		}
 	}
 
-	// ----------------------- setup iconview on map ---------------- //
-	private BitmapDescriptor combileLocationIcon(final Friend f,
-			boolean isSelected) {
-		final Bitmap brbitmap;
-
-		if (isSelected)
-			brbitmap = BitmapFactory.decodeResource(getResources(),
-					R.drawable.boder_location_selected);
-		else
-			brbitmap = BitmapFactory.decodeResource(getResources(),
-					R.drawable.boder_location_unselected);
-
-		return combileBorder(drawableToBitmap(Drawable.createFromPath(f
-				.getUserInfo().getAvatar())), brbitmap);
-	}
-
-	private BitmapDescriptor combileBorder(Bitmap bmAvatar, Bitmap brbitmap) {
-		int w = bmAvatar.getWidth();
-		int h = bmAvatar.getHeight();
-
-		int newWidth = 70;
-		int newHeight = 65;
-
-		float scaleWidth = ((float) newWidth) / w;
-		float scaleHeight = ((float) newHeight) / h;
-
-		Matrix matrix = new Matrix();
-		matrix.postScale(scaleWidth, scaleHeight);
-
-		Bitmap bmAvatarResize = Bitmap.createBitmap(bmAvatar, 0, 0, w, h,
-				matrix, false);
-		return BitmapDescriptorFactory.fromBitmap(overlay(brbitmap,
-				bmAvatarResize));
-	}
-
-	private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
-		Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(),
-				bmp1.getHeight(), bmp1.getConfig());
-		Canvas canvas = new Canvas(bmOverlay);
-		canvas.drawBitmap(bmp1, new Matrix(), null);
-		canvas.drawBitmap(bmp2, (canvas.getWidth() - bmp2.getWidth()) / 2,
-				(canvas.getWidth() - bmp2.getWidth()) / 2, null);
-		return bmOverlay;
-	}
-
-	private Bitmap drawableToBitmap(Drawable drawable) {
-		if (drawable instanceof BitmapDrawable) {
-			return ((BitmapDrawable) drawable).getBitmap();
-		}
-
-		Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-				drawable.getIntrinsicHeight(), Config.ARGB_8888);
-		Canvas canvas = new Canvas(bitmap);
-		drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-		drawable.draw(canvas);
-
-		return bitmap;
-	}
-
 	// ----------------------- create map's marker ----------------- //
+
+	private void createInvitedMakerOnMap(int id, Friend f) {
+		Log.i(TAG, "create on map");
+		if (null == f.getLastLocation())
+			return;
+
+		MarkerOptions options = new MarkerOptions();
+		options.position(f.getLastLocation());
+
+		options.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+				.decodeResource(getResources(), R.drawable.ic_invited_32)));
+
+		Marker m = getmMap().addMarker(options);
+		markerSIn.put(f.getUserInfo().getId(), m);
+
+	}
+
+	private void createStrangerMakerOnMap(int id, LatLng latlng) {
+		Log.i(TAG, "create stranger on map");
+
+		if (markerSIn.containsKey(id))
+			return;
+
+		MarkerOptions options = new MarkerOptions();
+		options.position(latlng);
+
+		options.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+				.decodeResource(getResources(), R.drawable.ic_stranger_32)));
+
+		Marker m = getmMap().addMarker(options);
+		markerSIn.put(id, m);
+	}
+
 	private void createMakerOnMap(Friend f) {
 		Log.i(TAG, "create on map");
 
 		MarkerOptions options = new MarkerOptions();
 		options.position(f.getLastLocation());
-		// options.title(mapController.getAddress(f.getLastLocation()));
 		options.snippet(Utility.convertMicTimeToString(System
-				.currentTimeMillis()
-				- f.getUserInfo().getLastestlogin().getTime())
+				.currentTimeMillis() - f.getUserInfo().getLastLogin().getTime())
 				+ " trước - sai lệch " + f.getAccurency() + "m.");
 
-		options.icon(combileLocationIcon(f, false));
+		options.icon(Utility.combileLocationIcon(getActivity(), f, false));
 
 		Marker m = getmMap().addMarker(options);
 		markerManager.put(f.getUserInfo().getId(), m);
@@ -1051,12 +1165,13 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 	public void onMyLocationChanged(Location location) {
 		if (null == location)
 			return;
-		Log.i(TAG, "update! " + markerManager.size());
-		Friend f = FriendManager.getInstance().getMine();
+		Log.i(TAG,
+				"update! " + location.getLatitude() + " # "
+						+ location.getLongitude());
 		LatLng latlng = new LatLng(location.getLatitude(),
 				location.getLongitude());
-		MyProfileManager.getInstance().myLocation = latlng;
-		f.setLastLocation(latlng);
+		MyProfileManager.getInstance().setMyPosition(latlng);
+		Friend f = MyProfileManager.getInstance().getMineInstance();
 
 		updatePositionOf(f);
 
@@ -1065,6 +1180,10 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 			isMapStarted = true;
 		}
 
+	}
+
+	public void updatePositionTask(int fID) {
+		mapController.updatePositionTask(fID);
 	}
 
 	public GoogleMap getmMap() {
@@ -1083,71 +1202,308 @@ public class MapFragment extends Fragment implements MyLocationChangeListener {
 		this.pbOnMap = pbOnMap;
 	}
 
+	public void showOptionsContacts() {
+		final Dialog dialog = new Dialog(myContext);
+
+		Window W = dialog.getWindow();
+		W.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
+		W.requestFeature(Window.FEATURE_NO_TITLE);
+		W.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		dialog.setContentView(R.layout.options_invite_layout);
+
+		((Button) dialog.findViewById(R.id.btnInvite))
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						InviteFromContactsDialog contactsdialog = new InviteFromContactsDialog(
+								myContext);
+						contactsdialog.show();
+						dialog.dismiss();
+					}
+				});
+
+		((Button) dialog.findViewById(R.id.btnSearch))
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						SearchFromServerDialog searchdialog = new SearchFromServerDialog(
+								myContext);
+						searchdialog.show();
+						dialog.dismiss();
+					}
+				});
+
+		dialog.show();
+	}
+
 	// handle message
 	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
-			if (intent.getStringExtra(
-					(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE)).equals(
-					Utility.SHARE)) {
+			String action = intent.getAction();
 
-				if (intent.getStringExtra(
-						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
-						.equals(Utility.REQUEST)) {
-					swipeAdapter.notifyDataSetChanged();
-					changeVisibilityView();
-				} else if (intent.getStringExtra(
-						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
-						.equals(Utility.RESPONSE_YES)) {
-					swipeAdapter.notifyDataSetChanged();
-					((MainActivity) myContext).notifyDataChange();
-					changeVisibilityView();
-				} else {
-					// response no
-					swipeAdapter.notifyDataSetChanged();
-					((MainActivity) myContext).notifyDataChange();
-					changeVisibilityView();
+			if (action.equals(com.sgu.findyourfriend.mgr.Config.MAIN_ACTION)) {
+				if (intent
+						.hasExtra(com.sgu.findyourfriend.mgr.Config.ZOOM_POSITION_ACTION)) {
+					int fID = intent
+							.getIntExtra(
+									com.sgu.findyourfriend.mgr.Config.ZOOM_POSITION_ACTION,
+									-1);
+					if (fID >= 0) {
+						Friend f = FriendManager.getInstance().hmMemberFriends
+								.get(fID);
+						if (f.getAcceptState() == Friend.SHARE_RELATIONSHIP)
+							mapController.zoomToPosition(f.getLastLocation());
+						else
+							Utility.showMessageOnCenter(context,
+									"Vị trí không có sẵn");
+					}
+				} else if (intent
+						.hasExtra(com.sgu.findyourfriend.mgr.Config.ROUTE_ACTION)) {
+					hideControl();
+					fIDCurrent = intent.getIntExtra(
+							com.sgu.findyourfriend.mgr.Config.ROUTE_ACTION, -1);
+					mapController.routeTask(fIDCurrent);
+				} else if (intent
+						.hasExtra(com.sgu.findyourfriend.mgr.Config.HISTORY_ACTION)) {
+
+					hideControl();
+					fIDCurrent = intent.getIntExtra(
+							com.sgu.findyourfriend.mgr.Config.HISTORY_ACTION,
+							-1);
+					mapController.drawHistoryTask(fIDCurrent);
 				}
 
-			} else if (intent.getStringExtra(
-					(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE)).equals(
-					Utility.FRIEND)) {
+			} else if (action
+					.equals(com.sgu.findyourfriend.mgr.Config.UPDATE_UI)) {
 				if (intent.getStringExtra(
-						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
-						.equals(Utility.REQUEST)) {
-					// update friend
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE))
+						.equals(Utility.SHARE)) {
+
+					swipeAdapter.notifyDataSetChanged();
+					((MainActivity) myContext).notifyDataChange();
+					changeVisibilityView();
 
 				} else if (intent.getStringExtra(
-						(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
-						.equals(Utility.RESPONSE_YES)) {
-					
-					Log.i(TAG, "friend response yes");
-					// add new friend to map
-					for (int id : FriendManager.getInstance().hmMemberFriends
-							.keySet()) {
-						Friend fr = FriendManager.getInstance().hmMemberFriends
-								.get(id);
-						
-						if (null != fr.getLastLocation() && fr.getAcceptState() == Friend.SHARE_RELATIONSHIP
-								&& !markerManager.containsKey(id)) {
-							Log.i(TAG, "ok");
-							createMakerOnMap(fr);
+						(com.sgu.findyourfriend.mgr.Config.UPDATE_TYPE))
+						.equals(Utility.FRIEND)) {
+					if (intent.getStringExtra(
+							(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+							.equals(Utility.REQUEST)) {
+						// update friend
+
+					} else if (intent.getStringExtra(
+							(com.sgu.findyourfriend.mgr.Config.UPDATE_ACTION))
+							.equals(Utility.RESPONSE_YES)) {
+
+						Log.i(TAG, "friend response yes");
+						// add new friend to map
+						for (int id : FriendManager.getInstance().hmMemberFriends
+								.keySet()) {
+							Friend fr = FriendManager.getInstance().hmMemberFriends
+									.get(id);
+
+							if (null != fr.getLastLocation()
+									&& fr.getAcceptState() == Friend.SHARE_RELATIONSHIP
+									&& !markerManager.containsKey(id)) {
+								Log.i(TAG, "ok");
+								createMakerOnMap(fr);
+							}
 						}
+
+					} else {
+						// response no
+
 					}
 
-				} else {
-					// response no
-
+					Log.i("UPDATE AFTER", "OK");
+					swipeAdapter.notifyDataSetChanged();
+					((MainActivity) myContext).notifyDataChange();
+					changeVisibilityView();
 				}
-
-				swipeAdapter.notifyDataSetChanged();
-				((MainActivity) myContext).notifyDataChange();
-				changeVisibilityView();
 			}
-
 		}
 
 	};
+
+	// ---------- private class
+	class OnCallClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[CALL] == 1 && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				mapController.callTask(fIDCurrent);
+			}
+		}
+	}
+
+	class OnMessageClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[MESSAGE] == 1 && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				mapController.sendMessageTask(fIDCurrent);
+			}
+		}
+	}
+
+	class OnHistoryClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[HISTORIES] == 1
+					&& null != FriendManager.getInstance().hmMemberFriends.get(
+							fIDCurrent).getLastLocation() && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				hideMarker();
+				mapController.drawHistoryTask(fIDCurrent);
+			} else {
+
+				Utility.showMessageOnCenter(context,
+						"Vị trí  hiện tại không có sẵn");
+			}
+
+		}
+	}
+
+	class OnUpdateClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[UPDATE] == 1 && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				showMarker();
+
+				mapController.updatePositionTask(fIDCurrent);
+			}
+		}
+	}
+
+	class OnRouteClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[ROUTE] == 1
+					&& null != FriendManager.getInstance().hmMemberFriends.get(
+							fIDCurrent).getLastLocation() && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				hideMarker(MyProfileManager.getInstance().getMineInstance(),
+						FriendManager.getInstance().hmMemberFriends
+								.get(fIDCurrent));
+				mapController.routeTask(fIDCurrent);
+			} else {
+				// Utility.showMessageOnCenter(context,
+				// "Vị trí  hiện tại không có sẵn");
+			}
+
+		}
+	}
+
+	class OnRequestClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[REQUEST] == 1 && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				showMarker();
+				Friend f = FriendManager.getInstance().hmMemberFriends
+						.get(fIDCurrent);
+
+				if (f.getAcceptState() == Friend.REQUESTED_SHARE)
+					mapController.acceptTask(fIDCurrent);
+				else
+					mapController.requestTask(fIDCurrent);
+
+				// update ui
+			}
+
+		}
+	}
+
+	class OnAcceptClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			if (maskEn[ACCEPT] == 1 && isControllerShowed) {
+				tickVibrator();
+				hideControl();
+				showMarker();
+				Friend f = FriendManager.getInstance().hmMemberFriends
+						.get(fIDCurrent);
+
+				mapController.requestTask(fIDCurrent);
+
+				// update ui
+			}
+		}
+	}
+
+	class OnUnFriendClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
+	class OnRemoveHistoryClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
+	class OnStopShareClick implements OnClickListener {
+
+		@Override
+		public void onClick(View arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+	
+	class OnToastClick implements OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			// hideMarker();
+
+			PositionDetailFragment fragment = new PositionDetailFragment(
+					mThis);
+
+			Bundle bundle = new Bundle();
+			bundle.putInt("friendId", fIDCurrent);
+			bundle.putString("address", textViewAddress.getText().toString());
+			bundle.putDouble("myLat", MyProfileManager
+					.getInstance().getMyPosition().latitude);
+			bundle.putDouble("myLng", MyProfileManager
+					.getInstance().getMyPosition().longitude);
+
+			fragment.setArguments(bundle);
+
+			hideControl();
+			((BaseContainerFragment) getParentFragment())
+					.replaceFragment(fragment, true);
+			
+		}
+		
+	}
 
 }

@@ -12,12 +12,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.net.PostData;
+import com.sgu.findyourfriend.utils.Utility;
 
 public class ForgetPasswordFragment extends BaseFragment {
 
-	EditText phone,email;
-	Button find;
+	private EditText phone,email;
+	private Button find;
 	private Context ctx;
+	private ProgressDialogCustom progress;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,22 +36,59 @@ public class ForgetPasswordFragment extends BaseFragment {
 			
 			@Override
 			public void onClick(View v) {
+				
+				boolean isEmpty = false;
+				
+				if (phone.getText().toString().trim().length() > 0) {
+					phone.setBackgroundDrawable(getResources()
+							.getDrawable(R.drawable.edit_text));
+				} else {
+					phone.setBackgroundDrawable(getResources()
+							.getDrawable(R.drawable.edit_text_wrong));
+					isEmpty = true;
+				}
+
+				if (Utility.isValidEmailAddress(email.getText().toString()
+						.trim())) {
+					email.setBackgroundDrawable(getResources().getDrawable(
+							R.drawable.edit_text));
+				} else {
+					email.setBackgroundDrawable(getResources().getDrawable(
+							R.drawable.edit_text_wrong));
+					isEmpty = true;
+				}
+
+				if (isEmpty) {
+					Utility.showAlertDialog(ctx, "Cảnh báo",
+							"Nhập các thông tin yêu cầu", false);
+					return;
+				}
+				
 				// TODO Auto-generated method stub
-				(new AsyncTask<Void, Void, Void>() {
+				(new AsyncTask<Void, Void, Boolean>() {
 
 					@Override
-					protected Void doInBackground(Void... params) {
-						
-					
-						return null;
+					protected void onPreExecute() {
+						progress = new ProgressDialogCustom(ctx);
+						progress.show();
 					}
 					
 					@Override
-					protected void onPostExecute(Void result) {
-						Toast.makeText(ctx, "Sẽ Gởi Email Đến Bạn Trong Giây Lát", Toast.LENGTH_LONG).show();
-						
-						
-						replaceFragment(new LoginFragment(), false);
+					protected Boolean doInBackground(Void... params) {
+						return PostData.userForgetPassword(getActivity(), phone.getText().toString().trim(),
+								email.getText().toString().trim());
+					}
+					
+					@Override
+					protected void onPostExecute(Boolean result) {
+						progress.dismiss();
+						if (result) { 
+							Utility.showAlertDialog(getActivity(), "Thông báo", "Sẽ gửi mail đến bạn trong giây lát", false);
+							replaceFragment(new LoginFragment(), false);
+						} else {
+							Utility.showAlertDialog(getActivity(), "Cảnh báo", "Email hoặc số điện thoại không đúng", false);
+							
+						}
 					}
 					
 				}).execute();

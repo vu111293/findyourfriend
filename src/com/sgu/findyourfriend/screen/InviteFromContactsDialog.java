@@ -36,11 +36,12 @@ public class InviteFromContactsDialog extends Dialog {
 	private ContactAdapter contactAdapter;
 	private ListView listView;
 	private Button btnNext;
-	private ImageButton btnDelete;
+	private ImageButton btnClose;
 	private EditText editSearch;
 	private Button btnSelectAll;
 	private Context ctx;
 	private ProgressBar pbLoader;
+	private boolean isSelectMode = true;
 
 	public InviteFromContactsDialog(Context context) {
 		super(context, R.style.full_screen_dialog);
@@ -56,7 +57,7 @@ public class InviteFromContactsDialog extends Dialog {
 				LayoutParams.MATCH_PARENT);
 
 		pbLoader = (ProgressBar) findViewById(R.id.pbLoader);
-		btnDelete = (ImageButton) findViewById(R.id.bntDelete);
+		btnClose = (ImageButton) findViewById(R.id.imgClose);
 		editSearch = (EditText) findViewById(R.id.editSearch);
 		btnSelectAll = (Button) findViewById(R.id.btnSelectAll);
 		btnNext = (Button) findViewById(R.id.btnNext);
@@ -84,11 +85,11 @@ public class InviteFromContactsDialog extends Dialog {
 				R.layout.custom_contact_addfriend, temptContactData);
 		listView.setAdapter(contactAdapter);
 
-		btnDelete.setOnClickListener(new View.OnClickListener() {
+		btnClose.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				editSearch.setText("");
+				dismiss();
 			}
 		});
 
@@ -123,7 +124,15 @@ public class InviteFromContactsDialog extends Dialog {
 
 			@Override
 			public void onClick(View v) {
-				contactAdapter.checkAll();
+				if (isSelectMode) {
+					contactAdapter.checkAll();
+					btnSelectAll.setText("Bỏ chọn");
+				} else {
+					contactAdapter.unCheckAll();
+					btnSelectAll.setText("Chọn tất cả");
+				}
+				
+				isSelectMode = !isSelectMode;
 			}
 		});
 
@@ -156,7 +165,7 @@ public class InviteFromContactsDialog extends Dialog {
 					protected HashMap<String, Integer> doInBackground(
 							Void... params) {
 						return PostData.userGetUserListWithoutFriend(ctx,
-								MyProfileManager.getInstance().mine.getId(),
+								MyProfileManager.getInstance().getMyID(),
 								phoneNumbers);
 					}
 
@@ -175,16 +184,13 @@ public class InviteFromContactsDialog extends Dialog {
 
 							(new AsyncTask<Void, Void, Void>() {
 
-								
-								
 								@Override
 								protected Void doInBackground(Void... params) {
 
 									for (String kPhone : result.keySet()) {
 										PostData.sendFriendRequest(
 												ctx,
-												MyProfileManager.getInstance().mine
-														.getId(), result
+												MyProfileManager.getInstance().getMyID(), result
 														.get(kPhone));
 									}
 
@@ -195,7 +201,7 @@ public class InviteFromContactsDialog extends Dialog {
 									Utility.showMessage(
 											ctx,
 											"Đã gửi lời mời đến "
-													+ result.size() + " bạn.");
+													+ result.size() + " bạn đang dùng ứng dụng");
 									showAlertSendByMessage(phoneSelected);
 								}
 

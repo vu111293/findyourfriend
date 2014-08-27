@@ -1,6 +1,5 @@
 package com.sgu.findyourfriend.screen;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,25 +7,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -53,40 +40,26 @@ public class MapController {
 	private Context context;
 	private GoogleMap mMap;
 	private GpsDirection gpsDirection;
-
 	private AsyncTask<Void, Void, Void> mLoadLocationTask;
-
-	private List<History> historyList;
 	private List<Marker> hisMarkerList;
-
-	private boolean isRouting;
-
 	private ProgressDialogCustom progress;
-
-	// private ProgressBar pbOnMap;
-
-	// public MapController(Context context, Fragment f, GoogleMap map,
-	// ProgressBar pbOnMap) {
 
 	public MapController(MapFragment parentFragment) {
 		this.mapFragment = parentFragment;
 		this.context = parentFragment.getParentFragment().getActivity();
 		this.mMap = parentFragment.getmMap();
-		// this.pbOnMap = parentFragment.getPbOnMap();
 
 		progress = new ProgressDialogCustom(context);
-		isRouting = false;
 
 		// get Gps direction after map is setup
 		gpsDirection = new GpsDirection(context, mMap);
 
 		// init variable
-		historyList = new ArrayList<History>();
 		hisMarkerList = new ArrayList<Marker>();
 	}
 
 	public void sendMessageTask(int friendId) {
-		SendMessageFragment fragment = new SendMessageFragment();
+		MessageSendFragment fragment = new MessageSendFragment();
 
 		Bundle bundle = new Bundle();
 		bundle.putInt("friendId", friendId);
@@ -102,11 +75,19 @@ public class MapController {
 				.get(friendId).getNumberLogin();
 
 		if (phs.size() == 0) {
-			Toast.makeText(context, "Not phone number", Toast.LENGTH_LONG)
+			Toast.makeText(context, "Không có số điện thoại", Toast.LENGTH_LONG)
 					.show();
 			return;
 		}
 
+		if (phs.size() == 1) {
+			Intent callIntent = new Intent(Intent.ACTION_CALL);
+			callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			callIntent.setData(Uri.parse("tel:" + phs.get(0)));
+			context.startActivity(callIntent);
+			return;
+		}
+		
 		final String[] phonenumbers = new String[phs.size()];
 
 		for (int i = 0; i < phs.size(); ++i) {
@@ -114,7 +95,7 @@ public class MapController {
 		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Chọn số cần gọi:");
+		builder.setTitle("Chọn số cần gọi");
 		builder.setItems(phonenumbers, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -143,32 +124,15 @@ public class MapController {
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
-				// pbOnMap.setVisibility(View.VISIBLE);
 				progress.show();
 			}
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				// locationsHis = aController.getLocationHistory(context);
-
-				// get list latlng from server
-				// historyList.add(new History(new Timestamp(System
-				// .currentTimeMillis() - 10000), new LatLng(
-				// 13.073887272186989, 106.1006023606658)));
-				// historyList.add(new History(new Timestamp(System
-				// .currentTimeMillis() - 8000), new LatLng(
-				// 13.973887272186989, 106.9006023606658)));
-				// historyList.add(new History(new Timestamp(System
-				// .currentTimeMillis() - 6000), new LatLng(
-				// 14.573887272186989, 106.8006023606658)));
-				// historyList.add(new History(new Timestamp(System
-				// .currentTimeMillis() - 4000), new LatLng(
-				// 13.273887272186989, 106.5006023606658)));
-				// historyList.add(new History(new Timestamp(System
-				// .currentTimeMillis() - 1000), new LatLng(
-				// 13.173887272186989, 107.1006023606658)));
-
 				f = FriendManager.getInstance().hmMemberFriends.get(friendId);
+				
+				Log.i("TAG debug", f + "");
+				
 				if (null == f.getSteps())
 					f.setSteps(PostData.historyGetUserHistory(context, f
 							.getUserInfo().getId()));
@@ -180,6 +144,16 @@ public class MapController {
 			protected void onPostExecute(Void result) {
 				mLoadLocationTask = null;
 
+				if (null == f.getSteps()) {
+					
+					Utility.showMessage(context, "Không tìm thấy lịch sử");
+					
+					// hide progress bar
+					progress.dismiss();
+					return;
+				}
+				
+				
 				List<LatLng> latlngs = new ArrayList<LatLng>();
 
 				// draw on map
@@ -196,7 +170,6 @@ public class MapController {
 				}
 
 				// hide progress bar
-				// pbOnMap.setVisibility(View.GONE);
 				progress.dismiss();
 
 				// set bound zoom
@@ -265,11 +238,9 @@ public class MapController {
 
 		LatLng dest = FriendManager.getInstance().hmMemberFriends.get(friendId)
 				.getLastLocation();
-		// Location myLocation = mMap.getMyLocation();
-		LatLng myLatLng = MyProfileManager.getInstance().myLocation;
+		LatLng myLatLng = MyProfileManager.getInstance().getMyPosition();
 
 		gpsDirection.excuteDirection(myLatLng, dest, true);
-		isRouting = true;
 
 		List<LatLng> latlngs = new ArrayList<LatLng>();
 		latlngs.add(myLatLng);
@@ -284,7 +255,7 @@ public class MapController {
 			@Override
 			protected Void doInBackground(Void... params) {
 				PostData.sendShareRequest(context,
-						MyProfileManager.getInstance().mine.getId(), friendId);
+						MyProfileManager.getInstance().getMyID(), friendId);
 				return null;
 			}
 
@@ -328,7 +299,7 @@ public class MapController {
 				// Toast.makeText(context, "sending accept",
 				// Toast.LENGTH_SHORT).show();
 				PostData.sendShareAccept(context,
-						MyProfileManager.getInstance().mine.getId(), fIDCurrent);
+						MyProfileManager.getInstance().getMyID(), fIDCurrent);
 
 				return null;
 			}
@@ -359,11 +330,11 @@ public class MapController {
 		MarkerOptions opt = new MarkerOptions();
 		opt.position(hisP.getLocation());
 		opt.title(getAddress(hisP.getLocation()));
-		opt.snippet(hisP.getTimest().toGMTString());
-		opt.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(
-				R.drawable.ic_position_history, prio + "")));
+		opt.snippet(null == hisP.getTimest() ? "không xác định thởi gian" :  hisP.getTimest().toGMTString());
+		opt.icon(BitmapDescriptorFactory.fromBitmap(Utility.writeTextOnDrawable(
+				context, R.drawable.ic_position_history, prio + "")));
 		Marker m = mMap.addMarker(opt);
-		opt.title(hisP.getTimest().toGMTString());
+//		opt.title(hisP.getTimest().toGMTString());
 		hisMarkerList.add(m);
 	}
 
@@ -400,51 +371,6 @@ public class MapController {
 		CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(
 				new LatLng(location.getLatitude(), location.getLongitude()), 8);
 		mMap.animateCamera(cu);
-	}
-
-	// ---------------bitmap untilities ------------------------ //
-
-	private Bitmap writeTextOnDrawable(int drawableId, String text) {
-
-		Bitmap bm = BitmapFactory.decodeResource(context.getResources(),
-				drawableId).copy(Bitmap.Config.ARGB_8888, true);
-
-		Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
-
-		Paint paint = new Paint();
-		paint.setStyle(Style.FILL);
-		paint.setColor(Color.BLACK);
-		paint.setTypeface(tf);
-		paint.setTextAlign(Align.CENTER);
-		paint.setTextSize(convertToPixels(context, 18));
-
-		Rect textRect = new Rect();
-		paint.getTextBounds(text, 0, text.length(), textRect);
-
-		Canvas canvas = new Canvas(bm);
-
-		// If the text is bigger than the canvas , reduce the font size
-		if (textRect.width() >= (canvas.getWidth() - 4))
-			paint.setTextSize(convertToPixels(context, 7));
-
-		// Calculate the positions
-		int xPos = (canvas.getWidth() / 2) - 2;
-
-		// baseline to the center.
-		int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint
-				.ascent()) / 2));
-
-		canvas.drawText(text, xPos, yPos, paint);
-
-		return bm;
-	}
-
-	public static int convertToPixels(Context context, int nDP) {
-		final float conversionScale = context.getResources()
-				.getDisplayMetrics().density;
-
-		return (int) ((nDP * conversionScale) + 0.5f);
-
 	}
 
 	// --------------- get address utilities ---------------------- //

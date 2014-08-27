@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:text="@string/alert_cancel_button"
             android:textStyle="bold"
+            android:background="@drawable/button_green"
             android:textColor="@color/white"
             android:textSize="@dimen/alert_text_btn" />
     </LinearLayout>

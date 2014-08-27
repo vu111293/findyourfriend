@@ -30,7 +30,7 @@ public class EmergenceDialog extends Dialog {
 	private boolean isSound;
 
 	public EmergenceDialog(Context context) {
-		super(context);
+		super(context, R.style.full_screen_dialog);
 		isStop = false;
 		isVibrate = SettingManager.getInstance().isVibrate();
 		isSound = SettingManager.getInstance().isAlertRingtone();
@@ -46,8 +46,8 @@ public class EmergenceDialog extends Dialog {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.alert_dialog_custom);
-		getWindow().setLayout(LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT);
+		getWindow().setLayout(LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT);
 
 		txtTicker = (TextView) findViewById(R.id.txtTicker);
 		findViewById(R.id.btnCancel).setOnClickListener(
@@ -107,7 +107,7 @@ public class EmergenceDialog extends Dialog {
 		
 		if (SettingManager.getInstance().isMessageWarning()) {
 			for (String fID : friendIds) {
-				PostData.sendMessage(getContext(), MyProfileManager.getInstance().mine.getId(),
+				PostData.sendMessage(getContext(), MyProfileManager.getInstance().getMyID(),
 						Integer.parseInt(fID), defaultMsg);
 			}
 		}

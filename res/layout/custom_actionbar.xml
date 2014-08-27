@@ -4,17 +4,14 @@
     android:layout_height="match_parent"
     android:background="@color/bar_color" >
 
-    <TextView
+    <ImageView
         android:id="@+id/TextView_Title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
-        android:gravity="center_vertical"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="10pt" />
+        android:layout_marginLeft="-25dp"
+        android:src="@drawable/logo_appname" />
 
     <LinearLayout
         android:id="@+id/grpItemControl"
@@ -34,7 +31,8 @@
             android:gravity="center_vertical"
             android:padding="3dp"
             android:background="@drawable/custom_button_control"
-            android:src="@drawable/ic_contacts" />
+            android:src="@drawable/ic_contacts"
+            android:visibility="gone" />
         
         <ImageView
             android:contentDescription="@string/item_alert_description"
@@ -57,18 +55,4 @@
             android:background="@drawable/custom_button_control"
             android:src="@drawable/ic_friend_status" />
     </LinearLayout>
-
-    <ImageView
-        android:contentDescription="@string/item_send_message_description"
-        android:id="@+id/imgSend"
-        android:layout_width="@dimen/item_actionbar_width"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:gravity="center_vertical"
-        android:padding="3dp"
-        android:background="@drawable/custom_button_control"
-        android:src="@drawable/ic_send"
-        android:visibility="gone" />
-
 </RelativeLayout>

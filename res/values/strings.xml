@@ -27,18 +27,13 @@
     <string name="hello_world">Hello world!</string>
     <string name="drawer_open">Slider Menu Opened</string>
     <string name="drawer_close">Slider Menu Closed</string>
-
     <string name="vendor">SGU Team Corporation 2014</string>
-    
-    
     <string name="alert_title">cảnh báo khẩn</string>
     <string name="alert_explain">Chúng tôi sẽ gọi, email, gửi tin nhắn đến bất kì ai đang ở gần bạn.</string>
     <string name="alert_cancel_button">Hủy</string>
-    
     <string name="item_alert_description">trợ giúp</string>
     <string name="item_friend_description">danh sách bạn bè</string>
     <string name="item_send_message_description">gửi tin nhắn</string>
-    
     <string name="item_status_description">thanh báo trạng thái</string>
     <string name="item_imgprofile_description">ảnh dại diện</string>
     <string name="item_none_accept_description">thanh cảnh báo không chấp nhận</string>
@@ -50,7 +45,6 @@
     <string name="item_background_description">ảnh nền</string>
     <string name="item_emergency_button_description">nút cầu cứu</string>
     <string name="item_icon_description">biểu tượng</string>
-    
     <string name="not_available">không có sẵn</string>
     <string name="accept">chấp chận</string>
     <string name="invite">gửi lời mời</string>
@@ -61,21 +55,17 @@
     <string name="update">cập nhật</string>
     <string name="route">tìm đường</string>
     <string name="request">yêu cầu</string>
-    
     <string name="close">đóng</string>
-    <string name="please_wait">đang tải, xin đợi</string>
-    
+    <string name="please_wait">đang tải...</string>
     <string name="current_password">Mật khẩu hiện tại</string>
     <string name="new_password">Mật khẩu mới</string>
     <string name="repeat_password">Nhập lại mật khẩu</string>
     <string name="forgot_password">Quên mật khẩu?</string>
     <string name="show_password">Hiển thị mật khẩu</string>
     <string name="really_delete_item">Bạn có chắc muốn xóa?</string>
-    
     <string name="item_show_description">hiển thị</string>
-    
     <string name="enter_message_hint">soạn tin nhắn</string>
-    
+
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
         <item>Bản đồ</item>
@@ -86,23 +76,12 @@
         <item>Trợ giúp</item>
     </string-array>
 
-    <!-- Nav Drawer List Item Icons -->
-    <!-- Keep them in order as the titles are in -->
-    <array name="nav_drawer_icons">
-        <item>@drawable/ic_home</item>
-        <item>@drawable/ic_location</item>
-        <item>@drawable/ic_grp</item>
-        <item>@drawable/ic_friend</item>
-        <item>@drawable/ic_setting</item>
-        <item>@drawable/ic_help</item>
-    </array>
-
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_setting">SettingActivity</string>
 
-    <string-array name="displayobjects" >
+    <string-array name="displayobjects">
         <item>Bệnh viện</item>
         <item>Trường học</item>
         <item>Tiệm sảnh</item>
@@ -134,18 +113,127 @@
         <item>terrain</item>
         <item>hybrid</item>
     </string-array>
-
     <string-array name="empty_array"></string-array>
-    
-    
-    
+
     <string name="name_demo">Họ và tên</string>
     <string name="phone_number_demo">0911111111</string>
     <string name="status_demo">trực tuyến</string>
     <string name="email_demo">email@email.com</string>
-    
     <string name="address">địa chỉ</string>
-    <string name="accuracy">chính xác trong</string>
+    <string name="accuracy">phạm vi</string>
+    <string name="long_street">độ dài </string>
+
+    <!-- help screen info -->
+    <string name="intro">Bạn muốn sử dụng ứng dụng nhanh chóng và chuyên nghiệp? Hãy theo các hướng dẫn sau đây, bạn sẽ làm chủ được ứng dụng.</string>
+    <string name="chapter_quickstart">Bắt đầu nhanh</string>
+    <string name="hp_register">Nếu bạn là người sử dụng mới, hãy tạo cho mình một tài khoản.\nB1. Nhấn nút đăng kí.\nB2. Điền các thông tin yêu cầu.\nB3. Nhấn vào nút Hoàn tất để bắt đầu trải nghiệm.</string>
+    <string name="hp_register_add">Số điện thoại và mật khẩu là thông tin đăng nhập sau này.
+Hãy chắc chắn bạn đã điền tất cả thông tin được yêu cầu và chọn cho mình một ảnh đại diện.</string>
+    <string name="hp_login">Nếu bạn đã có tài khoản hoặc muốn sử dụng trên máy khác.</string>
+    <string name="hp_forgot_password">Bạn đã có tài khoản nhưng lại quên mất mật khẩu? Hãy chọn liên kết Quên mật khẩu và nhập email bạn đăng kí, chúng tôi sẻ khôi phục mật khẩu qua email bạn cung cấp.</string>
+    <string name="chapter_findfriend">Tìm bạn</string>
+    <string name="hp_findfriend">Để có thêm nhiều bạn bè, đừng ngần ngại gửi lời mời đến các bạn của mình.
+\nB1. Nhấn biể tượng và chọn chức năng Tìm bạn.
+\nB2. Nhập thông tin họ tên bạn bè, chúng tôi sẻ đưa ra các gợi ý cho bạn.
+\nB3. Nhấn nút "Gửi lời mời".</string>
+    <string name="hp_invitefriend">Bạn muốn mời người thân dùng ứng dụng? 
+\nB1. Nhấn biểu tượng và chọn Mời.
+\nB2. Đánh dấu những người trong danh bạ bạn muốn mời.
+\nB3. Nhấn Kế tiếp để gửi lời mời.</string>
+    <string name="chapter_viewinfofriend">Xem thông tin bạn bè</string>
+    <string name="hp_friendlist">Phía dưới màn hình là sanh sách bạn bè</string>
+    <string name="hp_friendstatus">Trạng thái bạn bè</string>
+    <string name="hp_wait_request_status">Chờ yêu cầu.</string>
+    <string name="hp_wait_accept_status">Chờ chấp nhận.</string>
+    <string name="hp_share_status">Đang chia sẻ.</string>
+    <string name="hp_taskbar">Thanh chức năng.</string>
+    <string name="hp_message_task">Soạn và gửi tin nhắn.</string>
+    <string name="hp_phone_task">Gọi.</string>
+    <string name="hp_history_task">Hiển thị thông tin lịch sử di chuyển của bạn bè (nếu người đó chia sẻ).</string>
+    <string name="hp_route_task">Hiển thị đường đi gần nhất đến người bạn muốn tìm.</string>
+    <string name="hp_refesh_task">Làm mới lại thông tin vị trí bạn bè.</string>
+    <string name="hp_request_task">Yêu cầu chia sẻ vị trí để có thể xem thông tin vị trí và lịch sử di chuyển của bạn bè.</string>
+    <string name="hp_accept_task">Chấp nhận yêu cầu chia sẻ.</string>
+    <string name="hp_current_position">Thông tin vị trí bạn bè hiện tại</string>
+    <string name="hp_detail_position">Thông tin đường đi</string>
+    <string name="chapter_helpme">Cầu cứu</string>
+    <string name="hp_helpme">Gửi yêu cầu trợ giúp đến bạn bè đã định trước trong phần cài đặt (mặc định sẻ gửi yêu cầu đến tất cả bạn bè bạn có). Yêu cầu sẽ được gửi đi sau 10 giây.</string>
+    <string name="hp_widget">Gửi nhanh yêu cầu trợ giúp từ widget ở màn hình chính.</string>
+    <string name="chapter_chat">Chat với bạn bè</string>
+    <string name="hp_chat">Bạn có thể trao đổi thông tin với bạn bè qua tin nhắn tích hợp trong ứng dụng, hoàn toàn miễn phí.</string>
+    <string name="chapter_setting">Cài đặt</string>
+    <string name="hp_background_task">Chạy nền.</string>
+    <string name="policy">Hoàn tất đăng kí đồng nghĩa với việc bạn đã chấp nhận các điểu khoản dịch vụ cung cấp.</string>
+    <string name="min_password_length">Ít nhất 6 kí tự</string>
+    <string name="country_prompt">Choose a country</string>
+
+    <string-array name="country_arrays">
+        <item>Chọn tỉnh thành</item>
+        <item>An Giang</item>
+        <item>Bà Rịa - Vũng Tàu</item>
+        <item>Bắc Giang</item>
+        <item>Bắc Kạn</item>
+        <item>Bạc Liêu</item>
+        <item>Bắc Ninh</item>
+        <item>Bến Tre</item>
+        <item>Bình Định</item>
+        <item>Bình Dương</item>
+        <item>Bình Phước</item>
+        <item>Bình Thuận</item>
+        <item>Cà Mau</item>
+        <item>Cao Bằng</item>
+        <item>Đắk Lắk</item>
+        <item>Đắk Nông</item>
+        <item>Điện Biên</item>
+        <item>Đồng Nai</item>
+        <item>Đồng Tháp</item>
+        <item>Gia Lai</item>
+        <item>Hà Giang</item>
+        <item>Hà Nam</item>
+        <item>Hà Tĩnh</item>
+        <item>Hải Dương</item>
+        <item>Hậu Giang</item>
+        <item>Hòa Bình</item>
+        <item>Hưng Yên</item>
+        <item>Khánh Hòa</item>
+        <item>Kiên Giang</item>
+        <item>Kon Tum</item>
+        <item>Lai Châu</item>
+        <item>Lâm Đồng</item>
+        <item>Lạng Sơn</item>
+        <item>Lào Cai</item>
+        <item>Long An</item>
+        <item>Nam Định</item>
+        <item>Nghệ An</item>
+        <item>Ninh Bình</item>
+        <item>Ninh Thuận</item>
+        <item>Phú Thọ</item>
+        <item>Quảng Bình</item>
+        <item>Quảng Nam</item>
+        <item>Quảng Ngãi</item>
+        <item>Quảng Ninh</item>
+        <item>Quảng Trị</item>
+        <item>Sóc Trăng</item>
+        <item>Sơn La</item>
+        <item>Tây Ninh</item>
+        <item>Thái Bình</item>
+        <item>Thái Nguyên</item>
+        <item>Thanh Hóa</item>
+        <item>Thừa Thiên Huế</item>
+        <item>Tiền Giang</item>
+        <item>Trà Vinh</item>
+        <item>Tuyên Quang</item>
+        <item>Vĩnh Long</item>
+        <item>Vĩnh Phúc</item>
+        <item>Yên Bái</item>
+        <item>Phú Yên</item>
+        <item>Cần Thơ</item>
+        <item>Đà Nẵng</item>
+        <item>Hải Phòng</item>
+        <item>Hà Nội</item>
+        <item>TP HCM</item>
+    </string-array>
+
+    <string name="no_data">không có yêu cầu</string>
     
-    <string name="long_street">Độ dài quảng đường: </string>
 </resources>

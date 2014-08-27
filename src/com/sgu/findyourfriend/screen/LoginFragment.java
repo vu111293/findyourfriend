@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,18 +21,16 @@ import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.net.PostData;
-import com.sgu.findyourfriend.utils.Controller;
 import com.sgu.findyourfriend.utils.Utility;
 
 public class LoginFragment extends BaseFragment {
 
+	private static String TAG = "LoginFragment";
 	private ProgressDialogCustom progress;
 	private EditText ID, Password;
 	private Button BtnLogin, Signin;
 	private TextView Forgetpassword;
 	private Context ctx;
-
-	private Controller mController;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +47,9 @@ public class LoginFragment extends BaseFragment {
 		Forgetpassword = (TextView) rootView
 				.findViewById(R.id.TextView_Login_ForgetPassword);
 
+		ID.setText(SettingManager.getInstance().getPhoneAutoLogin());
+		Password.setText(SettingManager.getInstance().getPasswordAutoLogin());
+
 		BtnLogin.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -56,7 +58,23 @@ public class LoginFragment extends BaseFragment {
 				if (ID.getText().toString().trim().length() > 0
 						&& Password.getText().toString().trim().length() > 0) {
 
-					(new AsyncTask<Void, Void, Boolean>() {
+					if (Config.MODE_OFFLINE) {
+						
+						MyProfileManager.getInstance().init(ctx,
+								38, true);
+						
+						// start main app
+						Intent i = new Intent(
+								ctx,
+								com.sgu.findyourfriend.screen.MainActivity.class);
+						startActivity(i);
+						
+						getActivity().finish();
+						return;
+					}
+					
+					
+					(new AsyncTask<Void, Void, Integer>() {
 
 						private String phoneNumber;
 						private String password;
@@ -66,43 +84,53 @@ public class LoginFragment extends BaseFragment {
 						protected void onPreExecute() {
 							progress = new ProgressDialogCustom(ctx);
 							progress.show();
-							
+
 							phoneNumber = ID.getText().toString().trim();
 							password = Password.getText().toString().trim();
-							if (GCMRegistrar.isRegisteredOnServer(ctx)) {
-								gcmId = GCMRegistrar.getRegistrationId(ctx);
-							}
 						}
 
 						@Override
-						protected Boolean doInBackground(Void... params) {
-							if (gcmId.equals("")) {
-								GCMRegistrar.register(ctx,
-										Config.GOOGLE_SENDER_ID);
-							} else if (!GCMRegistrar.isRegisteredOnServer(ctx)) {
-								mController.register(ctx, phoneNumber,
-										password, gcmId);
-							}
+						protected Integer doInBackground(Void... params) {
 
-							gcmId = GCMRegistrar.getRegistrationId(ctx);
-							Log.i("GCM - do in background", gcmId);
-							
 							// login
 							int id = PostData.login(ctx, phoneNumber, password);
 
-							if (id >= 0) {
-								PostData.updateGcmId(ctx, id, gcmId);
-								MyProfileManager.getInstance().init(ctx, id);
-								return true;
-							}
+							Log.i(TAG, "Loginnnnnnnnnnnnnnnnn: " + id);
 
-							return false;
+							if (id > 0) {
+								SettingManager.getInstance()
+										.saveLastAccountIdLogin(id);
+
+								if (GCMRegistrar.isRegistered(ctx)) {
+									gcmId = GCMRegistrar.getRegistrationId(ctx);
+									PostData.updateGcmId(ctx, id, gcmId);
+									MyProfileManager.getInstance().init(ctx,
+											id, true);
+									Log.i(TAG, "registed with  " + gcmId);
+								} else {
+									Log.i(TAG, "empty gcmid");
+									MyProfileManager.getInstance().init(ctx,
+											id, true);
+									GCMRegistrar.register(ctx,
+											Config.GOOGLE_SENDER_ID);
+								}
+
+								// if (!gcmId.equals("")) {
+								// Log.i(TAG, "update gcmid");
+								// PostData.updateGcmId(ctx, id, gcmId);
+								// }
+
+								// MyProfileManager.getInstance().init(ctx, id,
+								// true);
+								return Config.SUCCESS;
+							} else if (id == -1)
+								return Config.ERROR_REGIST;
+							return Config.ERROR_NOT_FOUND;
 						}
 
 						@Override
-						protected void onPostExecute(Boolean isOk) {
-							progress.dismiss();
-							if (isOk) {
+						protected void onPostExecute(Integer result) {
+							if (result == Config.SUCCESS) {
 								// save info
 								SettingManager.getInstance()
 										.savePhoneAutoLogin(phoneNumber);
@@ -115,13 +143,22 @@ public class LoginFragment extends BaseFragment {
 										com.sgu.findyourfriend.screen.MainActivity.class);
 								startActivity(i);
 
+								getActivity().finish();
+
+							} else if (result == Config.ERROR_REGIST) {
+								// show error
+								Utility.showAlertDialog(
+										ctx,
+										"Cảnh báo",
+										"Tài khoản chưa được kích hoạt, xin kiểm tra mail để kích hoạt",
+										false);
+
 							} else {
 								// show error
-								Utility.showMessage(ctx,
-										"thong tin khong chinh xac!");
-								Password.setText("");
+								Utility.showAlertDialog(ctx, "Cảnh báo",
+										"Thông tin không chính xác", false);
 							}
-
+							progress.dismiss();
 						}
 
 					}).execute();
@@ -137,7 +174,7 @@ public class LoginFragment extends BaseFragment {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(new CreateAccountProfileFragment(), true);
+				replaceFragment(new CreateBasicInfoFragment(), true);
 			}
 		});
 
@@ -148,6 +185,11 @@ public class LoginFragment extends BaseFragment {
 				replaceFragment(new ForgetPasswordFragment(), true);
 			}
 		});
+
+		// // hide keyboard
+		// InputMethodManager imm = (InputMethodManager) getActivity()
+		// .getSystemService(Context.INPUT_METHOD_SERVICE);
+		// imm.hideSoftInputFromWindow(ID.getWindowToken(), 0);
 
 		return rootView;
 	}
@@ -162,31 +204,30 @@ public class LoginFragment extends BaseFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		Bundle bundle = this.getArguments();
-		if (null != bundle && bundle.getBoolean("error", false)) {
-			Utility.showAlertDialog(getActivity(), "Lỗi đăng nhập",
-					"Không thể đăng nhập tự động.", true);
+		// Bundle bundle = this.getArguments();
+		// if (null != bundle && bundle.getBoolean("error", false)) {
+		// Utility.showAlertDialog(getActivity(), "Lỗi đăng nhập",
+		// "Không thể đăng nhập tự động.", true);
+		//
+		// }
 
-		}
-
-		mController = (Controller) ctx.getApplicationContext();
 		// Check if Internet Connection present
-		if (!mController.isConnectingToInternet()) {
-			mController.showAlertDialog(ctx, "Lỗi kết nối mạng",
-					"Kiểm tra lại kết nối mạng và quay lại sau.", false);
-			return;
-		}
+		// if (!Utility.isConnectingToInternet(getActivity())) {
+		// Utility.showAlertDialog(ctx, "Lỗi kết nối mạng",
+		// "Kiểm tra lại kết nối mạng và quay lại sau.", false);
+		// return;
+		// }
 
 	}
-	
+
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (progress!=null) {
-	        if (progress.isShowing()) {
-	            progress.dismiss();       
-	        }
-	    }
+		if (progress != null) {
+			if (progress.isShowing()) {
+				progress.dismiss();
+			}
+		}
 	}
 
 }

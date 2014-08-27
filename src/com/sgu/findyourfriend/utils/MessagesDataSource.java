@@ -22,7 +22,9 @@ public class MessagesDataSource {
 			MySQLiteHelper.COLUMN_ID,
 			MySQLiteHelper.COLUMN_MESSAGE,
 			MySQLiteHelper.COLUMN_SENDER_ID,
+			MySQLiteHelper.COLUMN_SENDER_NAME,
 			MySQLiteHelper.COLUMN_RECEVIER_ID,
+			MySQLiteHelper.COLUMN_RECEVIER_NAME,
 			MySQLiteHelper.COLUMN_SMS_DATE };
 
 	public MessagesDataSource(Context context) {
@@ -41,9 +43,10 @@ public class MessagesDataSource {
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_MESSAGE, sms.getMessage());
 		values.put(MySQLiteHelper.COLUMN_SENDER_ID, sms.getIdSender());
+		values.put(MySQLiteHelper.COLUMN_SENDER_NAME, sms.getSenderName());
 		values.put(MySQLiteHelper.COLUMN_RECEVIER_ID, sms.getIdReceiver());
+		values.put(MySQLiteHelper.COLUMN_RECEVIER_NAME, sms.getReceiverName());
 		values.put(MySQLiteHelper.COLUMN_SMS_DATE, sms.getSmsTime().getTime());
-		
 		
 		long insertId = database.insert(MySQLiteHelper.TABLE_MESSAGES, null,
 				values);
@@ -85,13 +88,16 @@ public class MessagesDataSource {
 	}
 
 	private Message cursorToMessage(Cursor cursor) {
+		// new Message(id, message, isMine, idSender, senderName, idReceiver, receiverName, smsTime)
 		Message message = new Message(
 				cursor.getLong(0),
 				cursor.getString(1),
-				cursor.getInt(2) == MyProfileManager.getInstance().mine.getId(),
+				cursor.getInt(2) == MyProfileManager.getInstance().getMyID(),
 				cursor.getInt(2),
-				cursor.getInt(3),
-				new Date(Long.parseLong(cursor.getString(4))));
+				cursor.getString(3),
+				cursor.getInt(4),
+				cursor.getString(5),
+				new Date(Long.parseLong(cursor.getString(6))));
 		return message;
 	}
 }

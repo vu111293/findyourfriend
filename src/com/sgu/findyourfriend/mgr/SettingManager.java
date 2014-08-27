@@ -3,9 +3,11 @@ package com.sgu.findyourfriend.mgr;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.view.Display;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.sgu.findyourfriend.utils.PreferenceKeys;
@@ -17,6 +19,9 @@ public class SettingManager {
 	public static String SHARE_PREFERENCES_KEY = "com.sgu.findyourfriend.sharepreferences.11007";
 	public static String MESSAGE_COUNTER_KEY = "newMessage";
 	public static String REQUEST_COUNTER_KEY = "newRequest";
+	
+	public static int WIDTH_SCREEN;
+	public static int HEIGHT_SCREEN;
 
 	public static long TIME_UPDATE_DEFAULT = 90000;
 	
@@ -26,6 +31,11 @@ public class SettingManager {
 		prefs = context.getSharedPreferences(
 				"com.sgu.findyourfriend.sharepreferences.11007",
 				Context.MODE_PRIVATE);
+		
+		
+//		Display display = ((Activity)context).getWindowManager().getDefaultDisplay(); 
+//		WIDTH_SCREEN = display.getWidth();
+//		HEIGHT_SCREEN = display.getHeight();
 	}
 
 	public SettingManager() {
@@ -83,7 +93,7 @@ public class SettingManager {
 	}
 
 	public boolean isAlertRingtone() {
-		return prefs.getBoolean(PreferenceKeys.isAlertRingTone, false);
+		return prefs.getBoolean(PreferenceKeys.isAlertRingTone, true);
 	}
 
 	public boolean isMessageRingtone() {
@@ -95,7 +105,7 @@ public class SettingManager {
 	}
 
 	public boolean isVibrate() {
-		return prefs.getBoolean(PreferenceKeys.vibrate, false);
+		return prefs.getBoolean(PreferenceKeys.vibrate, true);
 	}
 
 	public boolean isEmailWarning() {
@@ -124,13 +134,17 @@ public class SettingManager {
 	public boolean isAutoLogin() {
 		return prefs.getBoolean(PreferenceKeys.AUTO_LOGIN, false);
 	}
+	
+	public boolean setAutoLogin(boolean autoLogin) {
+		return prefs.getBoolean(PreferenceKeys.AUTO_LOGIN, autoLogin);
+	}
 
 	public String getPhoneAutoLogin() {
-		return prefs.getString(PreferenceKeys.PHONENUMBER_AUTO_LOGIN, "01668074215");
+		return prefs.getString(PreferenceKeys.PHONENUMBER_AUTO_LOGIN, "0979742144");
 	}
 
 	public String getPasswordAutoLogin() {
-		return prefs.getString(PreferenceKeys.PASSWORD_AUTO_LOGIN, "123456");
+		return prefs.getString(PreferenceKeys.PASSWORD_AUTO_LOGIN, "111111");
 	}
 	
 	public void savePhoneAutoLogin(String phoneNumber) {
@@ -144,6 +158,20 @@ public class SettingManager {
 	
 	public long  getTimeUpdateOnlineStatus() {
 		return prefs.getLong(PreferenceKeys.timeUpdateOnlineStatus, TIME_UPDATE_DEFAULT);
+	}
+	
+	// warning with default value
+	public int getLastAccountIdLogin() {
+		return prefs.getInt(PreferenceKeys.lastAccountIdLogin, 0);
+	}
+	
+	public void saveLastAccountIdLogin(int id) {
+		prefs.edit().putInt(PreferenceKeys.lastAccountIdLogin, id).commit();
+	}
+
+	public void setUploadMyPosition(boolean checked) {
+		prefs.edit().putBoolean(PreferenceKeys.runBackground, checked).commit();
+		
 	}
 	
 }

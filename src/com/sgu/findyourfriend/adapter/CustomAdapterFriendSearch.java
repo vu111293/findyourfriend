@@ -57,8 +57,12 @@ public class CustomAdapterFriendSearch extends ArrayAdapter<User> {
 		((TextView) convertView.findViewById(R.id.txtName)).setText(ur
 				.getName());
 
-		((TextView) convertView.findViewById(R.id.txtProvince)).setText(ur
-				.getProvince());
+		if (ur.getAddress().lastIndexOf(",") > -1)
+			((TextView) convertView.findViewById(R.id.txtProvince)).setText(ur.getAddress().substring(
+					ur.getAddress().lastIndexOf(",") + 1).trim());
+		else
+			((TextView) convertView.findViewById(R.id.txtProvince)).setText(ur
+					.getAddress());
 
 		((Button) convertView.findViewById(R.id.btnInvite))
 				.setOnClickListener(new OnClickListener() {
@@ -72,8 +76,7 @@ public class CustomAdapterFriendSearch extends ArrayAdapter<User> {
 							@Override
 							protected Void doInBackground(Void... params) {
 								PostData.sendFriendRequest(context,
-										MyProfileManager.getInstance().mine
-												.getId(), ur.getId());
+										MyProfileManager.getInstance().getMyID(), ur.getId());
 
 								// ************ here add now
 								

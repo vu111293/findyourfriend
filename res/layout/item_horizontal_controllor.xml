@@ -3,7 +3,7 @@
     android:id="@+id/controlLayout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/scroll_height"
-    android:background="@color/bkg_bar"
+    android:background="#aa0F75BD"
     android:baselineAligned="false"
     android:gravity="center_horizontal"
     android:orientation="horizontal" >

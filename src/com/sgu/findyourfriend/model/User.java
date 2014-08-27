@@ -1,42 +1,139 @@
 package com.sgu.findyourfriend.model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
-
-import com.google.android.gms.maps.model.LatLng;
 
 public class User {
 
 	// attributes
 	private int id;
 	private String name;
-	private int gender; // 0: no select, 1: boy, 2: girl
-	private String province;
-	private String email;
 	private String avatar;
+	private String internetImageLink;
 	private String gcmId;
-	private Timestamp lastestLogin;
-	
-	private String phoneNumber;
-	private LatLng lastLocation;
-	private List<History> steps;
+	private Timestamp lastLogin;
+	private int gender;
+	private String address;
+	private Date birthday;
+	private String school;
+	private String workplace;
+	private String email;
+	private String fblink;
+	private boolean isPublic;
 
 	// methods
 
-	public User(int id, String name, int gender, String province, String email,
-			String avatar, String gcmid, Timestamp lastestlogin) {
-		this.setId(id);
-		this.setName(name);
-		this.setGender(gender);
-		this.setProvince(province);
-		this.setEmail(email);
-		this.setAvatar(avatar);
-		this.setGcmid(gcmid);
-		this.setLastestlogin(lastestlogin);
+	public User(int id) {
+		super();
+		this.id = id;
+		this.name = "";
+		this.avatar = "";
+		this.gcmId = "";
+		this.lastLogin = null;
+		this.gender = 0;
+		this.address = "";
+		this.birthday = new Date(System.currentTimeMillis());
+		this.school = "";
+		this.workplace = "";
+		this.email = "";
+		this.fblink = "";
+		this.isPublic = false;
+	}
+	
+	public User(int id, String name, String avatar, String gcmId,
+			Timestamp lastLogin, int gender, String address, Date birthday,
+			String school, String workplace, String email, String fblink,
+			boolean isPublic) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.avatar = avatar;
+		this.gcmId = gcmId;
+		this.lastLogin = lastLogin == null ? new Timestamp(System.currentTimeMillis()) : lastLogin;
+		this.gender = gender;
+		this.address = address;
+		this.birthday = birthday == null ? new Date(System.currentTimeMillis()) : birthday;
+		this.school = school;
+		this.workplace = workplace;
+		this.email = email;
+		this.fblink = fblink;
+		this.isPublic = isPublic;
+	}
+	
+	public User(User u) {
+		this.id = u.id;
+		this.name = u.name;
+		this.avatar = u.avatar;
+		this.gcmId = u.gcmId;
+		this.lastLogin = u.lastLogin;
+		this.gender = u.gender;
+		this.address = u.address;
+		this.birthday = u.birthday; 
+		this.school = u.school;
+		this.workplace = u.workplace;
+		this.email = u.email;
+		this.fblink = u.fblink;
+		this.isPublic = u.isPublic;
 	}
 
-	public User(User user) {
-		this(user.id, user.name, user.gender, user.province, user.email, user.avatar, user.gcmId, user.lastestLogin);
+	public Timestamp getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Timestamp lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getSchool() {
+		return school;
+	}
+
+	public void setSchool(String school) {
+		this.school = school;
+	}
+
+	public String getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(String workplace) {
+		this.workplace = workplace;
+	}
+
+	public String getFblink() {
+		return fblink;
+	}
+
+	public void setFblink(String fblink) {
+		this.fblink = fblink;
+	}
+
+	public boolean isPublic() {
+		return isPublic;
+	}
+
+	public void setPublic(boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+
+	public void setGcmId(String gcmId) {
+		this.gcmId = gcmId;
 	}
 
 	public void setName(String name) {
@@ -63,14 +160,6 @@ public class User {
 		return this.gender;
 	}
 
-	public void setProvince(String province) {
-		this.province = province;
-	}
-
-	public String getProvince() {
-		return this.province;
-	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -91,39 +180,21 @@ public class User {
 		return gcmId;
 	}
 
-	public void setGcmid(String gcmId) {
-		this.gcmId = gcmId;
+	public String getInternetImageLink() {
+		return internetImageLink;
 	}
 
-	public Timestamp getLastestlogin() {
-		return lastestLogin;
+	public void setInternetImageLink(String internetImageLink) {
+		this.internetImageLink = internetImageLink;
 	}
 
-	public void setLastestlogin(Timestamp lastestLogin) {
-		this.lastestLogin = lastestLogin;
+	@Override
+	public String toString() {
+		return id + " # " + name + " # " + address + " # " + email + " # " + gcmId ;
 	}
-
-	public String getPhoneNumber() {
-		return phoneNumber;
+	
+	public User clone() {
+		return new User(this);
 	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public LatLng getLastLocation() {
-		return lastLocation;
-	}
-
-	public void setLastLocation(LatLng lastLocation) {
-		this.lastLocation = lastLocation;
-	}
-
-	public List<History> getSteps() {
-		return steps;
-	}
-
-	public void setSteps(List<History> steps) {
-		this.steps = steps;
-	}
+	
 }
