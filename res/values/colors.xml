@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- basic color -->
+    <color name="transparent">#00000000</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+	<color name="gray">#EEEEEE</color>
+	<color name="orange">#F8931D</color>
+	<color name="blue">#0F75BD</color>
+	<color name="pupors">#662E91</color>
+    <color name="opc_blue">#76c0de</color>
+    <color name="mdu_blue">#25AAE3</color>
+    <color name="silver">#808080</color>
+    
+    <color name="while_opt20">#32FFFFFF</color>
+    
+    <color name="alertBkg">#DDC92020</color>
+	<color name="divider">#E6E6E6</color>
+	
+	<color name="row_status_bkg">#E6E6E6</color>
+	<color name="text_color_status">#838183</color>
+	
+	<color name="wait_frame_layout_bkg">#aac0c0c0</color>
+	
+	<color name="textColor">#FFF</color>
+	<color name="textFieldColor">#000</color>
+	<color name="textShadow">#FFF</color>
+	<color name="listViewBg">#DADFEE</color>
+
+	<color name="sendLightColor">#8897BF</color>
+	<color name="sendMeduimColor">#5D6CA5</color>
+	<color name="sendDarkColor">#515F9F</color>
+
+	<color name="barDarkColor">#CECECE</color>
+	<color name="barMeduimColor">#DFDEE0</color>
+	<color name="barLightColor">#F2F2F2</color>
+	
+	
+	<!-- sliding menu -->
+	<color name="list_item_title">#fff</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#086EBC</color>
+    <color name="list_divider">#272727</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="counter_text_color">#c5c4c4</color>
+    
+    
+    <!-- bar -->
+    <color name="bar_color">#0F75BD</color>
+    <color name="selector_bar_color">#2F497A</color>
+    <color name="bottom_bar_color">#E6E9F0</color>
+    <color name="selector_color">#0F75BD</color>
+    <color name="bkg_bar">#2F497A</color>
+    <color name="bkg_bar_selected">#003182</color>
+    
+    <!-- status color -->
+    <color name="share">#1395FE</color>
+    <color name="pending">#FF9900</color>
+    <color name="offine">#A0A0A0</color>
+    <color name="online">#318C01</color>
+    
+    <color name="phone_number_info">#0677CC</color>
+    <color name="email_info">#0677CC</color>
+
+    <color name="title_info">#818185</color>
+    <color name="value_info">#434343</color>
+    <color name="main_addres_info">#445261</color>
+    
+    <color name="name_sender_left">#387326</color>
+    <color name="name_sender_right">#387326</color>
+    <color name="sent_time">#707070</color>
+    
+    <color name="blue_text_message">#2560b3</color>
+    
+</resources>

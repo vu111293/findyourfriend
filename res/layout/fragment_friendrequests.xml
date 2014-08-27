@@ -1,0 +1,31 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".FriendRequestsFragment" >
+
+    <ListView
+        android:id="@+id/listView_FriendRequests"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/divider"
+        android:dividerHeight="0.5dp" >
+    </ListView>
+
+    <TextView
+        android:id="@+id/txtNoneData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/no_data"
+        android:textColor="@color/white"
+        android:textSize="9pt"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+</RelativeLayout>

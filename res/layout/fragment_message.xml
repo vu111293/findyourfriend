@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" 
+    android:background="@color/blue">
+
+    <LinearLayout
+        android:id="@+id/bottom_write_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/message_bar" >
+
+        <EditText
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/message_box_margin"
+            android:layout_marginLeft="@dimen/message_box_margin"
+            android:layout_marginRight="@dimen/message_box_margin"
+            android:layout_marginTop="@dimen/message_box_margin"
+            android:background="@drawable/edit_round"
+            android:ems="10"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:lines="1"
+            android:overScrollMode="always"
+            android:padding="10dp"
+            android:scrollHorizontally="false"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarStyle="insideInset"
+            android:hint="@string/enter_message_hint"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_write_bar"
+        android:cacheColorHint="@color/transparent"
+        android:divider="@color/transparent"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:listSelector="@color/transparent" >
+    </ListView>
+
+</RelativeLayout>

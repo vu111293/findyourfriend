@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/alertBkg"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="@string/alert_title"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="@dimen/alert_title" />
+
+    <TextView
+        android:id="@+id/txtTicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="@dimen/alert_number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:paddingLeft="@dimen/alert_explain_padding"
+        android:paddingRight="@dimen/alert_explain_padding"
+        android:text="@string/alert_explain"
+        android:textColor="@color/white"
+        android:textSize="@dimen/alert_explain_padding" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:paddingLeft="@dimen/alert_explain_padding"
+        android:paddingRight="@dimen/alert_explain_padding"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/alert_cancel_button"
+            android:textStyle="bold"
+            android:background="@drawable/button_green"
+            android:textColor="@color/white"
+            android:textSize="@dimen/alert_text_btn" />
+    </LinearLayout>
+
+</LinearLayout>
