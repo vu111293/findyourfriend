@@ -403,4 +403,42 @@ public class MapController {
 		}
 	}
 
+	public void unFriendTask(int fIDCurrent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void stopShareTask(int fIDCurrent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeHistoriesTask(int fIDCurrent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void inviteTask(final int id) {
+		(new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				PostData.sendFriendRequest(context,
+						MyProfileManager.getInstance().getMyID(), id);
+
+				// ************ here add now
+				
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				Toast.makeText(context, "đã gửi yêu cầu",
+						Toast.LENGTH_SHORT).show();
+			}
+
+		}).execute();
+		
+	}
+
 }

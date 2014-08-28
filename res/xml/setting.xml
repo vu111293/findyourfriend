@@ -3,7 +3,7 @@
     xmlns:iandroid="http://schemas.android.com/apk/res/com.sgu.findyourfriend" >
 
     <PreferenceCategory android:title="Cài đặt chung" >
-        <SwitchPreference
+        <CheckBoxPreference
             android:icon="@drawable/ic_background"
             android:defaultValue="true"
             android:key="com.sgu.findyourfriend.runbackground"
@@ -56,6 +56,9 @@
             <SwitchPreference
                 android:key="com.sgu.findyourfriend.vibrate"
                 android:title="Rung" />
+            
+             <!-- 
+            
             <SwitchPreference
                 android:key="com.sgu.findyourfriend.email"
                 android:summary="Tình trạng khẩn"
@@ -64,16 +67,15 @@
                 android:key="com.sgu.findyourfriend.sms"
                 android:summary="Tình trạng khẩn"
                 android:title="Tin nhắn" />
-
-            <MultiSelectListPreference
-                android:dialogTitle="Bạn bè yêu cầu giúp đỡ"
-                android:entries="@array/displayobjects"
-                android:entryValues="@array/displayobjects_values"
+ 			-->
+ 			
+            <Preference
                 android:key="com.sgu.findyourfriend.defaultwarning"
-                android:title="Bạn bè yêu cầu giúp đỡ" />
+                android:dialogTitle="Bạn bè giúp đỡ"
+                android:persistent="true"
+                android:title="Bạn bè giúp đỡ" />
 
-            <EditTextPreference
-                android:defaultValue="Tôi cần giúp đỡ!"
+            <Preference
                 android:dialogTitle="Nội dung mặc định"
                 android:key="com.sgu.findyourfriend.defaultmsg"
                 android:summary="Thay đổi tin nhắn mặc định"
@@ -137,7 +139,7 @@
 
         <Preference
             android:key="com.sgu.findyourfriend.prefer_help"
-            android:icon="@drawable/ic_help"
+            android:icon="@drawable/ic_help_setting"
             android:persistent="true"
             android:title="Trợ giúp" />
     </PreferenceCategory>

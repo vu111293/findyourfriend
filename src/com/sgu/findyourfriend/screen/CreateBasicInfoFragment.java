@@ -46,8 +46,6 @@ public class CreateBasicInfoFragment extends BaseFragment {
 	private String selectedImagePath = "";
 	private String selectedImageName = "";
 
-	protected Dialog alertDialog;
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -76,6 +74,8 @@ public class CreateBasicInfoFragment extends BaseFragment {
 
 			@Override
 			public void onClick(View v) {
+
+				final Dialog dialog = new Dialog(getActivity());
 
 				boolean isEmpty = false;
 
@@ -117,8 +117,15 @@ public class CreateBasicInfoFragment extends BaseFragment {
 				}
 
 				if (isEmpty) {
-					Utility.showAlertDialog(ctx, "Cảnh báo",
-							"Nhập các thông tin yêu cầu", false);
+					Utility.showDialog(Utility.ERROR, dialog,
+							"Thiếu thông tin", "Nhập các thông tin yêu cầu.",
+							"Đóng", new OnClickListener() {
+
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
 					return;
 				}
 
@@ -128,16 +135,15 @@ public class CreateBasicInfoFragment extends BaseFragment {
 
 				int sex = (sexGrp.getCheckedRadioButtonId() == R.id.radioMale ? 1
 						: 2);
-				
+
 				User mine = new User(0);
 				mine.setName(editName.getText().toString().trim());
 				mine.setGender(sex);
-				mine.setAddress(editProvice.getText().toString().trim() 
-						+ ", " + sprCity.getSelectedItem().toString());
-				mine.setEmail(editEmail
-								.getText().toString().trim());
+				mine.setAddress(editProvice.getText().toString().trim() + ", "
+						+ sprCity.getSelectedItem().toString());
+				mine.setEmail(editEmail.getText().toString().trim());
 				mine.setAvatar(selectedImagePath);
-				
+
 				MyProfileManager.getInstance().mTemp.setUserInfo(mine);
 
 				replaceFragment(new CreateOptionInfoFragment(), true);
@@ -157,24 +163,18 @@ public class CreateBasicInfoFragment extends BaseFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		// Check if Internet Connection present
-		if (!Utility.isConnectingToInternet(getActivity())) {
-			Utility.showAlertDialog(ctx, "Cảnh báo",
-					"Kiểm tra lại kết nối mạng và quay lại sau.", false);
-			return;
-		}
 	}
 
 	public void showTakeImage() {
 		final Dialog dialog = new Dialog(ctx);
-		
-		Window W= dialog.getWindow();
-		W.setGravity(Gravity.CENTER_VERTICAL| Gravity.CENTER_HORIZONTAL);
-		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,ViewGroup.LayoutParams.FILL_PARENT);
+
+		Window W = dialog.getWindow();
+		W.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
 		W.requestFeature(Window.FEATURE_NO_TITLE);
 		W.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+
 		dialog.setContentView(R.layout.options_take_image_layout);
 
 		((Button) dialog.findViewById(R.id.btnGallery))

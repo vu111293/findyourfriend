@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -97,6 +98,10 @@ public class MessageSendFragment extends Fragment implements IMessage {
 			@Override
 			public void onClick(View arg0) {
 
+				if (!Utility.checkConnectToNetworkContinue(getActivity())) return;
+				
+				final Dialog dialog = new Dialog(getActivity());
+				
 				InputMethodManager imm = (InputMethodManager) getActivity()
 						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(editMessage.getWindowToken(), 0);
@@ -112,11 +117,9 @@ public class MessageSendFragment extends Fragment implements IMessage {
 					((BaseContainerFragment) getParentFragment()).popFragment();
 
 				} else {
-					Utility.showAlertDialog(getParentFragment().getActivity(),
-							"", "Chọn người nhận", true);
-//					friendLayout.setBackgroundColor(getActivity()
-//							.getResources().getColor(R.color.pupors));
-
+					
+					Utility.showDialog(Utility.WARNING, dialog, "Cảnh báo",
+							"Bạn chưa chọn người nhận tin nhắn.");
 				}
 
 			}

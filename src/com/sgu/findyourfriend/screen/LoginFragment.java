@@ -1,6 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -55,116 +55,138 @@ public class LoginFragment extends BaseFragment {
 			@Override
 			public void onClick(View v) {
 
+				if (!Utility.checkConnectToNetworkContinue(getActivity()))
+					return;
+
+				final Dialog dialog = new Dialog(getActivity());
+				
 				if (ID.getText().toString().trim().length() > 0
 						&& Password.getText().toString().trim().length() > 0) {
 
 					if (Config.MODE_OFFLINE) {
-						
-						MyProfileManager.getInstance().init(ctx,
-								38, true);
-						
+
+						MyProfileManager.getInstance().init(ctx, 38, true);
+
 						// start main app
 						Intent i = new Intent(
 								ctx,
 								com.sgu.findyourfriend.screen.MainActivity.class);
 						startActivity(i);
-						
+
 						getActivity().finish();
-						return;
-					}
-					
-					
-					(new AsyncTask<Void, Void, Integer>() {
 
-						private String phoneNumber;
-						private String password;
-						private String gcmId = "";
+					} else {
 
-						@Override
-						protected void onPreExecute() {
-							progress = new ProgressDialogCustom(ctx);
-							progress.show();
+						(new AsyncTask<Void, Void, Integer>() {
 
-							phoneNumber = ID.getText().toString().trim();
-							password = Password.getText().toString().trim();
-						}
+							private String phoneNumber;
+							private String password;
+							private String gcmId = "";
 
-						@Override
-						protected Integer doInBackground(Void... params) {
+							@Override
+							protected void onPreExecute() {
+								progress = new ProgressDialogCustom(ctx);
+								progress.show();
 
-							// login
-							int id = PostData.login(ctx, phoneNumber, password);
-
-							Log.i(TAG, "Loginnnnnnnnnnnnnnnnn: " + id);
-
-							if (id > 0) {
-								SettingManager.getInstance()
-										.saveLastAccountIdLogin(id);
-
-								if (GCMRegistrar.isRegistered(ctx)) {
-									gcmId = GCMRegistrar.getRegistrationId(ctx);
-									PostData.updateGcmId(ctx, id, gcmId);
-									MyProfileManager.getInstance().init(ctx,
-											id, true);
-									Log.i(TAG, "registed with  " + gcmId);
-								} else {
-									Log.i(TAG, "empty gcmid");
-									MyProfileManager.getInstance().init(ctx,
-											id, true);
-									GCMRegistrar.register(ctx,
-											Config.GOOGLE_SENDER_ID);
-								}
-
-								// if (!gcmId.equals("")) {
-								// Log.i(TAG, "update gcmid");
-								// PostData.updateGcmId(ctx, id, gcmId);
-								// }
-
-								// MyProfileManager.getInstance().init(ctx, id,
-								// true);
-								return Config.SUCCESS;
-							} else if (id == -1)
-								return Config.ERROR_REGIST;
-							return Config.ERROR_NOT_FOUND;
-						}
-
-						@Override
-						protected void onPostExecute(Integer result) {
-							if (result == Config.SUCCESS) {
-								// save info
-								SettingManager.getInstance()
-										.savePhoneAutoLogin(phoneNumber);
-								SettingManager.getInstance()
-										.savePasswordAutoLogin(password);
-
-								// start main app
-								Intent i = new Intent(
-										ctx,
-										com.sgu.findyourfriend.screen.MainActivity.class);
-								startActivity(i);
-
-								getActivity().finish();
-
-							} else if (result == Config.ERROR_REGIST) {
-								// show error
-								Utility.showAlertDialog(
-										ctx,
-										"Cảnh báo",
-										"Tài khoản chưa được kích hoạt, xin kiểm tra mail để kích hoạt",
-										false);
-
-							} else {
-								// show error
-								Utility.showAlertDialog(ctx, "Cảnh báo",
-										"Thông tin không chính xác", false);
+								phoneNumber = ID.getText().toString().trim();
+								password = Password.getText().toString().trim();
 							}
-							progress.dismiss();
-						}
 
-					}).execute();
+							@Override
+							protected Integer doInBackground(Void... params) {
+
+								// login
+								int id = PostData.login(ctx, phoneNumber,
+										password);
+
+								Log.i(TAG, "Loginnnnnnnnnnnnnnnnn: " + id);
+
+								if (id > 0) {
+									SettingManager.getInstance()
+											.saveLastAccountIdLogin(id);
+
+									if (GCMRegistrar.isRegistered(ctx)) {
+										gcmId = GCMRegistrar
+												.getRegistrationId(ctx);
+										PostData.updateGcmId(ctx, id, gcmId);
+										MyProfileManager.getInstance().init(
+												ctx, id, true);
+										Log.i(TAG, "registed with  " + gcmId);
+									} else {
+										Log.i(TAG, "empty gcmid");
+										MyProfileManager.getInstance().init(
+												ctx, id, true);
+										GCMRegistrar.register(ctx,
+												Config.GOOGLE_SENDER_ID);
+									}
+
+									return Config.SUCCESS;
+								} else if (id == -1)
+									return Config.ERROR_REGIST;
+								return Config.ERROR_NOT_FOUND;
+							}
+
+							@Override
+							protected void onPostExecute(Integer result) {
+								if (result == Config.SUCCESS) {
+									// save info
+									SettingManager.getInstance()
+											.savePhoneAutoLogin(phoneNumber);
+									SettingManager.getInstance()
+											.savePasswordAutoLogin(password);
+
+									// start main app
+									Intent i = new Intent(
+											ctx,
+											com.sgu.findyourfriend.screen.MainActivity.class);
+									startActivity(i);
+
+									getActivity().finish();
+
+								} else if (result == Config.ERROR_REGIST) {
+									// show error
+									Utility.showDialog(Utility.WARNING, dialog,
+											"Cảnh báo",
+											"Tài khoản chưa được kích hoạt, xin kiểm tra mail để kích hoạt.",
+											"Đóng", new OnClickListener() {
+												
+												@Override
+												public void onClick(View v) {
+													dialog.dismiss();
+												}
+											});
+									
+
+								} else {
+									// show error
+									Utility.showDialog(Utility.ERROR, dialog,
+											"Lỗi đăng nhập",
+											"Số điện thoại hoặc mật khẩu không chính xác.",
+											"Đóng", new OnClickListener() {
+												
+												@Override
+												public void onClick(View v) {
+													dialog.dismiss();
+												}
+											});
+								}
+								progress.dismiss();
+							}
+
+						}).execute();
+					}
 				} else {
 					// truong rong
-					Utility.showMessage(ctx, "Xin nhập đủ thông tin");
+					Utility.showDialog(Utility.ERROR, dialog,
+							"Thiếu thông tin",
+							"Xin nhập đủ thông tin.",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View v) {
+									dialog.dismiss();
+								}
+							});
 				}
 
 			}
@@ -186,11 +208,6 @@ public class LoginFragment extends BaseFragment {
 			}
 		});
 
-		// // hide keyboard
-		// InputMethodManager imm = (InputMethodManager) getActivity()
-		// .getSystemService(Context.INPUT_METHOD_SERVICE);
-		// imm.hideSoftInputFromWindow(ID.getWindowToken(), 0);
-
 		return rootView;
 	}
 
@@ -198,26 +215,6 @@ public class LoginFragment extends BaseFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		ctx = activity;
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		// Bundle bundle = this.getArguments();
-		// if (null != bundle && bundle.getBoolean("error", false)) {
-		// Utility.showAlertDialog(getActivity(), "Lỗi đăng nhập",
-		// "Không thể đăng nhập tự động.", true);
-		//
-		// }
-
-		// Check if Internet Connection present
-		// if (!Utility.isConnectingToInternet(getActivity())) {
-		// Utility.showAlertDialog(ctx, "Lỗi kết nối mạng",
-		// "Kiểm tra lại kết nối mạng và quay lại sau.", false);
-		// return;
-		// }
-
 	}
 
 	@Override

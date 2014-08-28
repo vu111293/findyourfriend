@@ -94,7 +94,7 @@ public class EmergenceDialog extends Dialog {
 	}
 	
 	private void sendWarning() {
-		Set<String> friendIds = SettingManager.getInstance().getFriendsWarning();
+		Set<String> friendIds = SettingManager.getInstance().getDefaultWarning();
 		
 		String defaultMsg = SettingManager.getInstance().getDefaultMsg(); 
 		

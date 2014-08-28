@@ -1,33 +1,44 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
-import android.preference.SwitchPreference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.adapter.MessageContactAdapter;
 import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.MyProfileManager;
@@ -51,7 +62,9 @@ public class SettingFragment extends PreferenceFragment implements
 	private Preference preferDevInfo;
 	private Preference preferAccountManager;
 	private Preference preferEditProfile;
-	private SwitchPreference switchRunBkg;
+	private CheckBoxPreference switchRunBkg;
+	private Preference preferenceWarningDefault;
+	private Preference preferDefaultMessage;
 
 	public SettingFragment() {
 
@@ -80,28 +93,36 @@ public class SettingFragment extends PreferenceFragment implements
 
 	private void setupPrefs() {
 
-		switchRunBkg = (SwitchPreference) getPreferenceScreen().findPreference(
+		switchRunBkg = (CheckBoxPreference) getPreferenceScreen().findPreference(
 				PreferenceKeys.runBackground);
 
-		int numFriend = FriendManager.getInstance().hmMemberFriends.size();
-		String friendNames[] = new String[numFriend];
-		HashSet<String> idOfFriends = new HashSet<String>();
-
-		int i = 0;
-		for (int k : FriendManager.getInstance().hmMemberFriends.keySet()) {
-			Friend f = FriendManager.getInstance().hmMemberFriends.get(k);
-			friendNames[i] = f.getUserInfo().getName();
-			idOfFriends.add(f.getUserInfo().getId() + "");
-			i++;
-		}
-
-		// setup check all
-		friendNames[0] = "Tất cả";
-
-		contactOfFiends = (MultiSelectListPreference) getPreferenceScreen()
+		// friend list setup
+		preferenceWarningDefault = (Preference) getPreferenceScreen()
 				.findPreference(PreferenceKeys.friendsWarning);
-		contactOfFiends.setEntries(friendNames);
-		contactOfFiends.setValues(idOfFriends);
+
+		preferenceWarningDefault
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						(new FriendSelectDialog(getActivity())).show();
+						return false;
+					}
+				});
+
+		// default message setting
+		preferDefaultMessage = (Preference) getPreferenceScreen()
+				.findPreference(PreferenceKeys.defaultMsg);
+		preferDefaultMessage
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference arg0) {
+						setDefaultMessageDialog();
+						return false;
+					}
+				});
+
 
 		// prefer logout
 		preferLogout = (Preference) getPreferenceScreen().findPreference(
@@ -116,6 +137,9 @@ public class SettingFragment extends PreferenceFragment implements
 						getActivity().finish();
 						Intent intent = new Intent(getActivity(),
 								MainLoginActivity.class);
+						
+						intent.putExtra("fromLogout", true);
+						
 						getActivity().startActivity(intent);
 						return false;
 					}
@@ -223,7 +247,6 @@ public class SettingFragment extends PreferenceFragment implements
 
 	@Override
 	public void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
@@ -277,18 +300,21 @@ public class SettingFragment extends PreferenceFragment implements
 		final Button mAcceptBtn;
 		final Button mCancelBtn;
 
-		final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-				.create();
+		
+		final Dialog dialog = new Dialog(getActivity());
+		Window W = dialog.getWindow();
+		W.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
+		W.requestFeature(Window.FEATURE_NO_TITLE);
+		W.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		View view = LayoutInflater.from(getActivity()).inflate(
-				R.layout.layout_changepassword, null);
+		dialog.setContentView(R.layout.layout_changepassword);
 
-		alertDialog.setView(view);
-		alertDialog.setTitle("Đổi mật khẩu");
-
-		mCurrentPassword = (EditText) view.findViewById(R.id.pass_current);
-		mNewPassword = (EditText) view.findViewById(R.id.pass_newpass);
-		mShowPassword = (CheckBox) view.findViewById(R.id.chbx_showpass);
+		((TextView) dialog.findViewById(R.id.title)).setText("Đổi mật khẩu");
+		mCurrentPassword = (EditText) dialog.findViewById(R.id.pass_current);
+		mNewPassword = (EditText) dialog.findViewById(R.id.pass_newpass);
+		mShowPassword = (CheckBox) dialog.findViewById(R.id.chbx_showpass);
 
 		mShowPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
@@ -303,13 +329,15 @@ public class SettingFragment extends PreferenceFragment implements
 			}
 		});
 
-		mAcceptBtn = (Button) view.findViewById(R.id.acceptBtn);
+		mAcceptBtn = (Button) dialog.findViewById(R.id.acceptBtn);
 		mAcceptBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				oldPassword = mCurrentPassword.getText().toString().trim();
 				newPassword = mNewPassword.getText().toString().trim();
+				
+				final Dialog dialog = new Dialog(getActivity());
 
 				mCurrentPassword.setBackgroundDrawable(getActivity()
 						.getResources().getDrawable(R.drawable.edit_text));
@@ -321,16 +349,32 @@ public class SettingFragment extends PreferenceFragment implements
 					mCurrentPassword.setBackgroundDrawable(getActivity()
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(), "",
-							"Nhập mật khẩu hiện tại", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Thiếu thông tin", "Nhập mật khẩu hiện tại",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
 					return;
 				} else if (!oldPassword.equals(SettingManager.getInstance()
 						.getPasswordAutoLogin())) {
 					mCurrentPassword.setBackgroundDrawable(getActivity()
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(), "",
-							"Nhập mật không chính xác", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Sai mật khẩu", "Mật khẩu không chính xác." +
+							" Nếu quên mật khẩu bạn có thể khôi phục lại ở trang đăng nhập",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
+					
 					return;
 				}
 
@@ -338,17 +382,32 @@ public class SettingFragment extends PreferenceFragment implements
 					mNewPassword.setBackgroundDrawable(getActivity()
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(), "",
-							"Nhập mật khẩu mới", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Thiếu thông tin", "Nhập mật khẩu mới",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
+					
 					return;
 				} else if (newPassword.length() < Config.MIN_PASSWORD_LENGHT) {
 					mNewPassword.setBackgroundDrawable(getActivity()
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(), "",
-							"Nhập mật khẩu mới ít nhất "
-									+ Config.MIN_PASSWORD_LENGHT + " ký tự",
-							false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Thiếu thông tin", 
+							"Nhập mật khẩu mới ít nhất " + Config.MIN_PASSWORD_LENGHT + " ký tự",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
+					
 					return;
 				}
 
@@ -356,8 +415,16 @@ public class SettingFragment extends PreferenceFragment implements
 					mNewPassword.setBackgroundDrawable(getActivity()
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(), "",
-							"Nhập mật phải khác mật khẩu hiện tại", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Mật khẩu không đổi", 
+							"Nhập mật phải khác mật khẩu hiện tại",
+							"Đóng", new OnClickListener() {
+								
+								@Override
+								public void onClick(View arg0) {
+									dialog.dismiss();
+								}
+							});
 					return;
 				}
 
@@ -381,16 +448,31 @@ public class SettingFragment extends PreferenceFragment implements
 
 						progressDialog.dismiss();
 						if (result) {
-							Utility.showAlertDialog(getActivity(), "",
-									"Đổi mật khẩu thành công", false);
+							Utility.showDialog(Utility.CONFIRM, dialog, "Đổi mật khẩu thành công",
+									"Mật khẩu của bạn đã được thay đổi.",
+									"Đóng", new OnClickListener() {
+										
+										@Override
+										public void onClick(View arg0) {
+											dialog.dismiss();
+										}
+									});
+							
 							SettingManager.getInstance().savePasswordAutoLogin(
 									newPassword);
 						} else {
-							Utility.showAlertDialog(getActivity(), "",
-									"Đổi mật khẩu thất bại", false);
+							
+							Utility.showDialog(Utility.ERROR, dialog, "Đổi mật khẩu thất bại",
+									"Xãy ra lỗi trong quá trình đổi mật khẩu. Xin thử lại sau.",
+									"Đóng", new OnClickListener() {
+										
+										@Override
+										public void onClick(View arg0) {
+											dialog.dismiss();
+										}
+									});
 						}
 
-						alertDialog.dismiss();
 					}
 
 				}).execute();
@@ -398,64 +480,188 @@ public class SettingFragment extends PreferenceFragment implements
 			}
 		});
 
-		mCancelBtn = (Button) view.findViewById(R.id.cancelBtn);
+		mCancelBtn = (Button) dialog.findViewById(R.id.cancelBtn);
 
 		mCancelBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				alertDialog.dismiss();
+				dialog.dismiss();
 			}
 		});
 
-		// Show Alert Message
-		alertDialog.show();
+		dialog.show();
 	}
 
 	@SuppressWarnings("deprecation")
 	private void deleteAccountDialog() {
-		AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-				.create();
+		
+		final Dialog dialog = new Dialog(getActivity());
+		
+		Utility.showDialog(Utility.WARNING, dialog,
+				"Xóa tài khoản", "Bạn có chắc muốn xóa tài khoản?",
+				"Đồng ý", new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+						MyProfileManager.getInstance().clear();
+						getActivity().finish();
+						Intent intent = new Intent(getActivity(),
+								MainLoginActivity.class);
+						getActivity().startActivity(intent);
+					}
+				}, "Thôi", new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
 
-		alertDialog.setTitle("Xóa tài khoản");
-		alertDialog.setMessage("Bạn có chắc muốn xóa tài khoản?");
-
-		alertDialog.setButton("Đồng ý", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-				MyProfileManager.getInstance().clear();
-				getActivity().finish();
-				Intent intent = new Intent(getActivity(),
-						MainLoginActivity.class);
-				getActivity().startActivity(intent);
-			}
-		});
-
-		alertDialog.setButton2("Thôi", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-			}
-		});
-
-		// Show Alert Message
-		alertDialog.show();
+						
+					}
+				});
+		
+		dialog.show();
 	}
 
 	@SuppressWarnings("deprecation")
 	private void devInfoDialog() {
-		AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-				.create();
+		final Dialog dialog = new Dialog(getActivity());
+		Utility.showDialog(Utility.CONFIRM, dialog,
+				"Thông tin nhà phát triển",
+				"Sgu Coporation 2014",
+				"Thoát", new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+					}
+				});
+		dialog.show();
+	}
 
-		alertDialog.setTitle("Thông tin nhà phát triển");
-		alertDialog.setMessage("Sgu Coporation 2014");
+	
+	private void setDefaultMessageDialog() {
+		final Dialog dialog = new Dialog(getActivity());
+		Window W = dialog.getWindow();
+		W.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
+		W.requestFeature(Window.FEATURE_NO_TITLE);
+		W.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		alertDialog.setButton("Thoát", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+		dialog.setContentView(R.layout.default_message_setting);
+
+		
+		((TextView) dialog.findViewById(R.id.title)).setText("Tin nhắn mặc định");
+		((TextView) dialog.findViewById(R.id.content)).setText(SettingManager.getInstance().getDefaultMsg());
+
+		((Button) dialog.findViewById(R.id.btnLeft))
+				.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View arg0) {
+						SettingManager.getInstance().setDefaultMsg(
+								((TextView) dialog.findViewById(R.id.content)).getText().toString());
+						dialog.dismiss();
+					}
+				});
+
+			((Button) dialog.findViewById(R.id.btnRight))
+					.setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+
+		dialog.show();
+		
+	}
+	
+	
+	
+	class FriendSelectDialog extends Dialog {
+
+		private Context ctx;
+		private ArrayList<Friend> data;
+		private MessageContactAdapter adapter;
+		private ListView lv;
+
+		private Button btnSelect;
+		private Button btnAccept;
+		private boolean isSelectMode = false;
+
+		public FriendSelectDialog(Context context) {
+			super(context, R.style.full_screen_dialog);
+			this.ctx = context;
+		}
+
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			setContentView(R.layout.friend_default_warning_layout);
+			getWindow().setLayout(LayoutParams.MATCH_PARENT,
+					LayoutParams.MATCH_PARENT);
+
+			// setup view
+			lv = (ListView) findViewById(R.id.list);
+
+			data = new ArrayList<Friend>(
+					FriendManager.getInstance().pureFriends);
+
+			HashSet<String> ids = (HashSet<String>) SettingManager
+					.getInstance().getDefaultWarning();
+
+			for (Friend f : data) {
+				if (ids.contains(f.getUserInfo().getId() + ""))
+					f.setCheck(true);
 			}
-		});
 
-		// Show Alert Message
-		alertDialog.show();
+			adapter = new MessageContactAdapter(ctx,
+					R.layout.custom_contact_addfriend, data);
+
+			lv.setAdapter(adapter);
+
+			btnSelect = (Button) findViewById(R.id.btnSelectAll);
+			btnSelect.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					if (isSelectMode) {
+						adapter.checkAll();
+						btnSelect.setText("Bỏ chọn");
+					} else {
+						adapter.unCheckAll();
+						btnSelect.setText("Chọn tất cả");
+					}
+
+					isSelectMode = !isSelectMode;
+				}
+			});
+
+			btnAccept = (Button) findViewById(R.id.btnAccept);
+			btnAccept.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					HashSet<String> hset = new HashSet<String>();
+					for (Friend f : data) {
+						if (f.isCheck()) {
+							hset.add(f.getUserInfo().getId() + "");
+						}
+					}
+
+					SettingManager.getInstance().setDefaultWarning(hset);
+
+					dismiss();
+
+				}
+			});
+
+		}
 	}
 
 }

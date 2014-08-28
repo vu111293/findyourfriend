@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.Calendar;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,18 +83,28 @@ public class CreateOptionInfoFragment extends BaseFragment {
 
 			@Override
 			public void onClick(View arg0) {
-
-				Log.i("BTN", System.currentTimeMillis()  + "#" +  date.getTime());
+				final Dialog dialog = new Dialog(getActivity());
+				
 				if ((System.currentTimeMillis() - date.getTime())
 						< 0) {
 					Log.i("DATE", date.toLocaleString());
 					txtBirthday.setBackgroundDrawable(getResources()
 							.getDrawable(R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(getActivity(),
-							"Cảnh báo",
-							"Ngày sinh không hợp lệ", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog,
+							"Ngày sinh không hợp lệ",
+							"Ngày sinh phải trước thời gian hiện tại.", "Đóng",
+							new OnClickListener() {
+								
+								@Override
+								public void onClick(View v) {
+									dialog.dismiss();
+									
+								}
+							});
 					return;
 				} else {
+					
 					txtBirthday.setBackgroundDrawable(getResources()
 							.getDrawable(R.drawable.edit_text));
 				}

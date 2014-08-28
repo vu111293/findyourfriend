@@ -51,7 +51,7 @@ public class MyProfileManager {
 			numLogins.add("123456789");
 			numLogins.add("987654321");
 
-			User mineOff = new User(38, "admin", "", "", new Timestamp(
+			User mineOff = new User(138, "admin", "", "", new Timestamp(
 					System.currentTimeMillis()), 1, "address", new Date(1993,
 					10, 12), "saigon", "uni", "email@gmail.com", "", true);
 

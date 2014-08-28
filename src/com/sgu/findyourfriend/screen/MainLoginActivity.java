@@ -36,111 +36,111 @@ public class MainLoginActivity extends FragmentActivity {
 		SettingManager.getInstance().init(getApplicationContext());
 
 		// Check if Internet Connection present
-		if (!Utility.isConnectingToInternet(getApplicationContext())) {
-			showAlertDialogNotConnectNetwork();
-		}
+		Utility.checkConnectToNetworkForceQuit(this);
 		//
-		// if
-		// (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())
-		// != ConnectionResult.SUCCESS) {
-		// showAlertNotService();
+		// if (getIntent().getBooleanExtra("fromLogout", false)) {
+		// Log.i("GOO",
+		// "Ok++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		//
+		// } else {
+		// Log.i("GOO",
+		// "NotOk++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		// }
 
 		// setScreen login waitting
 		if (SettingManager.getInstance().isAutoLogin()
 				&& !getIntent().hasExtra("fromLogout")) {
-			
+
 			if (Config.MODE_OFFLINE) {
-				
+
 				MyProfileManager.getInstance().init(getApplicationContext(),
 						38, true);
-				
+
 				// start main app
-				Intent i = new Intent(
-						getApplicationContext(),
+				Intent i = new Intent(getApplicationContext(),
 						com.sgu.findyourfriend.screen.MainActivity.class);
 				startActivity(i);
-				
+
 				finish();
-				return;
-			}
-			
-			
-			
-			
-			// try login;
-			(new AsyncTask<Void, Void, Boolean>() {
+			} else {
 
-				private String phoneNumber;
-				private String password;
-				private String gcmId = "";
+				// try login;
+				(new AsyncTask<Void, Void, Boolean>() {
 
-				@Override
-				protected void onPreExecute() {
-					phoneNumber = SettingManager.getInstance()
-							.getPhoneAutoLogin();
-					password = SettingManager.getInstance()
-							.getPasswordAutoLogin();
-				}
+					private String phoneNumber;
+					private String password;
+					private String gcmId = "";
 
-				@Override
-				protected Boolean doInBackground(Void... arg0) {
+					@Override
+					protected void onPreExecute() {
+						phoneNumber = SettingManager.getInstance()
+								.getPhoneAutoLogin();
+						password = SettingManager.getInstance()
+								.getPasswordAutoLogin();
+					}
 
-					// login
-					int id = PostData.login(getApplicationContext(),
-							phoneNumber, password);
+					@Override
+					protected Boolean doInBackground(Void... arg0) {
 
-					if (id > 0) {
-						SettingManager.getInstance().saveLastAccountIdLogin(id);
-						if (GCMRegistrar.isRegistered(getApplicationContext())) {
-							gcmId = GCMRegistrar
-									.getRegistrationId(getApplicationContext());
-							PostData.updateGcmId(getApplicationContext(), id,
-									gcmId);
-							MyProfileManager.getInstance().init(
-									getApplicationContext(), id, true);
-							Log.i(TAG, "registed with  " + gcmId);
-						} else {
-							Log.i(TAG, "empty gcmid");
-							MyProfileManager.getInstance().init(
-									getApplicationContext(), id, true);
-							GCMRegistrar.register(getApplicationContext(),
-									Config.GOOGLE_SENDER_ID);
+						// login
+						int id = PostData.login(getApplicationContext(),
+								phoneNumber, password);
+
+						if (id > 0) {
+							SettingManager.getInstance()
+									.saveLastAccountIdLogin(id);
+							if (GCMRegistrar
+									.isRegistered(getApplicationContext())) {
+								gcmId = GCMRegistrar
+										.getRegistrationId(getApplicationContext());
+								PostData.updateGcmId(getApplicationContext(),
+										id, gcmId);
+								MyProfileManager.getInstance().init(
+										getApplicationContext(), id, true);
+								Log.i(TAG, "registed with  " + gcmId);
+							} else {
+								Log.i(TAG, "empty gcmid");
+								MyProfileManager.getInstance().init(
+										getApplicationContext(), id, true);
+								GCMRegistrar.register(getApplicationContext(),
+										Config.GOOGLE_SENDER_ID);
+							}
+
+							// if (!gcmId.equals("")) {
+							// Log.i(TAG, "update gcmid");
+							// PostData.updateGcmId(getApplicationContext(), id,
+							// gcmId);
+							// }
+
+							return true;
 						}
 
-//						if (!gcmId.equals("")) {
-//							Log.i(TAG, "update gcmid");
-//							PostData.updateGcmId(getApplicationContext(), id,
-//									gcmId);
-//						}
+						return false;
 
-						return true;
 					}
 
-					return false;
-
-				}
-
-				@Override
-				protected void onPostExecute(Boolean isOk) {
-					if (isOk) {
-						Intent i = new Intent(
-								getApplicationContext(),
-								com.sgu.findyourfriend.screen.MainActivity.class);
-						startActivity(i);
-						finish();
-					} else {
-						// show error
-						showAlertManualLogin();
-						LoginFragment fragment = new LoginFragment();
-						Bundle bundle = new Bundle();
-						bundle.putBoolean("error", true);
-						fragment.setArguments(bundle);
-						showScreen(fragment);
+					@Override
+					protected void onPostExecute(Boolean isOk) {
+						if (isOk) {
+							Intent i = new Intent(
+									getApplicationContext(),
+									com.sgu.findyourfriend.screen.MainActivity.class);
+							startActivity(i);
+							finish();
+						} else {
+							// show error
+							showAlertManualLogin();
+							LoginFragment fragment = new LoginFragment();
+							Bundle bundle = new Bundle();
+							bundle.putBoolean("error", true);
+							fragment.setArguments(bundle);
+							showScreen(fragment);
+						}
 					}
-				}
 
-			}).execute();
+				}).execute();
+			}
+
 		} else {
 			// //
 			// (new AsyncTask<Void, Void, Void> () {
@@ -158,6 +158,7 @@ public class MainLoginActivity extends FragmentActivity {
 
 			showScreen(new LoginFragment());
 		}
+
 	}
 
 	@SuppressWarnings("deprecation")
@@ -180,25 +181,6 @@ public class MainLoginActivity extends FragmentActivity {
 		alertDialog.show();
 	}
 
-	@SuppressWarnings("deprecation")
-	private void showAlertNotService() {
-		AlertDialog alertDialog = new AlertDialog.Builder(
-				MainLoginActivity.this).create();
-
-		alertDialog.setTitle("Cảnh báo");
-		alertDialog.setMessage("Thiết bị không được hỗ trợ");
-
-		// Set OK Button
-		alertDialog.setButton("Thoát", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
-
-		// Show Alert Message
-		alertDialog.show();
-	}
-
 	private void showScreen(Fragment fragment) {
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
@@ -209,24 +191,5 @@ public class MainLoginActivity extends FragmentActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-	}
-
-	@SuppressWarnings("deprecation")
-	private void showAlertDialogNotConnectNetwork() {
-		AlertDialog alertDialog = new AlertDialog.Builder(
-				MainLoginActivity.this).create();
-
-		alertDialog.setTitle("Lỗi kết nối mạng");
-		alertDialog.setMessage("Kiểm tra lại kết nối mạng và quay lại sau.");
-
-		// Set OK Button
-		alertDialog.setButton("Thoát", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
-
-		// Show Alert Message
-		alertDialog.show();
 	}
 }

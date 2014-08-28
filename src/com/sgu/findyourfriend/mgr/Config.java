@@ -4,7 +4,6 @@ public interface Config {
 
 	static final boolean MODE_OFFLINE = false;
 	
-	
 	// CONSTANTS
 	static final String YOUR_SERVER_URL = "http://sgudev2014.comuv.com/cfindyourfriend/register.php";
 

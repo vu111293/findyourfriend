@@ -4,10 +4,8 @@ import java.sql.Date;
 import java.util.Calendar;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,10 +15,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -69,7 +66,6 @@ public class EditProfileActivity extends Activity {
 
 	private boolean isChangedImg;
 
-	protected Dialog alertDialog;
 	private ProgressDialogCustom progress;
 
 	private EditProfileActivity mThis = this;
@@ -193,6 +189,10 @@ public class EditProfileActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
+				
+				if (!Utility.checkConnectToNetworkContinue(getApplicationContext())) return;
+				
+				final Dialog dialog  = new Dialog(mThis);
 				boolean isEmpty = false;
 
 				// validate basic information
@@ -235,8 +235,8 @@ public class EditProfileActivity extends Activity {
 
 				if (isEmpty) {
 					svMain.scrollTo(0, -svMain.getBottom());
-					Utility.showAlertDialog(mThis, "Cảnh báo",
-							"Nhập các thông tin yêu cầu", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Thiếu thông tin", "Nhập đủ thông tin yêu cầu.");
 					return;
 				}
 
@@ -245,8 +245,9 @@ public class EditProfileActivity extends Activity {
 					Log.i("DATE", date.toLocaleString());
 					txtBirthday.setBackgroundDrawable(getResources()
 							.getDrawable(R.drawable.edit_text_wrong));
-					Utility.showAlertDialog(mThis, "Cảnh báo",
-							"Ngày sinh không hợp lệ", false);
+					
+					Utility.showDialog(Utility.ERROR, dialog, "Ngày sinh không hợp lệ",
+							"Ngày sinh phải trước thời gian hiện tại.");
 					return;
 				} else {
 					txtBirthday.setBackgroundDrawable(getResources()
@@ -342,11 +343,19 @@ public class EditProfileActivity extends Activity {
 					protected void onPostExecute(Boolean result) {
 
 						if (result) {
-							showFinishDialog();
+							Utility.showDialog(Utility.CONFIRM, dialog,
+									"Thành công", "Cập nhật thông tin thành công.",
+									"Đóng", new OnClickListener() {
+										
+										@Override
+										public void onClick(View v) {
+											dialog.dismiss();
+											finish();
+										}
+									});
 						} else {
-							Utility.showAlertDialog(mThis, "Cảnh báo",
-									"Xãy ra lỗi trong quá trình cập nhật",
-									false);
+							Utility.showDialog(Utility.ERROR, dialog,
+									"Lỗi", "Xãy ra lỗi trong quá trình cập nhật. Xin thử lại sau .");
 						}
 						progress.dismiss();
 					}
@@ -435,20 +444,5 @@ public class EditProfileActivity extends Activity {
 				});
 
 		dialog.show();
-	}
-
-	@SuppressWarnings("deprecation")
-	public void showFinishDialog() {
-		AlertDialog alertDialog = new AlertDialog.Builder(mThis).create();
-
-		alertDialog.setMessage("Cập nhật thông tin thành công");
-
-		alertDialog.setButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
-
-		alertDialog.show();
 	}
 }

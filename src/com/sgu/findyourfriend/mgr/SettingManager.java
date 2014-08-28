@@ -1,5 +1,6 @@
 package com.sgu.findyourfriend.mgr;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.sgu.findyourfriend.utils.PreferenceKeys;
 
 public class SettingManager {
+
+	public static final double STRAGNER_DISTANCE = 200000; // km
 
 	private static SettingManager instance;
 
@@ -116,16 +119,16 @@ public class SettingManager {
 		return prefs.getBoolean(PreferenceKeys.sms, false);
 	}
 
-	public Set<String> getFriendsWarning() {
-
-		for (String id : prefs.getStringSet(PreferenceKeys.friendsWarning,
-				new HashSet<String>())) {
-			Log.i("share:", id);
-		}
-
-		return prefs.getStringSet(PreferenceKeys.friendsWarning,
-				new HashSet<String>());
-	}
+//	public Set<String> getFriendsWarning() {
+//
+//		for (String id : prefs.getStringSet(PreferenceKeys.friendsWarning,
+//				new HashSet<String>())) {
+//			Log.i("share:", id);
+//		}
+//
+//		return prefs.getStringSet(PreferenceKeys.friendsWarning,
+//				new HashSet<String>());
+//	}
 
 	public String getDefaultMsg() {
 		return prefs.getString(PreferenceKeys.defaultMsg, "HELP");
@@ -173,5 +176,18 @@ public class SettingManager {
 		prefs.edit().putBoolean(PreferenceKeys.runBackground, checked).commit();
 		
 	}
+
+	public void setDefaultWarning(HashSet<String> hset) {
+		prefs.edit().putStringSet(PreferenceKeys.friendsWarning, hset).commit();
+	}
+	
+	public Set<String> getDefaultWarning() {
+		return prefs.getStringSet(PreferenceKeys.friendsWarning, new HashSet<String>());
+	}
+
+	public void setDefaultMsg(String text) {
+		prefs.edit().putString(PreferenceKeys.defaultMsg, text).commit();
+	}
+	
 	
 }

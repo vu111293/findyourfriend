@@ -1,5 +1,6 @@
 package com.sgu.findyourfriend.screen;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,74 +39,78 @@ public class VerifyEmailFragment extends BaseFragment {
 
 			@Override
 			public void onClick(View arg0) {
-				(new AsyncTask<Void, Void, Integer>() {
 
-					@Override
-					protected void onPreExecute() {
-						progress = new ProgressDialogCustom(getActivity());
-						progress.show();
-					}
+				if (Utility.checkConnectToNetworkContinue(getActivity())) {
+					final Dialog dialog = new Dialog(getActivity());
+					
+					
+					(new AsyncTask<Void, Void, Integer>() {
 
-					@Override
-					protected Integer doInBackground(Void... params) {
+						@Override
+						protected void onPreExecute() {
+							progress = new ProgressDialogCustom(getActivity());
+							progress.show();
+						}
 
-						phoneNumber = SettingManager.getInstance()
-								.getPhoneAutoLogin();
-						password = SettingManager.getInstance()
-								.getPasswordAutoLogin();
+						@Override
+						protected Integer doInBackground(Void... params) {
 
-						int rs = PostData.login(getActivity(), phoneNumber,
-								password);
+							phoneNumber = SettingManager.getInstance()
+									.getPhoneAutoLogin();
+							password = SettingManager.getInstance()
+									.getPasswordAutoLogin();
 
-						if (rs > 0) {
-							if (GCMRegistrar.isRegistered(getActivity())) {
-								gcmId = GCMRegistrar
-										.getRegistrationId(getActivity());
-								PostData.updateGcmId(getActivity(), rs, gcmId);
-								MyProfileManager.getInstance().init(
-										getActivity(), rs, true);
-								Log.i("Verify", "registed with  " + gcmId);
-							} else {
-								Log.i("Verify", "empty gcmid");
-								MyProfileManager.getInstance().init(
-										getActivity(), rs, true);
-								GCMRegistrar.register(getActivity(),
-										Config.GOOGLE_SENDER_ID);
+							int rs = PostData.login(getActivity(), phoneNumber,
+									password);
+
+							if (rs > 0) {
+								if (GCMRegistrar.isRegistered(getActivity())) {
+									gcmId = GCMRegistrar
+											.getRegistrationId(getActivity());
+									PostData.updateGcmId(getActivity(), rs,
+											gcmId);
+									MyProfileManager.getInstance().init(
+											getActivity(), rs, true);
+									Log.i("Verify", "registed with  " + gcmId);
+								} else {
+									Log.i("Verify", "empty gcmid");
+									MyProfileManager.getInstance().init(
+											getActivity(), rs, true);
+									GCMRegistrar.register(getActivity(),
+											Config.GOOGLE_SENDER_ID);
+								}
+
+								// MyProfileManager.getInstance().init(
+								// getActivity(),
+								// SettingManager.getInstance().getLastAccountIdLogin(),
+								// true);
 							}
 
-							// MyProfileManager.getInstance().init(
-							// getActivity(),
-							// SettingManager.getInstance().getLastAccountIdLogin(),
-							// true);
+							return rs;
 						}
 
-						return rs;
-					}
+						@Override
+						protected void onPostExecute(Integer result) {
+							progress.dismiss();
 
-					@Override
-					protected void onPostExecute(Integer result) {
-						progress.dismiss();
-
-						if (result > 0) {
-							Log.i("GET SUC", MyProfileManager.getInstance()
-									.getMineInstance().getUserInfo().toString());
-							Intent i = new Intent(
-									getActivity(),
-									com.sgu.findyourfriend.screen.MainActivity.class);
-							startActivity(i);
-							getActivity().finish();
-						} else {
-							Utility.showAlertDialog(
-									getActivity(),
-									"Thông báo",
-									"Tài khoản chưa được kích hoạt, vui lòng xác nhận e-mail",
-									false);
-
+							if (result > 0) {
+								Log.i("GET SUC", MyProfileManager.getInstance()
+										.getMineInstance().getUserInfo()
+										.toString());
+								Intent i = new Intent(
+										getActivity(),
+										com.sgu.findyourfriend.screen.MainActivity.class);
+								startActivity(i);
+								getActivity().finish();
+							} else {
+								
+								Utility.showDialog(Utility.WARNING, dialog, "Xác nhận email",
+										"Tài khoản chưa được kích hoạt, vui lòng xác nhận e-mail");
+							}
 						}
-					}
 
-				}).execute();
-
+					}).execute();
+				}
 			}
 		});
 

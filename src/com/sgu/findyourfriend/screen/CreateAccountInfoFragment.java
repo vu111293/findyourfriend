@@ -1,5 +1,7 @@
 package com.sgu.findyourfriend.screen;
 
+import java.util.UUID;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -23,7 +25,8 @@ import com.sgu.findyourfriend.net.PostData;
 import com.sgu.findyourfriend.utils.Utility;
 
 public class CreateAccountInfoFragment extends BaseFragment {
-	public static final String TAG = "CreateAccountProfilrFragment";
+	public static final String TAG = CreateAccountInfoFragment.class
+			.getSimpleName();
 	public static int count = 0;
 
 	private ProgressDialogCustom progress;
@@ -34,8 +37,6 @@ public class CreateAccountInfoFragment extends BaseFragment {
 
 	private String phoneNumber;
 	private String passwd;
-
-	protected Dialog alertDialog;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,111 +56,179 @@ public class CreateAccountInfoFragment extends BaseFragment {
 			@Override
 			public void onClick(View v) {
 
-				boolean isEmpty = false;
+				if (Utility.checkConnectToNetworkContinue(getActivity())) {
 
-				if (editPhone.getText().toString().trim().length() > 0
-						&& isPhoneValidate(editPhone.getText().toString()
-								.trim())) {
-					editPhone.setBackgroundDrawable(getResources().getDrawable(
-							R.drawable.edit_text));
-				} else {
-					editPhone.setBackgroundDrawable(getResources().getDrawable(
-							R.drawable.edit_text_wrong));
-					isEmpty = true;
-				}
+					final Dialog dialog = new Dialog(getActivity());
 
-				if (editPassword.getText().toString().trim().length() > 0
-						&& editPassword.getText().toString().trim().length() >= Config.MIN_PASSWORD_LENGHT) {
-					editPassword.setBackgroundDrawable(getResources()
-							.getDrawable(R.drawable.edit_text));
-				} else {
-					editPassword.setBackgroundDrawable(getResources()
-							.getDrawable(R.drawable.edit_text_wrong));
-					isEmpty = true;
-				}
+					boolean isEmpty = false;
 
-				if (isEmpty) {
-					Utility.showAlertDialog(ctx, "",
-							"Nhập các thông tin yêu cầu", false);
-					return;
-				}
-
-				(new AsyncTask<Void, Void, Integer>() {
-
-					private String gcmId = "";
-					private boolean success = false;
-
-					protected void onPreExecute() {
-						progress.show();
-						phoneNumber = editPhone.getText().toString().trim();
-						passwd = editPassword.getText().toString().trim();
-					};
-
-					@Override
-					protected Integer doInBackground(Void... params) {
-
-						if (PostData
-								.isPhoneRegisted(getActivity(), phoneNumber))
-							return Config.PHONE_REGISTED;
-
-						User mine = MyProfileManager.getInstance().mTemp
-								.getUserInfo();
-
-						String renameFile = "temp_"
-								+ System.currentTimeMillis() + ".png";
-						// String selectedImagePath = mine.getAvatar();
-
-						if (!mine.getAvatar().equals("")) {
-							PostData.uploadFile(ctx, mine.getAvatar(),
-									renameFile);
-						} else {
-							renameFile = "ic_no_imgprofile.png";
-						}
-
-						int id = PostData.userCreate(ctx, mine.getName(),
-								PostData.IMAGE_HOST + renameFile, gcmId, mine
-										.getGender(), mine.getAddress(), mine
-										.getBirthday().toString(), mine
-										.getSchool(), mine.getWorkplace(), mine
-										.getEmail(), mine.getFblink(), passwd,
-								mine.isPublic());
-
-						mine.setId(id);
-						MyProfileManager.getInstance().mTemp.setUserInfo(mine);
-
-						// wait to receive response
-						if (id > 0) {
-							SettingManager.getInstance()
-									.saveLastAccountIdLogin(id);
-							success = PostData.accountCreate(ctx, id,
-									phoneNumber);
-
-							return success ? Config.SUCCESS : Config.ERROR;
-						}
-
-						return Config.ERROR;
+					if (editPhone.getText().toString().trim().length() > 0
+							&& isPhoneValidate(editPhone.getText().toString()
+									.trim())) {
+						editPhone.setBackgroundDrawable(getResources()
+								.getDrawable(R.drawable.edit_text));
+					} else {
+						editPhone.setBackgroundDrawable(getResources()
+								.getDrawable(R.drawable.edit_text_wrong));
+						isEmpty = true;
 					}
 
-					@Override
-					protected void onPostExecute(Integer result) {
-						progress.dismiss();
-						if (result == Config.SUCCESS) {
-							showFinishDialog(ctx);
-						} else if (result == Config.PHONE_REGISTED) {
-							editPhone.setBackgroundDrawable(getResources()
-									.getDrawable(R.drawable.edit_text_wrong));
-							Utility.showAlertDialog(ctx, "Cảnh báo",
-									"Số điện thoại này đã được đăng kí", false);
-						} else {
-							Utility.showAlertDialog(ctx, "Cảnh báo",
-									"Xãy ra lỗi trong khi tạo tải khoản.",
-									false);
-						}
+					if (editPassword.getText().toString().trim().length() > 0
+							&& editPassword.getText().toString().trim()
+									.length() >= Config.MIN_PASSWORD_LENGHT) {
+						editPassword.setBackgroundDrawable(getResources()
+								.getDrawable(R.drawable.edit_text));
+					} else {
+						editPassword.setBackgroundDrawable(getResources()
+								.getDrawable(R.drawable.edit_text_wrong));
+						isEmpty = true;
 					}
 
-				}).execute();
+					if (isEmpty) {
+						Utility.showDialog(Utility.ERROR, dialog,
+								"Thiếu thông tin",
+								"Nhập các thông tin yêu cầu", "Đóng",
+								new OnClickListener() {
+
+									@Override
+									public void onClick(View v) {
+										dialog.dismiss();
+									}
+								});
+						return;
+					}
+
+					(new AsyncTask<Void, Void, Integer>() {
+
+						private String gcmId = "";
+						private boolean success = false;
+
+						protected void onPreExecute() {
+							progress.show();
+							phoneNumber = editPhone.getText().toString().trim();
+							passwd = editPassword.getText().toString().trim();
+						};
+
+						@Override
+						protected Integer doInBackground(Void... params) {
+
+							if (PostData.isPhoneRegisted(getActivity(),
+									phoneNumber))
+								return Config.PHONE_REGISTED;
+
+							User mine = MyProfileManager.getInstance().mTemp
+									.getUserInfo();
+
+							String renameFile = "temp_"
+									+ System.currentTimeMillis() + ".png";
+							// String selectedImagePath = mine.getAvatar();
+
+							if (!mine.getAvatar().equals("")) {
+								PostData.uploadFile(ctx, mine.getAvatar(),
+										renameFile);
+							} else {
+								renameFile = "ic_no_imgprofile.png";
+							}
+
+							int id = PostData.userCreate(ctx, mine.getName(),
+									PostData.IMAGE_HOST + renameFile, gcmId,
+									mine.getGender(), mine.getAddress(), mine
+											.getBirthday().toString(), mine
+											.getSchool(), mine.getWorkplace(),
+									mine.getEmail(), mine.getFblink(), passwd,
+									mine.isPublic());
+
+							mine.setId(id);
+							MyProfileManager.getInstance().mTemp
+									.setUserInfo(mine);
+
+							// wait to receive response
+							if (id > 0) {
+								SettingManager.getInstance()
+										.saveLastAccountIdLogin(id);
+								success = PostData.accountCreate(ctx, id,
+										phoneNumber);
+
+								return success ? Config.SUCCESS : Config.ERROR;
+							}
+
+							return Config.ERROR;
+						}
+
+						@Override
+						protected void onPostExecute(Integer result) {
+							progress.dismiss();
+							if (result == Config.SUCCESS) {
+
+								// save info
+								SettingManager.getInstance()
+										.savePhoneAutoLogin(phoneNumber);
+								SettingManager.getInstance()
+										.savePasswordAutoLogin(passwd);
+
+								Utility.showDialog(
+										Utility.CONFIRM,
+										dialog,
+										"Tạo tài khoản thành công",
+										"Bạn có muốn tự đồng đăng nhập vào lần sau",
+										"Có", new OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												SettingManager.getInstance()
+														.setAutoLogin(true);
+												replaceFragment(
+														new VerifyEmailFragment(),
+														true);
+												dialog.dismiss();
+											}
+										}, "Không", new OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												SettingManager.getInstance()
+														.setAutoLogin(false);
+												replaceFragment(
+														new VerifyEmailFragment(),
+														true);
+												dialog.dismiss();
+											}
+										});
+
+							} else if (result == Config.PHONE_REGISTED) {
+								editPhone
+										.setBackgroundDrawable(getResources()
+												.getDrawable(
+														R.drawable.edit_text_wrong));
+
+								Utility.showDialog(Utility.ERROR, dialog,
+										"Số điện thoại đã sử dụng",
+										"Chọn số điện thoại khác.", "Đóng",
+										new OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												dialog.dismiss();
+											}
+										});
+							} else {
+
+								Utility.showDialog(Utility.ERROR, dialog,
+										"Lỗi",
+										"Xãy ra lỗi trong khi tạo tải khoản.",
+										"Đóng", new OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												dialog.dismiss();
+											}
+										});
+							}
+						}
+
+					}).execute();
+				}
 			}
-
 		});
 
 		return rootView;
@@ -174,48 +243,5 @@ public class CreateAccountInfoFragment extends BaseFragment {
 		super.onAttach(activity);
 
 		ctx = activity;
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		// Check if Internet Connection present
-		if (!Utility.isConnectingToInternet(getActivity())) {
-			Utility.showAlertDialog(ctx, "Lỗi kết nối mạng",
-					"Kiểm tra lại kết nối mạng và quay lại sau.", false);
-			return;
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	public void showFinishDialog(Context context) {
-		// save info
-		SettingManager.getInstance().savePhoneAutoLogin(phoneNumber);
-		SettingManager.getInstance().savePasswordAutoLogin(passwd);
-
-		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-
-		// Set Dialog Message
-		alertDialog
-				.setMessage("Tạo tài khoản thành công. Bạn có muốn tự động đăng nhập vào lần sau?");
-
-		alertDialog.setButton("Có", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-				SettingManager.getInstance().setAutoLogin(true);
-				replaceFragment(new VerifyEmailFragment(), true);
-			}
-		});
-
-		alertDialog.setButton2("Không", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				SettingManager.getInstance().setAutoLogin(false);
-				replaceFragment(new VerifyEmailFragment(), true);
-			}
-		});
-
-		// Show Alert Message
-		alertDialog.show();
 	}
 }

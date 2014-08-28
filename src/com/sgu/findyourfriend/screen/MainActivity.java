@@ -248,7 +248,7 @@ public class MainActivity extends SherlockFragmentActivity {
 				mTabHost.newTabSpec(CATEGORIES_TAG).setIndicator(
 						"",
 						getResources().getDrawable(
-								R.drawable.ic_action_settings)),
+								R.drawable.ic_setting)),
 				CategoriesContainerFragment.class, null);
 
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {

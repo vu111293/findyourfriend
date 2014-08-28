@@ -6,8 +6,11 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.w3c.dom.Text;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -35,8 +38,16 @@ import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.internal.bt;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.sgu.findyourfriend.R;
@@ -44,8 +55,10 @@ import com.sgu.findyourfriend.mgr.Config;
 import com.sgu.findyourfriend.mgr.FriendManager;
 import com.sgu.findyourfriend.mgr.SettingManager;
 import com.sgu.findyourfriend.model.Friend;
+import com.sgu.findyourfriend.screen.InviteFromContactsDialog;
 import com.sgu.findyourfriend.screen.MainActivity;
 import com.sgu.findyourfriend.screen.MapFragment;
+import com.sgu.findyourfriend.screen.SearchFromServerDialog;
 
 /**
  * Utility is a just an ordinary class to have some Utility methods
@@ -96,8 +109,8 @@ public class Utility {
 			builder.append(" " + hours + " giờ");
 		if (mins >= 0)
 			builder.append(" " + mins + " phút");
-//		if (secs >= 0)
-//			builder.append(" " + secs + "giây");
+		// if (secs >= 0)
+		// builder.append(" " + secs + "giây");
 		return builder.toString();
 	}
 
@@ -106,9 +119,9 @@ public class Utility {
 	}
 
 	public static void showMessageOnCenter(Context ctx, String msg) {
-		Toast toast = Toast.makeText(ctx, msg,
-				Toast.LENGTH_SHORT);
-		toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
+		Toast toast = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL,
+				0, 0);
 		toast.show();
 	}
 
@@ -161,30 +174,109 @@ public class Utility {
 				Integer.parseInt(res[2]), res[3].equals("YES"));
 	}
 
-	public static void showAlertDialog(Context context, String title,
-			String message, Boolean status) {
-		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+//	public static void showAlertDialog(Context context, String title,
+//			String message, Boolean status) {
+//		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+//
+//		// Set Dialog Title
+//		alertDialog.setTitle(title);
+//
+//		// Set Dialog Message
+//		alertDialog.setMessage(message);
+//
+//		if (status != null)
+//			// Set alert dialog icon
+//			// alertDialog
+//			// .setIcon((status) ? R.drawable.success : R.drawable.fail);
+//
+//			// Set OK Button
+//			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+//				public void onClick(DialogInterface dialog, int which) {
+//
+//				}
+//			});
+//
+//		// Show Alert Message
+//		alertDialog.show();
+//	}
 
-		// Set Dialog Title
-		alertDialog.setTitle(title);
+	public static int ERROR = 0;
+	public static int CONFIRM = 1;
+	public static int WARNING = 2;
 
-		// Set Dialog Message
-		alertDialog.setMessage(message);
+	public static void showDialog(int type, final Dialog dialog, String title,
+			String content, String titleBtnLeft, OnClickListener leftOnClick,
+			String titleBtnRight, OnClickListener rightOnClick) {
 
-		if (status != null)
-			// Set alert dialog icon
-			// alertDialog
-			// .setIcon((status) ? R.drawable.success : R.drawable.fail);
+		Button leftBtn, rightBtn;
+		TextView txtTitle;
+		TextView txtContent;
 
-			// Set OK Button
-			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+		Window W = dialog.getWindow();
+		W.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		W.setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
+		W.requestFeature(Window.FEATURE_NO_TITLE);
+		W.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+		dialog.setContentView(R.layout.custom_dialog);
+
+		txtTitle = (TextView) dialog.findViewById(R.id.title);
+		txtContent = (TextView) dialog.findViewById(R.id.content);
+		leftBtn = (Button) dialog.findViewById(R.id.btnLeft);
+		rightBtn = (Button) dialog.findViewById(R.id.btnRight);
+
+		if (type == ERROR)
+			txtTitle.setBackgroundColor(dialog.getContext().getResources()
+					.getColor(R.color.red));
+		else if (type == CONFIRM)
+			txtTitle.setBackgroundColor(dialog.getContext().getResources()
+					.getColor(R.color.green));
+		else if (type == WARNING)
+			txtTitle.setBackgroundColor(dialog.getContext().getResources()
+					.getColor(R.color.yellow));
+
+		txtTitle.setText(title);
+		txtContent.setText(content);
+
+		// confirm default
+		if (null == leftOnClick) {
+			rightBtn.setVisibility(View.GONE);
+			leftBtn.setText("Đóng");
+			leftBtn.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
 				}
 			});
 
-		// Show Alert Message
-		alertDialog.show();
+		// modify
+		} else {
+
+			leftBtn.setText(titleBtnLeft);
+			leftBtn.setOnClickListener(leftOnClick);
+
+			if (null == rightOnClick) {
+				rightBtn.setVisibility(View.GONE);
+			} else {
+				rightBtn.setText(titleBtnRight);
+				rightBtn.setOnClickListener(rightOnClick);
+			}
+		}
+
+		dialog.show();
+	}
+
+	public static void showDialog(int type, final Dialog dialog, String title,
+			String content, String titleBtn, OnClickListener onClick) {
+		showDialog(type, dialog, title, content, titleBtn, onClick, "", null);
+	}
+	
+	public static void showDialog(int type, final Dialog dialog, String title,
+			String content) {
+		showDialog(type, dialog, title, content, "", null, "", null);
+		
 	}
 
 	public class RReply {
@@ -293,8 +385,8 @@ public class Utility {
 
 	}
 
-	public static BitmapDescriptor combileLocationIcon(Context ctx, final Friend f,
-			boolean isSelected) {
+	public static BitmapDescriptor combileLocationIcon(Context ctx,
+			final Friend f, boolean isSelected) {
 		final Bitmap brbitmap;
 
 		if (isSelected)
@@ -309,7 +401,8 @@ public class Utility {
 						.getUserInfo().getId())), brbitmap);
 	}
 
-	private static BitmapDescriptor combileBorder(Bitmap bmAvatar, Bitmap brbitmap) {
+	private static BitmapDescriptor combileBorder(Bitmap bmAvatar,
+			Bitmap brbitmap) {
 		int w = bmAvatar.getWidth();
 		int h = bmAvatar.getHeight();
 
@@ -344,17 +437,15 @@ public class Utility {
 		}
 
 		Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-				drawable.getIntrinsicHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+				drawable.getIntrinsicHeight(),
+				android.graphics.Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
 		drawable.draw(canvas);
 
 		return bitmap;
 	}
-	
-	
-	
-	
+
 	// Checking for all possible internet providers
 	public static boolean isConnectingToInternet(Context ctx) {
 
@@ -370,6 +461,43 @@ public class Utility {
 
 		}
 		return false;
+	}
+
+	public static boolean checkConnectToNetworkForceQuit(final Activity act) {
+		if (!isConnectingToInternet(act)) {
+			final Dialog dialog = new Dialog(act);
+			showDialog(ERROR, dialog, "Lỗi kết nối mạng",
+					"Bật kết nối mạng và thử lại", "Đóng",
+					new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+							act.finish();
+						}
+					});
+
+			return false;
+		}
+		return true;
+	}
+
+	public static boolean checkConnectToNetworkContinue(Context ctx) {
+		if (!isConnectingToInternet(ctx)) {
+			final Dialog dialog = new Dialog(ctx);
+			showDialog(ERROR, dialog, "Lỗi kết nối mạng",
+					"Bật kết nối mạng và thử lại", "Đóng",
+					new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+
+			return false;
+		}
+		return true;
 	}
 
 	// debug method

@@ -87,6 +87,8 @@ public class SearchFromServerDialog extends Dialog {
 
 	private class LoadData extends AsyncTask<String, Void, Void> {
 
+		private Dialog dialog = new Dialog(getContext());
+		
 		@Override
 		protected void onPreExecute() {
 
@@ -110,8 +112,8 @@ public class SearchFromServerDialog extends Dialog {
 			lv.setAdapter(adapter);
 
 			if (temptData.size() == 0) {
-				Utility.showAlertDialog(ctx, "", "Không có kết quả", true);
-
+				
+				Utility.showDialog(Utility.WARNING, dialog, "Tìm kiếm rỗng", "Không có kết quả.");
 			}
 
 		}

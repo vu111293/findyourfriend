@@ -202,12 +202,13 @@ public class FriendManager {
 
 		while (it.hasNext()) {
 			Friend f = it.next();
-			if (!f.getUserInfo().getAvatar().equals(""))
-				hmImageP.put(f.getUserInfo().getId(),
-						Drawable.createFromPath(f.getUserInfo().getAvatar()));
-			else
+			if (null == f.getUserInfo().getAvatar() 
+					|| f.getUserInfo().getAvatar().equals(""))
 				hmImageP.put(f.getUserInfo().getId(), context.getResources()
 						.getDrawable(R.drawable.ic_no_imgprofile));
+			else
+				hmImageP.put(f.getUserInfo().getId(),
+						Drawable.createFromPath(f.getUserInfo().getAvatar()));
 		}
 
 		hmRequestFriends = new HashMap<Integer, Friend>();
@@ -232,6 +233,15 @@ public class FriendManager {
 			} else if (f.getAcceptState() == Friend.REQUEST_FRIEND) {
 				hmInvited.put(f.getUserInfo().getId(), f);
 			}
+		}
+		
+		
+		
+		// import stranger offline
+		if (Config.MODE_OFFLINE) {
+			hmStrangers.put(100, new LatLng(11.574108, 107.8529177));
+			hmStrangers.put(101, new LatLng(10.214108, 106.41529177));
+			hmStrangers.put(102, new LatLng(10.414108, 106.9529177));
 		}
 
 	}

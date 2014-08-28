@@ -13,6 +13,10 @@
     <color name="mdu_blue">#25AAE3</color>
     <color name="silver">#808080</color>
     
+    <color name="green">#79C142</color>
+    <color name="yellow">#FEE102</color>
+    <color name="red">#FE0000</color>
+    
     <color name="while_opt20">#32FFFFFF</color>
     
     <color name="alertBkg">#DDC92020</color>

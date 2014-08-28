@@ -66,6 +66,10 @@ public class PhoneNumberManagerDialog extends Dialog {
 			@Override
 			public void onClick(View arg0) {
 
+				if (!Utility.checkConnectToNetworkContinue(getContext())) return;
+
+				final Dialog dialog = new Dialog(getContext());
+				
 				newPhone = editNewPhone.getText().toString().trim();
 				editNewPhone.setText("");
 				InputMethodManager imm = (InputMethodManager) getContext()
@@ -77,8 +81,8 @@ public class PhoneNumberManagerDialog extends Dialog {
 							.getResources().getDrawable(
 									R.drawable.edit_text_wrong));
 
-					Utility.showAlertDialog(getContext(), "Cảnh báo",
-							"Số điện thoại không đúng", false);
+					Utility.showDialog(Utility.ERROR, dialog, "Số điện thoại không hợp lệ",
+							"Kiểm tra lại hoặc chọn số điện thoại khác.");
 					return;
 				}
 
@@ -112,8 +116,8 @@ public class PhoneNumberManagerDialog extends Dialog {
 						progress.dismiss();
 						if (result == Config.SUCCESS) {
 
-							Utility.showAlertDialog(getContext(), "Thông báo",
-									"Thêm số điện thoại thành công", false);
+							Utility.showDialog(Utility.CONFIRM, dialog, "Thêm thành công",
+									"Số điện thoại mới đã được thêm vào tài khoản.");
 
 							dataP.add(newPhone);
 							adapter.notifyDataSetChanged();
@@ -121,11 +125,13 @@ public class PhoneNumberManagerDialog extends Dialog {
 							MyProfileManager.getInstance().addMyPhoneNumber(newPhone);
 
 						} else if (result == Config.PHONE_REGISTED) {
-							Utility.showAlertDialog(getContext(), "Cảnh báo",
-									"Số điện thoại này đã được đăng kí", false);
+							
+							Utility.showDialog(Utility.ERROR, dialog, "Số điện thoại dẵ được đăng kí",
+									"Chọn số điện thoại khác.");
 						} else if (result == Config.ERROR) {
-							Utility.showAlertDialog(getContext(), "Cảnh báo",
-									"Thêm thất bại", false);
+							
+							Utility.showDialog(Utility.ERROR, dialog, "Lỗi",
+									"Thêm thất bại. Xin thử lại sau.");
 						}
 					}
 
