@@ -34,6 +34,13 @@ gần nhất (độ chính xác không cao).
 * Hướng dẫn sử dụng.
 
 
+Dự án đang thực hiện phần testing nhằm đảm bảo tính ổn định
+-------------------
+Hiện nhóm phát triển đã hoàn thành test chức năng login và tạo account cùng một số lỗi phát sinh.
+
+
+
+
 
 Ảnh chụp ứng dụng
 -----------
