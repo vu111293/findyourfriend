@@ -1,0 +1,126 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        class="com.sgu.findyourfriend.screen.CustomMapFragment" />
+
+    <!-- remove black blank -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" >
+
+        <ProgressBar
+            android:id="@+id/pbOnMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical" >
+
+        <ImageButton
+            android:id="@+id/btnShow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_map"
+            android:contentDescription="@string/item_show_description"
+            android:src="@drawable/ic_show" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical" >
+
+        <ImageButton
+            android:id="@+id/btnZoomIn"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/button_map"
+            android:contentDescription="@string/item_show_description"
+            android:gravity="center"
+            android:src="@drawable/ic_plus" />
+
+        <ImageButton
+            android:id="@+id/btnZoomOut"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="1dp"
+            android:background="@drawable/button_map"
+            android:contentDescription="@string/item_show_description"
+            android:gravity="center"
+            android:src="@drawable/ic_minus" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frWaitLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/wait_frame_layout_bkg"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <!-- controller layout -->
+
+    <include
+        android:id="@+id/task_inc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        layout="@layout/task_layout" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="#77FFFFFF" >
+
+        <com.devsmart.android.ui.HorizontalListView
+            android:id="@+id/avatarHListView"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent" />
+        
+        <ImageButton
+            android:id="@+id/imgAdd"
+            android:layout_width="@dimen/status_image_size"
+            android:layout_height="@dimen/status_image_size"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="4dp"
+            android:layout_marginLeft="4dp"
+            android:contentDescription="@string/item_imgprofile_description"
+            android:scaleType="centerCrop"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_addfriend" />
+    </LinearLayout>
+
+</RelativeLayout>

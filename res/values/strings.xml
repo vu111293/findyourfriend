@@ -1,0 +1,372 @@
+<resources>
+
+    <string name="app_name">Find Your Friend</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Android Push Notifications</string>
+    <string name="error_config">Please set the %1$s constant and recompile the app.</string>
+    <string name="already_registered">Device is already registered on server.</string>
+    <string name="gcm_registered">GCM: device successfully registered!</string>
+    <string name="gcm_unregistered">GCM: device successfully unregistered!</string>
+    <string name="gcm_message">GCM: you got message!</string>
+    <string name="gcm_error">GCM: error (%1$s).</string>
+    <string name="gcm_recoverable_error">GCM: recoverable error (%1$s).</string>
+    <string name="gcm_deleted">GCM: server deleted %1$d pending messages!</string>
+    <string name="server_registered">Demo Server: successfully added device!</string>
+    <string name="server_unregistered">Demo Server: successfully removed device!</string>
+    <string name="server_register_error">Could not register device on Demo Server after %1$d attempts.</string>
+    <string name="server_unregister_error">Could not unregister device on Demo Server (%1$s).</string>
+    <string name="options_register">Register</string>
+    <string name="options_unregister">Unregister</string>
+    <string name="options_clear">Clear</string>
+    <string name="options_exit">Exit</string>
+    <string name="server_registering">Trying (attempt %1$d/%2$d) to register device on Demo Server.</string>
+    <string name="main_empty_list">There is no recent conversation, write new message
+		to start one.</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+    <string name="vendor">SGU Team Corporation 2014</string>
+    <string name="alert_title">cảnh báo khẩn</string>
+    <string name="alert_explain">Chúng tôi sẽ gọi, email, gửi tin nhắn đến bất kì ai đang ở gần bạn.</string>
+    <string name="alert_cancel_button">Hủy</string>
+    <string name="item_alert_description">trợ giúp</string>
+    <string name="item_friend_description">danh sách bạn bè</string>
+    <string name="item_send_message_description">gửi tin nhắn</string>
+    <string name="item_status_description">thanh báo trạng thái</string>
+    <string name="item_imgprofile_description">ảnh dại diện</string>
+    <string name="item_none_accept_description">thanh cảnh báo không chấp nhận</string>
+    <string name="item_walk_description">đi bộ</string>
+    <string name="item_moto_description">xe máy</string>
+    <string name="item_wait_description">đợi</string>
+    <string name="item_border_description">khung biên</string>
+    <string name="item_background_description">ảnh nền</string>
+    <string name="item_emergency_button_description">nút cầu cứu</string>
+    <string name="item_icon_description">biểu tượng</string>
+    <string name="not_available">không có sẵn</string>
+    <string name="accept">chấp chận</string>
+    <string name="invite">gửi lời mời</string>
+    <string name="notnow">lúc khác</string>
+    <string name="message">nhắn tin</string>
+    <string name="call">gọi</string>
+    <string name="history">xem l.sử</string>
+    <string name="update">cập nhật</string>
+    <string name="route">tìm đường</string>
+    <string name="request">yêu cầu</string>
+    <string name="close">đóng</string>
+    <string name="please_wait">đang tải...</string>
+    <string name="current_password">Mật khẩu hiện tại</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="repeat_password">Nhập lại mật khẩu</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="show_password">Hiển thị mật khẩu</string>
+    <string name="really_delete_item">Bạn có chắc muốn xóa?</string>
+    <string name="item_show_description">hiển thị</string>
+    <string name="enter_message_hint">soạn tin nhắn</string>
+
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items">
+        <item>Bản đồ</item>
+        <item>Vị trí</item>
+        <item>Tin nhắn</item>
+        <item>Bạn bè</item>
+        <item>Cài đặt</item>
+        <item>Trợ giúp</item>
+    </string-array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_setting">SettingActivity</string>
+
+    <string-array name="displayobjects">
+        <item>Bệnh viện</item>
+        <item>Trường học</item>
+        <item>Tiệm sảnh</item>
+        <item>Bệnh viện</item>
+        <item>Trường học</item>
+        <item>Tiệm sảnh</item>
+        <item>Bệnh viện</item>
+        <item>Trường học</item>
+        <item>Tiệm sảnh</item>
+    </string-array>
+    <string-array name="displayobjects_values">
+        <item>benhvien</item>
+        <item>truonghoc</item>
+        <item>tiemsanh</item>
+        <item>nhahang</item>
+        <item>benhvien</item>
+        <item>truonghoc</item>
+        <item>tiemsanh</item>
+        <item>nhahang</item>
+        <item>nhahang</item>
+    </string-array>
+    <string-array name="maptype">
+        <item>Bình thường</item>
+        <item>"Vệ tinh"</item>
+        <item>"Kết hợp"</item>
+    </string-array>
+    <string-array name="maptype_values">
+        <item>normal</item>
+        <item>terrain</item>
+        <item>hybrid</item>
+    </string-array>
+    <string-array name="empty_array"></string-array>
+
+    <string name="name_demo">Họ và tên</string>
+    <string name="phone_number_demo">0911111111</string>
+    <string name="status_demo">trực tuyến</string>
+    <string name="email_demo">email@email.com</string>
+    <string name="address">địa chỉ</string>
+    <string name="accuracy">phạm vi</string>
+    <string name="long_street">độ dài </string>
+
+    <!-- help screen info -->
+    <string name="intro">Bạn muốn sử dụng ứng dụng nhanh chóng và chuyên nghiệp? Hãy theo các hướng dẫn sau đây, bạn sẽ làm chủ được ứng dụng.</string>
+    <string name="chapter_quickstart">Bắt đầu nhanh</string>
+    <string name="hp_register">Nếu bạn là người sử dụng mới, hãy tạo cho mình một tài khoản.\nB1. Nhấn nút đăng kí.\nB2. Điền các thông tin yêu cầu.\nB3. Nhấn vào nút Hoàn tất để bắt đầu trải nghiệm.</string>
+    <string name="hp_register_add">Số điện thoại và mật khẩu là thông tin đăng nhập sau này.
+Hãy chắc chắn bạn đã điền tất cả thông tin được yêu cầu và chọn cho mình một ảnh đại diện.</string>
+    <string name="hp_login">Nếu bạn đã có tài khoản hoặc muốn sử dụng trên máy khác.</string>
+    <string name="hp_forgot_password">Bạn đã có tài khoản nhưng lại quên mất mật khẩu? Hãy chọn liên kết Quên mật khẩu và nhập email bạn đăng kí, chúng tôi sẻ khôi phục mật khẩu qua email bạn cung cấp.</string>
+    <string name="chapter_findfriend">Tìm bạn</string>
+    <string name="hp_findfriend">Để có thêm nhiều bạn bè, đừng ngần ngại gửi lời mời đến các bạn của mình.
+\nB1. Nhấn biể tượng và chọn chức năng Tìm bạn.
+\nB2. Nhập thông tin họ tên bạn bè, chúng tôi sẻ đưa ra các gợi ý cho bạn.
+\nB3. Nhấn nút "Gửi lời mời".</string>
+    <string name="hp_invitefriend">Bạn muốn mời người thân dùng ứng dụng? 
+\nB1. Nhấn biểu tượng và chọn Mời.
+\nB2. Đánh dấu những người trong danh bạ bạn muốn mời.
+\nB3. Nhấn Kế tiếp để gửi lời mời.</string>
+    <string name="chapter_viewinfofriend">Xem thông tin bạn bè</string>
+    <string name="hp_friendlist">Phía dưới màn hình là sanh sách bạn bè</string>
+    <string name="hp_friendstatus">Trạng thái bạn bè</string>
+    <string name="hp_wait_request_status">Chờ yêu cầu.</string>
+    <string name="hp_wait_accept_status">Chờ chấp nhận.</string>
+    <string name="hp_share_status">Đang chia sẻ.</string>
+    <string name="hp_taskbar">Thanh chức năng.</string>
+    <string name="hp_message_task">Soạn và gửi tin nhắn.</string>
+    <string name="hp_phone_task">Gọi.</string>
+    <string name="hp_history_task">Hiển thị thông tin lịch sử di chuyển của bạn bè (nếu người đó chia sẻ).</string>
+    <string name="hp_route_task">Hiển thị đường đi gần nhất đến người bạn muốn tìm.</string>
+    <string name="hp_refesh_task">Làm mới lại thông tin vị trí bạn bè.</string>
+    <string name="hp_request_task">Yêu cầu chia sẻ vị trí để có thể xem thông tin vị trí và lịch sử di chuyển của bạn bè.</string>
+    <string name="hp_accept_task">Chấp nhận yêu cầu chia sẻ.</string>
+    <string name="hp_current_position">Thông tin vị trí bạn bè hiện tại</string>
+    <string name="hp_detail_position">Thông tin đường đi</string>
+    <string name="chapter_helpme">Cầu cứu</string>
+    <string name="hp_helpme">Gửi yêu cầu trợ giúp đến bạn bè đã định trước trong phần cài đặt (mặc định sẻ gửi yêu cầu đến tất cả bạn bè bạn có). Yêu cầu sẽ được gửi đi sau 10 giây.</string>
+    <string name="hp_widget">Gửi nhanh yêu cầu trợ giúp từ widget ở màn hình chính.</string>
+    <string name="chapter_chat">Chat với bạn bè</string>
+    <string name="hp_chat">Bạn có thể trao đổi thông tin với bạn bè qua tin nhắn tích hợp trong ứng dụng, hoàn toàn miễn phí.</string>
+    <string name="chapter_setting">Cài đặt</string>
+    <string name="hp_background_task">Chạy nền.</string>
+    <string name="policy">Hoàn tất đăng kí đồng nghĩa với việc bạn đã chấp nhận các điểu khoản dịch vụ cung cấp.</string>
+    <string name="min_password_length">Ít nhất 6 kí tự</string>
+    <string name="country_prompt">Choose a country</string>
+
+    <string-array name="country_arrays">
+        <item>Chọn tỉnh thành</item>
+        <item>An Giang</item>
+        <item>Bà Rịa - Vũng Tàu</item>
+        <item>Bắc Giang</item>
+        <item>Bắc Kạn</item>
+        <item>Bạc Liêu</item>
+        <item>Bắc Ninh</item>
+        <item>Bến Tre</item>
+        <item>Bình Định</item>
+        <item>Bình Dương</item>
+        <item>Bình Phước</item>
+        <item>Bình Thuận</item>
+        <item>Cà Mau</item>
+        <item>Cao Bằng</item>
+        <item>Đắk Lắk</item>
+        <item>Đắk Nông</item>
+        <item>Điện Biên</item>
+        <item>Đồng Nai</item>
+        <item>Đồng Tháp</item>
+        <item>Gia Lai</item>
+        <item>Hà Giang</item>
+        <item>Hà Nam</item>
+        <item>Hà Tĩnh</item>
+        <item>Hải Dương</item>
+        <item>Hậu Giang</item>
+        <item>Hòa Bình</item>
+        <item>Hưng Yên</item>
+        <item>Khánh Hòa</item>
+        <item>Kiên Giang</item>
+        <item>Kon Tum</item>
+        <item>Lai Châu</item>
+        <item>Lâm Đồng</item>
+        <item>Lạng Sơn</item>
+        <item>Lào Cai</item>
+        <item>Long An</item>
+        <item>Nam Định</item>
+        <item>Nghệ An</item>
+        <item>Ninh Bình</item>
+        <item>Ninh Thuận</item>
+        <item>Phú Thọ</item>
+        <item>Quảng Bình</item>
+        <item>Quảng Nam</item>
+        <item>Quảng Ngãi</item>
+        <item>Quảng Ninh</item>
+        <item>Quảng Trị</item>
+        <item>Sóc Trăng</item>
+        <item>Sơn La</item>
+        <item>Tây Ninh</item>
+        <item>Thái Bình</item>
+        <item>Thái Nguyên</item>
+        <item>Thanh Hóa</item>
+        <item>Thừa Thiên Huế</item>
+        <item>Tiền Giang</item>
+        <item>Trà Vinh</item>
+        <item>Tuyên Quang</item>
+        <item>Vĩnh Long</item>
+        <item>Vĩnh Phúc</item>
+        <item>Yên Bái</item>
+        <item>Phú Yên</item>
+        <item>Cần Thơ</item>
+        <item>Đà Nẵng</item>
+        <item>Hải Phòng</item>
+        <item>Hà Nội</item>
+        <item>TP HCM</item>
+    </string-array>
+
+    <string name="no_data">không có yêu cầu</string>
+    <string name="alert_explain_detail">Tin nhắn vẫn được gửi cho dù hộp thoại bị ẩn đi bởi một ứng dụng khác.</string>
+    <string name="none">không có</string>
+    <string name="resendEmail">Bạn chưa nhận được email? <u>Nhấn vào đầy để gửi lại.</u></string>
+    <string name="forgetPassword"><u>quên mật khẩu</u>?</string>
+    
+    <string name="share_content">Ứng dụng giúp bạn tìm vị trí bạn bè, hỗ trợ khi bạn bị thất lạc.</string>
+    <string name="share_title">Find your friend</string>
+    
+    <string name="about">
+        <![CDATA[
+        <p><b>Thông tin nhà phát triển</b><br/>Sgu team 2014<br/>
+        <br/>	Ứng dụng <b>Find your friend</b> là một trong những dự án đầu tiên sgu-team tham dự cuộc thi <b>Mùa hè sáng tạo</b> đồng thời sgu-team cũng mong muốn cung cấp một tiện tích cho cộng đồng phục vụ trong việc tìm kiếm bạn bè cũng như nhờ trợ giúp khi bị thất lạc. 
+        </p>
+        <p><b>Phiên bản: </b> v1.0</p>
+        <p><b>Giấy phép: </b> LGPL</p>
+        ]]>
+        </string>
+    
+    <string name="help">
+        <![CDATA[
+        <p><b>Các hướng dẫn bên dưới giúp bạn nhanh chóng làm chủ ứng dụng và khám phá thêm nhiều điều thú vị.</b></p>
+        <p><b>Tìm kiếm bạn bè</b><br/>
+		Chức năng giúp bạn tìm kiếm nhiều bạn bè đang sử dụng ứng dụng. Bạn bè có được tìm kiếm theo tên, địa danh, nơi ở, nơi làm việc.. Ứng dụng giúp bạn mở rộng mối quan hệ trong môi trường mạng xã hội, hỗ trợ việc tìm kiếm khi bị thất lạc.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang bản đồ &gt; biểu tượng thêm bạn cuối bản đồ. 
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn tính năng tìm bạn.
+			<br/>&nbsp;&nbsp;&nbsp;3. Nhập thông tin bạn bè vào khung tìm kiếm &gt; nút tìm kiếm.
+			<br/><br/>&nbsp;&nbsp;&nbsp;Danh sách những người tìm được hiện ra bên dưới. Bạn có thể nhấn vào ảnh đại diện để xem thông tin người đó trước khi gửi lời mời. Chức năng mô tả như ảnh bên dưới. 
+		</p>
+		
+		<p><b>Gửi lời mời người thân</b><br/>
+		Chức năng giúp bạn gợi ý người thân sử dụng ứng dụng. Ứng dụng sẽ gửi trực tiếp tin nhắn đến người thân bạn qua số điện thoại có trong danh bạ.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang bản đồ &gt; biểu tượng thêm bạn cuối bản đồ.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn tính  năng mời qua danh bạ.
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn người thân bạn muốn mời (có thể dùng tìm kiếm hoặc chọn tất cả).
+			<br/>&nbsp;&nbsp;&nbsp;4. Nhấn kế tiếp.
+			<br/><br/>&nbsp;&nbsp;&nbsp;Ứng dụng sẽ kiểm tra những người bạn chọn đã dùng ứng dụng chưa. Nếu họ đã dùng, ứng dụng gửi lời mời qua tính năng tin nhắn tích hợp, ngược lại ứng dụng tin nhắn mặc định hệ thống sẽ mở lên và bạn có thể tùy chỉnh nội dung tin nhắn trước khi gửi.
+		</p>
+		
+		<p><b>Bật thông báo cầu cứu</b><br/>
+		Trong trường hợp bạn bị lạc đường, bạn có thể sử dụng tính năng thông báo cầu cứu để gửi yêu cầu nhờ người thân giúp đỡ.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; biểu tượng "cầu cứu".
+			<br/>&nbsp;&nbsp;&nbsp;2. Đợi 10 giây trước khi ứng dụng gửi cầu cứu.
+			<br/><br/>&nbsp;&nbsp;&nbsp;Bạn có thể tùy chỉnh danh sách những người ứng dụng sẽ gửi đến. Ngoài ra chúng tôi còn hỗ trợ một widget ngoài màn hình giúp bạn xem trang thái ứng dụng và gửi nhanh yêu cầu hỗ trợ. Minh họa như hình dưới.
+		</p>
+
+		<p><b>Danh sách bạn bè</b><br/>
+		Danh sách bạn bè cung cấp thông tin về trạng thái trực tuyến, giúp bạn truy cập nhanh đến tính năng như xem vị trí, gọi, nhắn tin.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; biểu tượng "bạn bè" hoặc bạn có thể trượt tay qua cạnh phải màn hình.
+			<br/>&nbsp;&nbsp;&nbsp;2. Xem trạng thái trực tuyến, chia sẻ.
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn bạn bè để truy cập nhanh tính năng.
+			<br/>&nbsp;&nbsp;&nbsp;4. Chọn tính năng bạn muốn thực hiện.
+		</p>
+		
+		<p><b>Xem thông tin vị trí bạn bè</b><br/>
+		Bạn có thể xem thông tin vị trí hiện tại, lịch sử di chuyển qua thanh tác vụ phía dưới màn hình. [ảnh]
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang bản đồ.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn người bạn muốn xem vị trí &gt; bản đồ được phóng to tại người bạn chọn và thanh tác vụ hiện lên. (bạn sẽ nhận được thông báo "vị trí không có sẳn" trong trường hợp người bạn chọn chưa chia sẻ vị trí. Để yêu cầu chia sẻ, bạn xem mục Yêu cầu chia sẻ )
+			<br/>&nbsp;&nbsp;&nbsp;3. Nhấn vào biểu tưởng người thân trên bản đồ để xem địa chỉ người đó.
+			<br/>&nbsp;&nbsp;&nbsp;4. Nhấn vào popup địa chỉ để màn hình thông tin di chuyển. Tại đây bạn được cung cấp thông tin về độ dài quảng đường, thời gian di chuyển,..
+		</p>
+		
+		<p><b>Lịch sử di chuyển</b><br/>
+		Bạn có thể xem lịch dử di chuyển của bạn bè trong trường hợp được chia sẻ.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang bản đồ.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn người bạn muốn xem lịch sử.
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn tính năng xem lịch sử trên thanh tác vụ. (bạn sẽ nhận được thông báo "vị trí không có sẳn" trong trường hợp người bạn chọn chưa chia sẻ vị trí. Để yêu cầu chia sẻ, bạn xem mục Yêu cầu chia sẻ).
+		</p>
+		
+		<p><b>Tìm đường</b><br/>
+		Bạn có thể tìm đường đi ngắn nhất đến người bạn của mình qua hướng dẫn đường đi trên bản đồ.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang bản đồ.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn người bạn muốn tìm đường đi đến.
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn tính năng xem lịch sử trên thanh tác vụ. (bạn sẽ nhận được thông báo "vị trí không có sẳn" trong trường hợp người bạn chọn chưa chia sẻ vị trí. Để yêu cầu chia sẻ, bạn xem mục Yêu cầu chia sẻ).
+		</p>
+		
+		<p><b>Gửi tin nhắn</b><br/>
+		Bạn có thể gửi tin nhắn đến bạn bè đã kết bạn. Ngoài ra bạn có thể gửi tín nhắn đến chúng tôi để yêu cầu trợ giúp.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang tin nhắn.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn "soạn tin nhắn".
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn người bạn muốn gửi tin nhắn. Có thể chọn nhiều người.
+			<br/>&nbsp;&nbsp;&nbsp;4. Gõ tin nhắn &gt; nhấn nút gửi.
+			<br/><br/>&nbsp;&nbsp;&nbsp;Tin nhắn chỉ hoạt động trong trường hợp thiết bị của bạn và người thân có kết nối mạng. Trường hợp thiết bị người thân không được kết nối mạng, tin nhắn sẽ được gửi ngay sau khi thiết bị được kết nối lại.
+		</p>
+	
+		<p><b>Chấp nhận yêu cầu kết bạn</b><br/>
+		Khi nhận được yêu cầu kết bạn, bạn có thể chấp nhận hoặc từ chối.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; chọn trang "yêu cầu kết bạn".
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn "chấp nhận" hoặc "từ chối"
+			<br/><br/>&nbsp;&nbsp;&nbsp;Khi một người bạn mới được thêm vào, danh sách bạn bè sẽ được cập nhật.
+		</p>	
+		
+		<p><b>Đăng kí tài khoản</b><br/>
+		Trước khi sử dụng ứng dụng bạn cần tạo cho mình một tài khoản.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; đăng kí.
+			<br/>&nbsp;&nbsp;&nbsp;2. Nhập đầy đủ thông tin yêu cầu (bạn có thể chọn một ảnh đại diện hoặc bổ sung sau)
+			<br/>&nbsp;&nbsp;&nbsp;3. Nhấn "kế tiếp" (trường hợp bạn chưa nhập đủ thông tin ứng dụng hiện thông báo yêu cầu nhập các thông tin bắt buộc)
+			<br/>&nbsp;&nbsp;&nbsp;4. Bạn có thể cung cấp thông tin bổ sung bằng việc nhập các thông tin trên màn hình hoặc bỏ qua. (Thông tin này giúp chúng tối gợi ý cho bạn những người bạn có thể quen biết và hỗ trợ việc tìm đường khi bạn bị lạc)
+			<br/>&nbsp;&nbsp;&nbsp;5. Nhấn "kết tiếp".
+			<br/>&nbsp;&nbsp;&nbsp;6. Nhập số điện thoại và mật khẩu > nhấn "hoàn thành".
+			<br/><br/>&nbsp;&nbsp;&nbsp;Số điện thoại giúp bạn đăng nhập và ứng dụng, mỗi số điện thoại cung cấp phải là duy nhất.
+			Sau khi hoàn tất đăng kí, bạn sẽ nhận được mail xác nhận từ chúng tôi bao gồm mã xác nhận. Trong lần mở ứng dụng kế tiếp bạn cần cung cấp mã này để ứng dụng có thể hoạt động. Mã duy trì trong 3 ngày, nếu bạn chưa cung cấp chúng tôi sẽ xóa tài khoản đã đăng kí.
+		</p>
+		
+		<p><b>Khôi phục mật khẩu</b><br/>
+		Trong trường hợp bạn quên mật khẩu đăng nhập, chúng tôi sẽ cung cấp mật khẩu thay thế qua email đã cung cấp.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; quên mật khẩu.
+			<br/>&nbsp;&nbsp;&nbsp;2. Nhập số điện thoại đã đăng kí .
+			<br/>&nbsp;&nbsp;&nbsp;3. Nhập email đã đăng kí ứng với số điện thoại vừa cung cấp.
+			<br/>&nbsp;&nbsp;&nbsp;4. Nhấn "Khôi phục mật khẩu".
+			<br/><br/>&nbsp;&nbsp;&nbsp;Bạn sẽ nhận được email khôi phục mật khẩu từ chúng tôi gồm mật khẩu thay thế. Bạn dùng mật khẩu này đăng nhập vào ứng dụng và tiến hành thay đổi mật khẩu. (xem mục đổi mật khẩu).
+		</p>
+		
+		<p><b>Quản lí tài khoản đăng nhập</b><br/>
+		Ứng dụng cung cấp cơ chế quản lí tài khoản đăng nhập. Bạn có thể dùng nhiều số điện thoại khác nhau để đăng nhập vào tài khoản. Bạn có thể thêm hoặc xóa tài khoản.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang cài đặt.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn "Thiết lập tài khoản"
+			<br/>&nbsp;&nbsp;&nbsp;3. Chọn "Quản lí đăng nhập"
+			<br/>&nbsp;&nbsp;&nbsp;4. Nhấn "Xóa" nếu bạn muốn xóa số điện thoại đăng nhập.
+			<br/>&nbsp;&nbsp;&nbsp;5. Nhấn "Thêm" nếu bạn muốn thêm số điện thoại đăng nhập.
+		</p>
+		
+		<p><b>Đăng nhập tự động</b><br/>
+		Bạn có thể yêu cầu ứng dụng tự động đăng nhập với tài khoản hiện tại mà không cần phải nhập thông tin đăng nhập.
+			<br/><br/>1. Mở ứng dụng &gt; trang cài đặt.
+			<br/>2. Bật "Đăng nhập tự động"
+		</p>
+		
+		<p><b>Đổi mật khẩu</b><br/>
+		Đổi mật khẩu tài khoản đăng nhập.
+			<br/><br/>&nbsp;&nbsp;&nbsp;1. Mở ứng dụng &gt; trang cài đặt.
+			<br/>&nbsp;&nbsp;&nbsp;2. Chọn "Đổi mật khẩu".
+			<br/>&nbsp;&nbsp;&nbsp;3. Nhập mật khẩu hiện tại và mật khẩu mới.
+			<br/>&nbsp;&nbsp;&nbsp;4. Nhấn "Đồng ý".
+		</p>
+        ]]>
+    </string>
+</resources>

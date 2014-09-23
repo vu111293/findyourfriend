@@ -1,0 +1,167 @@
+/*
+ * 	 This file is part of Find Your Friend.
+ *
+ *   Find Your Friend is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   Find Your Friend is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with Find Your Friend.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.sgu.findyourfriend.screen;
+
+import android.app.Dialog;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.google.android.gcm.GCMRegistrar;
+import com.sgu.findyourfriend.R;
+import com.sgu.findyourfriend.mgr.Config;
+import com.sgu.findyourfriend.mgr.MyProfileManager;
+import com.sgu.findyourfriend.mgr.SettingManager;
+import com.sgu.findyourfriend.net.PostData;
+import com.sgu.findyourfriend.utils.Utility;
+
+public class VerifyEmailFragment extends BaseFragment {
+
+	private ProgressDialogCustom progress;
+	private Button btnLogin;
+
+	private String phoneNumber;
+	private String password;
+	private String gcmId = "";
+	private TextView txtResendEmail;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.veritfy_email_fragment,
+				container, false);
+
+		progress = new ProgressDialogCustom(getActivity());
+
+		btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
+		btnLogin.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				if (Utility.checkConnectToNetworkContinue(getActivity())) {
+					final Dialog dialog = new Dialog(getActivity());
+
+					(new AsyncTask<Void, Void, Integer>() {
+
+						@Override
+						protected void onPreExecute() {
+							progress.show();
+						}
+
+						@Override
+						protected Integer doInBackground(Void... params) {
+
+							phoneNumber = SettingManager.getInstance()
+									.getPhoneAutoLogin();
+							password = SettingManager.getInstance()
+									.getPasswordAutoLogin();
+
+							int rs = PostData.login(getActivity(), phoneNumber,
+									password);
+
+							if (rs > 0) {
+								if (GCMRegistrar.isRegistered(getActivity())) {
+									gcmId = GCMRegistrar
+											.getRegistrationId(getActivity());
+									PostData.updateGcmId(getActivity(), rs,
+											gcmId);
+									MyProfileManager.getInstance().init(
+											getActivity(), rs, true);
+									Log.i("Verify", "registed with  " + gcmId);
+								} else {
+									Log.i("Verify", "empty gcmid");
+									MyProfileManager.getInstance().init(
+											getActivity(), rs, true);
+									GCMRegistrar.register(getActivity(),
+											Config.GOOGLE_SENDER_ID);
+								}
+
+								// MyProfileManager.getInstance().init(
+								// getActivity(),
+								// SettingManager.getInstance().getLastAccountIdLogin(),
+								// true);
+							}
+
+							return rs;
+						}
+
+						@Override
+						protected void onPostExecute(Integer result) {
+							progress.dismiss();
+
+							if (result > 0) {
+								Log.i("GET SUC", MyProfileManager.getInstance()
+										.getMineInstance().getUserInfo()
+										.toString());
+								Intent i = new Intent(
+										getActivity(),
+										com.sgu.findyourfriend.screen.MainActivity.class);
+								startActivity(i);
+								getActivity().finish();
+							} else {
+
+								Utility.showDialog(Utility.WARNING, dialog,
+										"Xác nhận email",
+										"Tài khoản chưa được kích hoạt, vui lòng xác nhận e-mail");
+							}
+						}
+
+					}).execute();
+				}
+			}
+		});
+
+		txtResendEmail = (TextView) rootView.findViewById(R.id.resendEmail);
+		txtResendEmail.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				(new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected void onPreExecute() {
+						progress.show();
+					}
+
+					@Override
+					protected Void doInBackground(Void... params) {
+						PostData.resendEmail(getActivity(), phoneNumber);
+						return null;
+					}
+
+					@Override
+					protected void onPostExecute(Void result) {
+						Utility.showMessage(getActivity(),
+								"Một email đã gửi đến hộp thư của bạn.");
+						progress.dismiss();
+					}
+
+				}).execute();
+
+			}
+		});
+		return rootView;
+	}
+}
