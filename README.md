@@ -41,7 +41,7 @@ gần nhất (độ chính xác không cao).
 Ảnh chụp ứng dụng
 -----------
 
-### Hiển thị vị trì bạn bè
+### Hiển thị vị trí bạn bè
 
 [![mutt dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-49-36.png)](https://github.com/altercation/solarized/raw/master/img/screen-mutt-dark.png)
 
