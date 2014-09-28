@@ -6,6 +6,9 @@ Find Your Friend
 
 [![solarized dualmode](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/logo.png)](#features)
 
+
+** Hiện tại ứng dụng đã có mặt trên GooglePlay theo địa chỉ [Find Your Friend](https://play.google.com/store/apps/details?id=com.sgu.findyourfriend).
+
 Bạn hay có những chuyến đi chơi xa cùng bạn bè? Bạn đang cần biết vị trí điểm hẹn mà
 người bạn của bạn đã đến trước? Bạn bị lạc và muồn cầu cứu mà không biết gọi ai? Ứng dụng
 Find your friend sẽ giúp bạn làm điều đó.
@@ -38,38 +41,38 @@ gần nhất (độ chính xác không cao).
 Ảnh chụp ứng dụng
 -----------
 
-### giao diện đăng nhập
+### Hiển thị vị trì bạn bè
 
-[![mutt dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-05-23.png)](https://github.com/altercation/solarized/raw/master/img/screen-mutt-dark.png)
+[![mutt dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-49-36.png)](https://github.com/altercation/solarized/raw/master/img/screen-mutt-dark.png)
 
 ### Vị trí bạn bè thể hiện trên bản đồ và thanh taskbar giúp truy cập nhanh
 
-[![c light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-17-59-31.png)](https://github.com/altercation/solarized/raw/master/img/screen-c-light.png)
+[![c light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-50-57.png)](https://github.com/altercation/solarized/raw/master/img/screen-c-light.png)
 
 ### Tìm đường
 
-[![haskell light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-17-59-51.png)](https://github.com/altercation/solarized/raw/master/img/screen-haskell-light.png)
+[![haskell light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-52-19.png)](https://github.com/altercation/solarized/raw/master/img/screen-haskell-light.png)
 
 ### Xem lịch sử vị trí
 
-[![html light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-00-15.png)](https://github.com/altercation/solarized/raw/master/img/screen-html-light.png)
+[![html light](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-51-51.png)](https://github.com/altercation/solarized/raw/master/img/screen-html-light.png)
 
 ### Trạng thái bạn bè
 
-[![java dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-29.png)](https://github.com/altercation/solarized/raw/master/img/screen-java-dark.png)
+[![java dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-56-23.png)](https://github.com/altercation/solarized/raw/master/img/screen-java-dark.png)
 
 ### Tin nhắn trao đổi hoặc nhờ trợ giúp
 
-[![javascript dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-00.png)](https://github.com/altercation/solarized/raw/master/img/screen-javascript-dark.png)
+[![javascript dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-56-07.png)](https://github.com/altercation/solarized/raw/master/img/screen-javascript-dark.png)
 
 ### Cảnh báo gửi cầu cứu
 
-[![pandoc dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-03-36.png)](https://github.com/altercation/solarized/raw/master/img/screen-pandoc-dark.png)
+[![pandoc dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-27-21-52-39.png)](https://github.com/altercation/solarized/raw/master/img/screen-pandoc-dark.png)
 
-### Mời bạn bè từ danh bạ
 
-[![perl dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-08-27-18-00-46.png)](https://github.com/altercation/solarized/raw/master/img/screen-perl-dark.png)
+### Wiget truy vập nhanh
 
+[![pandoc dark](https://raw.githubusercontent.com/vu111293/findyourfriend/master/screenshot/Screenshot_2014-09-23-00-00-35.png)](https://github.com/altercation/solarized/raw/master/img/screen-pandoc-dark.png)
 
 
 Thông tin nhóm phát triển và người hướng dẫn
