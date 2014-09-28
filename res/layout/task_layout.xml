@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/half_task_frame"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@android:color/transparent"
+    android:orientation="vertical" >
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <ImageButton
+        android:layout_width="@dimen/size_task_button"
+        android:layout_height="@dimen/size_task_button"
+        android:background="@drawable/task_button_bkg"
+        android:src="@drawable/ic_call" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/touchViewDetail"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="2dp"
+            android:background="@color/blue"
+            android:src="@drawable/ic_touch" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@drawable/task_toast_bkg"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:text="hello thanh"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/task_toast_bkg"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:text="cong hoa xa hoi chu nghia viet nam viet nam viet nam viet namviet namviet namviet namviet namviet nam"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

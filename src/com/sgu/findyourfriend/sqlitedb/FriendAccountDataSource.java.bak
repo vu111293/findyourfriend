@@ -1,0 +1,245 @@
+//package com.sgu.findyourfriend.sqlitedb;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//import android.content.ContentValues;
+//import android.content.Context;
+//import android.database.Cursor;
+//import android.database.SQLException;
+//import android.database.sqlite.SQLiteDatabase;
+//import android.util.Log;
+//
+//import com.google.android.gms.maps.model.LatLng;
+//import com.sgu.findyourfriend.model.Friend;
+//import com.sgu.findyourfriend.model.User;
+//
+//public class FriendAccountDataSource {
+//
+//	private SQLiteDatabase database;
+//	private MySQLiteFriendHelper dbHelper;
+//	private String[] allFriendCols = {
+//			MySQLiteFriendHelper.COLUMN_ID,
+//			MySQLiteFriendHelper.COLUMN_NAME,
+//			MySQLiteFriendHelper.COLUMN_GENDER,
+//			MySQLiteFriendHelper.COLUMN_ADDRESS,
+//			MySQLiteFriendHelper.COLUMN_BIRTHDAY,
+//			MySQLiteFriendHelper.COLUMN_SCHOOL,
+//			MySQLiteFriendHelper.COLUMN_WORKPLACE,
+//			MySQLiteFriendHelper.COLUMN_EMAIL,
+//			MySQLiteFriendHelper.COLUMN_FBLINK,
+//			MySQLiteFriendHelper.COLUMN_PUBLIC,
+//			MySQLiteFriendHelper.COLUMN_LATITUDE,
+//			MySQLiteFriendHelper.COLUMN_LONGITUDE,
+//			MySQLiteFriendHelper.COLUMN_AVATAR,
+//			MySQLiteFriendHelper.COLUMN_GCMID,
+//			MySQLiteFriendHelper.COLUMN_FRIENDSTATE
+//	};
+//	
+//	private String[] allAccountCols = {
+//			MySQLiteFriendHelper.COLUMN_ID,
+//			MySQLiteFriendHelper.COLUMN_PHONENUMBER
+//	};
+//	
+//	public FriendAccountDataSource(Context context) {
+//		dbHelper = new MySQLiteFriendHelper(context);
+//	}
+//
+//	public void close() {
+//		dbHelper.close();
+//	}
+//
+//	public void open() throws SQLException {
+//		database = dbHelper.getWritableDatabase();
+//	}
+//	
+//	public void saveMyProfile(Friend mineF) {
+//		mineF.setAcceptState(-1); // for mine
+//		addFriend(mineF);
+//	}
+//	
+//	public Friend getMyProfile() {
+//		Friend mine = null;
+//		Cursor cursor = database.rawQuery(
+//				"SELECT * FROM " + MySQLiteFriendHelper.TABLE_FRIEND
+//				+ " WHERE " + MySQLiteFriendHelper.COLUMN_FRIENDSTATE + "=-1", null);
+//		cursor.moveToFirst();
+//		if (!cursor.isAfterLast()) { 
+//			mine = cursorToFriend(cursor);
+//		}
+//		
+//		cursor.close();
+//		return mine;
+//	}
+//
+//	public ArrayList<Friend> getAllFriend() {
+//		
+//		ArrayList<Friend> friends = new ArrayList<Friend>();
+//
+//		Cursor cursor = database.query(MySQLiteFriendHelper.TABLE_FRIEND,
+//				allFriendCols, null, null, null, null, null);
+//
+//		cursor.moveToFirst();
+//		while (!cursor.isAfterLast()) {
+//			Friend fr = cursorToFriend(cursor);
+//			friends.add(fr);
+//			cursor.moveToNext();
+//		}
+//		// make sure to close the cursor
+//		cursor.close();
+//		return friends;
+//	}
+//	
+//
+//	private Friend cursorToFriend(Cursor cursor) {
+//		
+//		User u = new User(
+//				cursor.getInt(0),
+//				cursor.getString(1), // name
+//				cursor.getString(12), // avatar
+//				cursor.getString(13), // gcm 
+//				null, // last login
+// 				cursor.getInt(2), // gender
+// 				cursor.getString(3), // address
+// 				new java.sql.Date(cursor.getLong(4)), // birthday
+// 				cursor.getString(5), // school
+// 				cursor.getString(6), // workplace
+// 				cursor.getString(7), // email
+// 				cursor.getString(8), // facebook
+// 				cursor.getInt(9) == 1);
+//		
+//		return new Friend(u,
+//				getPhoneNumber(cursor.getInt(0)),
+//				false, cursor.getInt(14),
+//				cursor.getDouble(10) == -1.0 ? null :
+//					new LatLng(cursor.getDouble(10), cursor.getDouble(10)),
+//					null);
+//	}
+//
+//	private ArrayList<String> getPhoneNumber(int fID) {
+//		ArrayList<String> phoneNumbers = new ArrayList<String>();
+//
+//		Cursor cursor = database.query(MySQLiteFriendHelper.TABLE_ACCOUNT,
+//				allAccountCols, null, null, null, null, null);
+//
+//		cursor.moveToFirst();
+//		while (!cursor.isAfterLast()) {
+//			String pn = cursorToPhoneNumber(cursor);
+//			phoneNumbers.add(pn);
+//			cursor.moveToNext();
+//		}
+//		// make sure to close the cursor
+//		cursor.close();
+//		return phoneNumbers;
+//	}
+//
+//	private String cursorToPhoneNumber(Cursor cursor) {
+//		return cursor.getString(1);
+//	}
+//
+//	public void saveOffFriend(List<Friend> tempFriends) {
+//		for (Friend f : tempFriends) {
+//			addFriend(f);
+//		}
+//	}
+//
+//	public void removeFriend(int fIDCurrent) {
+//		int rowid = database.delete(MySQLiteFriendHelper.TABLE_FRIEND, 
+//				MySQLiteFriendHelper.COLUMN_ID + "=" + fIDCurrent, null);
+//		Log.i("DELETE Friend WITH ID ", String.valueOf(rowid));
+//		
+//		
+//		int rowid2 = database.delete(MySQLiteFriendHelper.TABLE_ACCOUNT, 
+//				MySQLiteFriendHelper.COLUMN_ID + "=" + fIDCurrent, null);
+//		Log.i("DELETE Phonenumber WITH ID ", String.valueOf(rowid2));
+//	}
+//
+//	public void addFriend(Friend fr) {
+//		Cursor cursor = database.rawQuery(
+//				"SELECT * FROM " + MySQLiteFriendHelper.TABLE_FRIEND
+//				+ " WHERE " + MySQLiteFriendHelper.COLUMN_ID + "=" 
+//						+ fr.getUserInfo().getId(), null);
+//		if (cursor.getCount() <= 0) {
+//			// add really add
+//			ContentValues values = new ContentValues();
+//			values.put(MySQLiteFriendHelper.COLUMN_ID, fr.getUserInfo().getId());
+//			values.put(MySQLiteFriendHelper.COLUMN_NAME, fr.getUserInfo().getName());
+//			values.put(MySQLiteFriendHelper.COLUMN_GENDER, fr.getUserInfo().getGender());
+//			values.put(MySQLiteFriendHelper.COLUMN_ADDRESS, fr.getUserInfo().getAddress());
+//			values.put(MySQLiteFriendHelper.COLUMN_BIRTHDAY, fr.getUserInfo().getBirthday().getTime());
+//			values.put(MySQLiteFriendHelper.COLUMN_SCHOOL, fr.getUserInfo().getSchool());
+//			values.put(MySQLiteFriendHelper.COLUMN_WORKPLACE, fr.getUserInfo().getWorkplace());
+//			values.put(MySQLiteFriendHelper.COLUMN_EMAIL, fr.getUserInfo().getEmail());
+//			values.put(MySQLiteFriendHelper.COLUMN_FBLINK, fr.getUserInfo().getFblink());
+//			values.put(MySQLiteFriendHelper.COLUMN_PUBLIC, fr.getUserInfo().isPublic() ? 1 : 0);
+//			values.put(MySQLiteFriendHelper.COLUMN_LATITUDE, 
+//					(null != fr.getLastLocation()) ? fr.getLastLocation().latitude : -1);
+//			values.put(MySQLiteFriendHelper.COLUMN_LONGITUDE, 
+//					(null != fr.getLastLocation()) ? fr.getLastLocation().longitude : -1);
+//			values.put(MySQLiteFriendHelper.COLUMN_AVATAR, fr.getUserInfo().getAvatar());
+//			values.put(MySQLiteFriendHelper.COLUMN_GCMID, fr.getUserInfo().getGcmId());
+//			values.put(MySQLiteFriendHelper.COLUMN_FRIENDSTATE, fr.getAcceptState());
+//		
+//			long insertId = database.insert(MySQLiteFriendHelper.TABLE_FRIEND, null,
+//					values);
+//
+//			Log.i("CREATE Friend WITH ID ", String.valueOf(insertId));
+//			
+//			if (insertId != -1) {
+//				// add phone number
+////				removeAllPhoneNumber();
+//				for (String pnumber : fr.getNumberLogin()) {
+//					ContentValues values2 = new ContentValues();
+//					values.put(MySQLiteFriendHelper.COLUMN_ID, fr.getUserInfo().getId());
+//					values.put(MySQLiteFriendHelper.COLUMN_NAME, pnumber);
+//					long row = database.insert(MySQLiteFriendHelper.TABLE_ACCOUNT, null, values2);
+//					Log.i("CREATE Phone WITH ID ", String.valueOf(row));
+//				}
+//				
+//			}
+//		}
+//		
+//		cursor.close();
+//	}
+//
+////	private void removeAllPhoneNumber() {
+////	}
+//
+//	public void updateFriend(Friend fr) {
+//		Cursor cursor = database.rawQuery(
+//				"SELECT * FROM " + MySQLiteFriendHelper.TABLE_FRIEND
+//				+ " WHERE " + MySQLiteFriendHelper.COLUMN_ID + "=" 
+//						+ fr.getUserInfo().getId(), null);
+//		if (cursor.getCount() > 0) {
+//			ContentValues values = new ContentValues();
+//			values.put(MySQLiteFriendHelper.COLUMN_NAME, fr.getUserInfo().getName());
+//			values.put(MySQLiteFriendHelper.COLUMN_GENDER, fr.getUserInfo().getGender());
+//			values.put(MySQLiteFriendHelper.COLUMN_ADDRESS, fr.getUserInfo().getAddress());
+//			values.put(MySQLiteFriendHelper.COLUMN_BIRTHDAY, fr.getUserInfo().getBirthday().getTime());
+//			values.put(MySQLiteFriendHelper.COLUMN_SCHOOL, fr.getUserInfo().getSchool());
+//			values.put(MySQLiteFriendHelper.COLUMN_WORKPLACE, fr.getUserInfo().getWorkplace());
+//			values.put(MySQLiteFriendHelper.COLUMN_EMAIL, fr.getUserInfo().getEmail());
+//			values.put(MySQLiteFriendHelper.COLUMN_FBLINK, fr.getUserInfo().getFblink());
+//			values.put(MySQLiteFriendHelper.COLUMN_PUBLIC, fr.getUserInfo().isPublic() ? 1 : 0);
+//			values.put(MySQLiteFriendHelper.COLUMN_LATITUDE, 
+//					(null != fr.getLastLocation()) ? fr.getLastLocation().latitude : -1);
+//			values.put(MySQLiteFriendHelper.COLUMN_LONGITUDE, 
+//					(null != fr.getLastLocation()) ? fr.getLastLocation().longitude : -1);
+//			values.put(MySQLiteFriendHelper.COLUMN_AVATAR, fr.getUserInfo().getAvatar());
+//			values.put(MySQLiteFriendHelper.COLUMN_GCMID, fr.getUserInfo().getGcmId());
+//			values.put(MySQLiteFriendHelper.COLUMN_FRIENDSTATE, fr.getAcceptState());
+//			
+//			
+//			int rowupdate = database.update(MySQLiteFriendHelper.TABLE_FRIEND, values, 
+//					MySQLiteFriendHelper.COLUMN_ID + "=" + fr.getUserInfo().getId(), null);
+//			
+//			Log.i("UPDATE Friend WITH ID ", String.valueOf(rowupdate));
+//		}
+//		
+//		cursor.close();
+//		
+//	}
+//
+//	
+//	
+//}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/instruction"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/insBkg"
+    android:padding="10dp" >
+
+    <RelativeLayout
+        android:id="@+id/container_framelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true">
+		
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/button_ins_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="60dp"
+        android:background="@color/transparent"
+        android:src="@drawable/instruction_back"
+        android:layout_toLeftOf="@+id/button_ins_next" />
+    
+    <ImageButton
+        android:id="@+id/button_ins_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/instruction_next"
+        android:background="@color/transparent" />
+
+    <ImageButton
+        android:id="@+id/button_ins_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/container_framelayout"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/instruction_skip"
+        android:background="@color/transparent" />
+
+</RelativeLayout>

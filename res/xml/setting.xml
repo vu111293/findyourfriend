@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:iandroid="http://schemas.android.com/apk/res/com.sgu.findyourfriend" >
+
+    <PreferenceCategory android:title="Cài đặt chung" >
+        <CheckBoxPreference
+            android:icon="@drawable/ic_background"
+            android:defaultValue="true"
+            android:key="com.sgu.findyourfriend.runbackground"
+            android:title="Đồng bộ" />
+
+        <PreferenceScreen
+            android:icon="@drawable/ic_waypoint_map"
+            android:title="Bản đồ" >
+
+            <ListPreference
+                android:defaultValue="normal"
+                android:dialogTitle="Kiểu bản đồ"
+                android:entries="@array/maptype"
+                android:entryValues="@array/maptype_values"
+                android:key="com.sgu.findyourfriend.maptype"
+                android:title="Loại bản đồ" />
+
+            <com.sgu.findyourfriend.screen.SeekBarPreference
+                android:defaultValue="100"
+                android:dialogTitle="Độ chính xác (m)"
+                android:key="com.sgu.findyourfriend.accuracy"
+                android:persistent="true"
+                android:summary="Độ chính xác cao có thể xử lí chậm"
+                android:title="Độ chính xác"
+                iandroid:maxValue="100"
+                iandroid:minValue="10" />
+            <com.sgu.findyourfriend.screen.SeekBarPreference
+                android:defaultValue="60"
+                android:dialogTitle="Thời gian cập nhật vị trí (giây)"
+                android:key="com.sgu.findyourfriend.timetoupdatelocation"
+                android:persistent="true"
+                android:summary="Thời gian dài cho mạng chậm"
+                android:title="Thời gian cập nhật vị trí"
+                iandroid:maxValue="120"
+                iandroid:minValue="30" />
+               
+        </PreferenceScreen>
+        <PreferenceScreen
+            android:icon="@drawable/ic_megaphone"
+            android:title="Thông báo"
+            android:summary="Tin nhắn vào yêu cầu trợ giúp" >
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="com.sgu.findyourfriend.vibrate"
+                android:title="Rung" />
+ 			
+            <Preference
+                android:key="com.sgu.findyourfriend.defaultwarning"
+                android:dialogTitle="Bạn bè trợ giúp"
+                android:persistent="true"
+                android:title="Bạn bè trợ giúp" />
+
+            <Preference
+                android:dialogTitle="Nội dung tin nhắn mặc định"
+                android:key="com.sgu.findyourfriend.defaultmsg"
+                android:summary="Tin nhắn yêu cầu hỗ trợ từ bạn bè"
+                android:title="Nội dung tin nhắn mặc định" />
+
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="com.sgu.findyourfriend.isalertringtone"
+                android:title="Âm thông báo gửi tin hỗ trợ" />
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="com.sgu.findyourfriend.ismessageringtone"
+                android:title="Âm báo tin nhắn đến" />
+
+            <RingtonePreference
+                android:dependency="com.sgu.findyourfriend.ismessageringtone"
+                android:key="com.sgu.findyourfriend.ringtone"
+                android:ringtoneType="notification"
+                android:title="Chọn âm báo" />
+        </PreferenceScreen>
+        <PreferenceScreen
+            android:icon="@drawable/ic_edit_user"
+            android:title="Thiết lập tài khoản" >
+            <SwitchPreference
+                android:enabled="true"
+                android:key="com.sgu.findyourfriend.isautologin"
+                android:title="Đăng nhập tự động"/>
+
+            <Preference
+                android:key="com.sgu.findyourfriend.edit_profile"
+                android:dialogTitle="Cập nhật thông tin cá nhân"
+                android:persistent="true"
+                android:title="Cập nhật thông tin cá nhân" />
+            
+            <Preference
+                android:key="com.sgu.findyourfriend.account_manager"
+                android:summary="Cho phép thêm và xóa số điện thoại đăng nhập"
+                android:persistent="true"
+                android:title="Quản lí đăng nhập" />
+            
+            <Preference
+                android:key="com.sgu.findyourfriend.prefer_change_password"
+                android:dialogTitle="Thay đổi mật khẩu"
+                android:persistent="true"
+                android:title="Đổi mật khẩu" />
+            
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Thông tin ứng dụng" >
+        <Preference
+            android:key="com.sgu.findyourfriend.prefer_devinfo"
+            android:icon="@drawable/ic_about"
+            android:persistent="true"
+            android:title="Nhà phát triển" />
+
+        <Preference
+            android:key="com.sgu.findyourfriend.prefer_share"
+            android:icon="@drawable/ic_share_menu"
+            android:persistent="true"
+            android:title="Chia sẻ" />
+        
+        <Preference
+            android:key="com.sgu.findyourfriend.prefer_help"
+            android:icon="@drawable/ic_help_setting"
+            android:persistent="true"
+            android:title="Trợ giúp" />
+        
+        <Preference
+            android:key="com.sgu.findyourfriend.prefer_instructor"
+            android:icon="@drawable/ic_manual"
+            android:persistent="true"
+            android:title="Hướng dẫn" />
+        
+    </PreferenceCategory>
+
+    <Preference
+        android:icon="@drawable/iconoff"
+        android:key="com.sgu.findyourfriend.prefer_logout"
+        android:title="Đăng xuất" />
+
+</PreferenceScreen>

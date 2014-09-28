@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item 
+        android:id="@+id/smsItem"
+        android:title="Go to sms"/>
+    
+    <item 
+        android:id="@+id/callItem"
+        android:title="Go to phone call"/>
+    
+    <item 
+        android:id="@+id/mapItem"
+        android:title="Go to map"/>
+    
+    <item 
+        android:id="@+id/mFriendListItem"
+        android:title="Go to FriendList"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    
+</menu>

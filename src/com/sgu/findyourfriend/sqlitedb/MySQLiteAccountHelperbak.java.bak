@@ -1,0 +1,33 @@
+package com.sgu.findyourfriend.sqlitedb;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class MySQLiteAccountHelperbak extends SQLiteOpenHelper {
+
+	public static String TABLE_ACCOUNT = "accounts";
+	public static String COLUMN_ID = "_id";
+	public static String COLUMN_PHONENUMBER = "phonenumber";
+	
+	private static final String DATABASE_CREATE = "create table "
+			+ TABLE_ACCOUNT + "(" 
+			+ COLUMN_ID + " integer primary key, "
+			+ COLUMN_PHONENUMBER + " integer primary key);"; 
+	
+	public MySQLiteAccountHelperbak(Context context) {
+		super(context, MySQLiteBase.getDataBaseName(), null, MySQLiteBase.DATABASE_VERSION);
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		db.execSQL(DATABASE_CREATE);
+	}
+	
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNT);
+		onCreate(db);
+	}
+	
+}
