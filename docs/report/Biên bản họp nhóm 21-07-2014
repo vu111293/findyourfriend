@@ -1,0 +1,11 @@
+Ngày 14-07-2014
+@Skype
+
+*	Chủ đề: GCM + UI mới
+*	Thành viên: Quốc Vũ, Hữu Toàn
+*	Nội dung thảo luận:
+	1.	Cơ chế gcm trên server.
+		- Sử dụng GCM API để gửi tin nhắn qua intenet
+		- Test gửi và nhận tin nhắn
+	2.	Cập nhật UI app.
+		- Thay đổi vài icon cho phù hợp

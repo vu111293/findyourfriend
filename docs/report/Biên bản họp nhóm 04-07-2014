@@ -1,0 +1,14 @@
+Ngày 04-07-2014
+@Skype
+
+*	Chủ đề: Host + Thống nhất danh sách bạn bè
+*	Thành viên: Quốc Vũ, Hữu Toàn
+*	Nội dung thảo luận:
+	1.	PHP host.
+		- Tìm kiếm các host miễn phí
+		- Host ổn định
+		- Hỗ trợ SMTP, PHP mail()
+	2.	Ý tưởng lấy danh sách bạn bè + trạng thái.
+		- Thống nhất JSON trả về, tránh dư thừa
+		- Quy ước trạng thái người dùng để thống nhất
+		- Fix bug liên quan

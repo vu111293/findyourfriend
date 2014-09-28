@@ -1,0 +1,17 @@
+Ngày 15-07-2014
+@Skype
+
+*	Chủ đề: Dữ liệu người dùng
+*	Thành viên: Quốc Vũ, Hữu Toàn, Chí Hùng
+*	Nội dung thảo luận:
+	1.	Cách lấy history.
+		- Lấy lịch sử người dùng
+		- Quy định số record trả về
+	2.	Get last location.
+		- Lấy vị trí mới nhất
+		- Hiển thị lên map
+	3.	Time check on off status.
+		- Cơ chế xác định trạng thái người dùng
+		- Thời gian cập nhật trang thái
+	4.	Cấp source code.
+		- Upload source cơ bản có thể chạy

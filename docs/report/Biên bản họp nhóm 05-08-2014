@@ -1,0 +1,16 @@
+Ngày 05-08-2014
+@Skype
+
+*	Chủ đề: Host ngưng hoạt động + Việc xác nhận mail
+*	Thành viên: Quốc Vũ, Hữu Toàn, Chí Hùng
+*	Nội dung thảo luận:
+	1.	Tìm nguyên nhân.
+		- Host miễn phí không ổn định
+		- Sự hạn chế về gửi mail
+	2.	Tìm host thay thế và upload dữ liệu.
+		- Tìm được host thay thế có đủ yêu cầu
+		- Dự tính đầu tư host mới (có phí để đảm bảo)
+		- Backup
+	3.	Xác nhận mail đăng kí và quên mật khẩu
+		- Thống nhất sử dụng SMTP của Gmail
+		- Hoàn thành các giao diện web cho đăng ký và quên mật khẩu
