@@ -1,0 +1,96 @@
+[19-Sep-2014 13:25:42 UTC] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'u678381840_sgu'@'server.datahost.com.vn' (using password: YES) in /home/sgulabna/public_html/apps/findyourfriend/opendb.php on line 25
+[19-Sep-2014 15:29:21 UTC] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'u678381840_sgu'@'server.datahost.com.vn' (using password: YES) in /home/sgulabna/public_html/apps/findyourfriend/opendb.php on line 25
+[19-Sep-2014 15:29:24 UTC] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'u678381840_sgu'@'server.datahost.com.vn' (using password: YES) in /home/sgulabna/public_html/apps/findyourfriend/opendb.php on line 25
+[19-Sep-2014 15:29:28 UTC] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'u678381840_sgu'@'server.datahost.com.vn' (using password: YES) in /home/sgulabna/public_html/apps/findyourfriend/opendb.php on line 25
+[19-Sep-2014 16:15:27 UTC] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'u678381840_sgu'@'server.datahost.com.vn' (using password: YES) in /home/sgulabna/public_html/apps/findyourfriend/opendb.php on line 25
+[21-Sep-2014 06:32:33 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '106.5529009', '2 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 08:36:12 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '106.5529009', '2 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 08:51:54 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '106.5529009', '2 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 09:40:19 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '106.5529009', '2 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 11:04:37 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '106.5529009', '2 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 16:00:57 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(150): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(75): LocationManager::phpGetLocation('11.0141011', '106.5529009')
+#5 /home/sgulabna/public_html/apps/findyourfriend/location.php(56): LocationManager::locationParse('11.0141011', '106.5529009')
+#6 /home/sgulabna/public_html/apps/findy in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[21-Sep-2014 16:08:46 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('11.0141011', '106.5529009', '10.871412559698...', '106.99333369731...')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('11.0141011', '1 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[22-Sep-2014 13:53:56 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(150): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(75): LocationManager::phpGetLocation('10.7685678', '106.6641087')
+#5 /home/sgulabna/public_html/apps/findyourfriend/location.php(56): LocationManager::locationParse('10.7685678', '106.6641087')
+#6 /home/sgulabna/public_html/apps/findy in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[22-Sep-2014 14:03:54 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 6: name lookup timed out' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('10.7685678', '106.6641087', '10.871412559698...', '106.99333369731...')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getUserInDistance('10.7685678', '1 in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291
+[25-Sep-2014 03:11:58 UTC] PHP Fatal error:  Cannot redeclare Send_Mail() (previously declared in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php:2) in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php on line 25
+[25-Sep-2014 03:12:06 UTC] PHP Fatal error:  Cannot redeclare Send_Mail() (previously declared in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php:2) in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php on line 25
+[25-Sep-2014 03:12:16 UTC] PHP Fatal error:  Cannot redeclare Send_Mail() (previously declared in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php:2) in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php on line 25
+[25-Sep-2014 03:12:39 UTC] PHP Fatal error:  Cannot redeclare Send_Mail() (previously declared in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php:2) in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php on line 25
+[25-Sep-2014 03:13:07 UTC] PHP Fatal error:  Cannot redeclare Send_Mail() (previously declared in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php:2) in /home/sgulabna/public_html/apps/findyourfriend/activation/smtp/Send_Mail.php on line 25
+[25-Sep-2014 17:56:34 UTC] PHP Warning:  mysql_error() expects parameter 1 to be resource, null given in /home/sgulabna/public_html/apps/findyourfriend/user.php on line 1084
+[25-Sep-2014 17:56:51 UTC] PHP Warning:  mysql_error() expects parameter 1 to be resource, null given in /home/sgulabna/public_html/apps/findyourfriend/user.php on line 1084
+[25-Sep-2014 18:01:37 UTC] PHP Warning:  mysql_error() expects parameter 1 to be resource, null given in /home/sgulabna/public_html/apps/findyourfriend/user.php on line 1084
+[25-Sep-2014 18:02:01 UTC] PHP Warning:  mysql_error() expects parameter 1 to be resource, null given in /home/sgulabna/public_html/apps/findyourfriend/user.php on line 1084
+[25-Sep-2014 21:20:02 UTC] PHP Fatal error:  Uncaught exception 'Requests_Exception' with message 'cURL error 28: Operation timed out after 10001 milliseconds with 0 bytes received' in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php:291
+Stack trace:
+#0 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php(126): Requests_Transport_cURL->process_response(false, Array)
+#1 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(325): Requests_Transport_cURL->request(Object(Requests_IRI), Array, NULL, Array)
+#2 /home/sgulabna/public_html/apps/findyourfriend/lib/Requests.php(199): Requests::request('http://maps.goo...', Array, NULL, 'GET', Array)
+#3 /home/sgulabna/public_html/apps/findyourfriend/location.php(167): Requests::get('http://maps.goo...')
+#4 /home/sgulabna/public_html/apps/findyourfriend/location.php(111): LocationManager::phpGetDistance('10.8252688', '106.6964261', '20.9885585', '105.840875')
+#5 /home/sgulabna/public_html/apps/findyourfriend/usermanager.php(105): LocationManager::getU in /home/sgulabna/public_html/apps/findyourfriend/lib/Requests/Transport/cURL.php on line 291

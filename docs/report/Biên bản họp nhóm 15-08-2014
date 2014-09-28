@@ -1,0 +1,13 @@
+Ngày 15-08-2014
+@Facebook
+
+*	Chủ đề: Tính năng tìm kiếm
+*	Thành viên: Quốc Vũ, Hữu Toàn, Tiến (phụ)
+*	Nội dung thảo luận:
+	1.	Tìm hiểu về Google Map API online
+		- Xác định khoảng giữa 2 điểm bằng các phương tiện
+		- Có thể sử dụng tọa độ hoặc địa chỉ trực tiếp
+	2.	Xây dựng các hàm tìm kiếm bạn bè
+		- Tìm kiếm bạn bè trong một phạm vi
+		- Tìm kiếm bạn bè theo từ khóa (tên, địa chỉ...)
+	3.	Fix bug về Latitude và Longtitude
