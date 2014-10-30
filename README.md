@@ -89,8 +89,7 @@ Dự án có sự tham gia của:
   
 
   Các thành viên hiện là đang học năm 3 tại trường Đại học Sài Gòn
-  Tất cả các thành viên đều đến từ trường Đại học FPT
-- Với sự hướng dẫn tận tình từ các mentor:
+ - Với sự hướng dẫn tận tình từ các mentor:
   + Chị [Nguyễn Thùy Linh]: Mentor chính, đồng thời là tác giả ý tưởng - [linhnt1601@gmail.com ](mailto:linhnt1601@gmail.com ) đến từ Viện Đại học Mở Hà Nội.
   
 ### Liên hệ hỗ trợ
